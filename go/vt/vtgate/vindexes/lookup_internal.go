@@ -61,8 +61,8 @@ func (lkp *lookupInternal) Init(lookupQueryParams map[string]string, autocommit,
 	// TODO @rafael: update sel and ver to support multi column vindexes. This will be done
 	// as part of face 2 of https://github.com/vitessio/vitess/issues/3481
 	// For now multi column behaves as a single column for Map and Verify operations
-	lkp.sel = fmt.Sprintf("select %s, %s from %s where %s in ::%s", lkp.FromColumns[0], lkp.To, lkp.Table, lkp.FromColumns[0], lkp.FromColumns[0])
-	lkp.ver = fmt.Sprintf("select %s from %s where %s = :%s and %s = :%s", lkp.FromColumns[0], lkp.Table, lkp.FromColumns[0], lkp.FromColumns[0], lkp.To, lkp.To)
+	lkp.sel = fmt.Sprintf("select %s, %s from %s where %s in ::%s", lkp.To, lookupQueryParams["from"], lkp.Table, lkp.FromColumns[0], lkp.FromColumns[0])
+	lkp.ver = fmt.Sprintf("select %s from %s where %s = :%s and %s = :%s", lookupQueryParams["from"], lkp.Table, lkp.FromColumns[0], lkp.FromColumns[0], lkp.To, lkp.To)
 	lkp.del = lkp.initDelStmt()
 	return nil
 }
@@ -96,9 +96,7 @@ func (lkp *lookupInternal) Lookup(vcursor VCursor, ids []sqltypes.Value, co vtga
 				return nil, fmt.Errorf("lookup.Map: %v", err)
 			}
 			rows := make([][]sqltypes.Value, 0, len(result.Rows))
-			for _, row := range result.Rows {
-				rows = append(rows, []sqltypes.Value{row[1]})
-			}
+			rows = append(rows, result.Rows...)
 			results = append(results, &sqltypes.Result{
 				Rows: rows,
 			})
@@ -118,7 +116,7 @@ func (lkp *lookupInternal) Lookup(vcursor VCursor, ids []sqltypes.Value, co vtga
 		}
 		resultMap := make(map[string][][]sqltypes.Value)
 		for _, row := range result.Rows {
-			resultMap[row[0].ToString()] = append(resultMap[row[0].ToString()], []sqltypes.Value{row[1]})
+			resultMap[row[1].ToString()] = append(resultMap[row[1].ToString()], row)
 		}
 
 		for _, id := range ids {

@@ -18,8 +18,10 @@ package vindexes
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"vitess.io/vitess/go/vt/vtgate/evalengine"
@@ -37,6 +39,9 @@ var (
 	_ SingleColumn  = (*ConsistentLookupUnique)(nil)
 	_ Lookup        = (*ConsistentLookupUnique)(nil)
 	_ WantOwnerInfo = (*ConsistentLookupUnique)(nil)
+	_ SingleColumn  = (*ConsistentLookupUniqueSlotted)(nil)
+	_ Lookup        = (*ConsistentLookupUniqueSlotted)(nil)
+	_ WantOwnerInfo = (*ConsistentLookupUniqueSlotted)(nil)
 	_ SingleColumn  = (*ConsistentLookup)(nil)
 	_ Lookup        = (*ConsistentLookup)(nil)
 	_ WantOwnerInfo = (*ConsistentLookup)(nil)
@@ -45,6 +50,7 @@ var (
 func init() {
 	Register("consistent_lookup", NewConsistentLookup)
 	Register("consistent_lookup_unique", NewConsistentLookupUnique)
+	Register("consistent_lookup_unique_slotted", NewConsistentLookupUniqueSlotted)
 }
 
 // ConsistentLookup is a non-unique lookup vindex that can stay
@@ -179,6 +185,116 @@ func (lu *ConsistentLookupUnique) Map(vcursor VCursor, ids []sqltypes.Value) ([]
 		}
 	}
 	return out, nil
+}
+
+//====================================================================
+
+type shardParams struct {
+	rangeSize uint64
+	slotRange uint64
+}
+
+// ConsistentLookupUniqueSlotted defines a vindex that uses a lookup table.
+// The table is expected to define the id column as unique. It's
+// Unique and a Lookup.
+type ConsistentLookupUniqueSlotted struct {
+	*clCommon
+	*shardParams
+}
+
+// NewConsistentLookupUniqueSlotted creates a ConsistentLookupUniqueSlotted vindex.
+// The supplied map has the following required fields:
+//   table: name of the backing table. It can be qualified by the keyspace.
+//   from: list of columns in the table that have the 'from' values of the lookup vindex.
+//   to: The 'to' column name of the table.
+func NewConsistentLookupUniqueSlotted(name string, m map[string]string) (Vindex, error) {
+	clc, err := newCLCommon(name, m)
+	if err != nil {
+		return nil, err
+	}
+
+	shard := &shardParams{}
+	if shardRangeSize, ok := m["shard_range_size"]; ok {
+		shard.rangeSize, err = strconv.ParseUint(shardRangeSize, 16, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if shardSlotRange, ok := m["shard_slot_range"]; ok {
+		shard.slotRange, err = strconv.ParseUint(shardSlotRange, 16, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &ConsistentLookupUniqueSlotted{clCommon: clc, shardParams: shard}, nil
+}
+
+// Cost returns the cost of this vindex as 10.
+func (lu *ConsistentLookupUniqueSlotted) Cost() int {
+	return 10
+}
+
+// IsUnique returns true since the Vindex is unique.
+func (lu *ConsistentLookupUniqueSlotted) IsUnique() bool {
+	return true
+}
+
+// NeedsVCursor satisfies the Vindex interface.
+func (lu *ConsistentLookupUniqueSlotted) NeedsVCursor() bool {
+	return true
+}
+
+// Map can map ids to key.Destination objects.
+func (lu *ConsistentLookupUniqueSlotted) Map(vcursor VCursor, ids []sqltypes.Value) ([]key.Destination, error) {
+	out := make([]key.Destination, 0, len(ids))
+	if lu.writeOnly {
+		for range ids {
+			out = append(out, key.DestinationKeyRange{KeyRange: &topodatapb.KeyRange{}})
+		}
+		return out, nil
+	}
+
+	results, err := lu.lkp.Lookup(vcursor, ids, vtgatepb.CommitOrder_PRE)
+	if err != nil {
+		return nil, err
+	}
+	for i, result := range results {
+		switch len(result.Rows) {
+		case 0:
+			out = append(out, key.DestinationNone{})
+		case 1:
+			id, _ := result.Rows[0][1].ToUint64()
+			slot, _ := result.Rows[0][2].ToUint64()
+			ksID := id + lu.shardParams.rangeSize*(slot/lu.shardParams.slotRange)
+
+			var keybytes [8]byte
+			binary.BigEndian.PutUint64(keybytes[:], ksID)
+			out = append(out, key.DestinationKeyspaceID(keybytes[:]))
+		default:
+			return nil, fmt.Errorf("Lookup.Map: unexpected multiple results from vindex %s: %v", lu.lkp.Table, ids[i])
+		}
+	}
+	return out, nil
+}
+
+// Verify returns true if ids maps to ksids.
+func (lu *ConsistentLookupUniqueSlotted) Verify(vcursor VCursor, ids []sqltypes.Value, ksids [][]byte) ([]bool, error) {
+	if lu.writeOnly {
+		out := make([]bool, len(ids))
+		for i := range ids {
+			out[i] = true
+		}
+		return out, nil
+	}
+
+	values := make([]sqltypes.Value, 0, len(ksids))
+	for _, ksid := range ksids {
+		val := string([]byte(ksid))
+		values = append(values, sqltypes.NewVarChar(val))
+	}
+
+	return lu.lkp.VerifyCustom(vcursor, ids, values, vtgate.CommitOrder_PRE)
 }
 
 //====================================================================
