@@ -29,6 +29,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"vitess.io/vitess/go/mysql"
 	"vitess.io/vitess/go/sqltypes"
 	"vitess.io/vitess/go/test/endtoend/cluster"
@@ -364,8 +365,8 @@ func TestUpdateLookupUniqueVindex(t *testing.T) {
 	exec(t, conn, `update t1 set c3 = 400 where c2 = 200`)
 	// changed - same vindex
 	exec(t, conn, `update t1 set c4 = 'abc' where c1 = 999`)
-	// not changed - same vindex - not yet supported bcoz of varchar field
-	// exec(t, conn, `update t1 set c4 = 'abc' where c4 = 'abc'`)
+	// not changed - same vindex
+	exec(t, conn, `update t1 set c4 = 'abc' where c4 = 'abc'`)
 
 }
 

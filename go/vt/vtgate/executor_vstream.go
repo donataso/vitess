@@ -67,7 +67,7 @@ func getVStreamStartPos(stmt *sqlparser.VStream) (string, error) {
 	if stmt.Where != nil {
 		switch v := stmt.Where.Expr.(type) {
 		case *sqlparser.ComparisonExpr:
-			if v.Operator == sqlparser.GreaterThanStr {
+			if v.Operator == sqlparser.GreaterThanOp {
 				switch c := v.Left.(type) {
 				case *sqlparser.ColName:
 					switch val := v.Right.(type) {
@@ -150,9 +150,8 @@ func (e *Executor) startVStream(ctx context.Context, keyspace string, shard stri
 	}
 	send := func(evs []*binlogdata.VEvent) error {
 		result := &sqltypes.Result{
-			Fields:       nil,
-			RowsAffected: 0,
-			Rows:         [][]sqltypes.Value{},
+			Fields: nil,
+			Rows:   [][]sqltypes.Value{},
 		}
 		for _, ev := range evs {
 			if totalRows+numRows >= limit {
@@ -188,7 +187,6 @@ func (e *Executor) startVStream(ctx context.Context, keyspace string, shard stri
 						break
 					}
 				}
-				result.RowsAffected = uint64(numRows)
 			default:
 			}
 		}

@@ -35,9 +35,14 @@ import (
 	"vitess.io/vitess/go/vt/vtgate/vindexes"
 	"vitess.io/vitess/go/vt/vttablet/tabletserver/schema"
 	"vitess.io/vitess/go/vt/vttablet/tabletserver/tabletenv"
+	"vitess.io/vitess/go/vt/vttablet/tabletserver/throttle"
 
 	binlogdatapb "vitess.io/vitess/go/vt/proto/binlogdata"
 	vschemapb "vitess.io/vitess/go/vt/proto/vschema"
+)
+
+const (
+	throttlerAppName = "vstreamer"
 )
 
 // Engine is the engine for handling vreplication streaming requests.
@@ -73,25 +78,31 @@ type Engine struct {
 	vschemaUpdates *stats.Counter
 
 	// vstreamer metrics
-	vstreamerPhaseTimings    *servenv.TimingsWrapper
-	vstreamerEventsStreamed  *stats.Counter
-	vstreamerPacketSize      *stats.GaugeFunc
-	vstreamerNumPackets      *stats.Counter
-	resultStreamerNumRows    *stats.Counter
-	resultStreamerNumPackets *stats.Counter
-	rowStreamerNumRows       *stats.Counter
-	rowStreamerNumPackets    *stats.Counter
+	vstreamerPhaseTimings     *servenv.TimingsWrapper
+	vstreamerEventsStreamed   *stats.Counter
+	vstreamerPacketSize       *stats.GaugeFunc
+	vstreamerNumPackets       *stats.Counter
+	resultStreamerNumRows     *stats.Counter
+	resultStreamerNumPackets  *stats.Counter
+	rowStreamerNumRows        *stats.Counter
+	rowStreamerNumPackets     *stats.Counter
+	errorCounts               *stats.CountersWithSingleLabel
+	vstreamersCreated         *stats.Counter
+	vstreamersEndedWithErrors *stats.Counter
+
+	throttlerClient *throttle.Client
 }
 
 // NewEngine creates a new Engine.
 // Initialization sequence is: NewEngine->InitDBConfig->Open.
 // Open and Close can be called multiple times and are idempotent.
-func NewEngine(env tabletenv.Env, ts srvtopo.Server, se *schema.Engine, cell string) *Engine {
+func NewEngine(env tabletenv.Env, ts srvtopo.Server, se *schema.Engine, lagThrottler *throttle.Throttler, cell string) *Engine {
 	vse := &Engine{
-		env:  env,
-		ts:   ts,
-		se:   se,
-		cell: cell,
+		env:             env,
+		ts:              ts,
+		se:              se,
+		cell:            cell,
+		throttlerClient: throttle.NewBackgroundClient(lagThrottler, throttlerAppName, throttle.ThrottleCheckSelf),
 
 		streamers:       make(map[int]*uvstreamer),
 		rowStreamers:    make(map[int]*rowStreamer),
@@ -102,14 +113,17 @@ func NewEngine(env tabletenv.Env, ts srvtopo.Server, se *schema.Engine, cell str
 		vschemaErrors:  env.Exporter().NewCounter("VSchemaErrors", "Count of VSchema errors"),
 		vschemaUpdates: env.Exporter().NewCounter("VSchemaUpdates", "Count of VSchema updates. Does not include errors"),
 
-		vstreamerPhaseTimings:    env.Exporter().NewTimings("VStreamerPhaseTiming", "Time taken for different phases during vstream copy", "phase-timing"),
-		vstreamerEventsStreamed:  env.Exporter().NewCounter("VStreamerEventsStreamed", "Count of events streamed in VStream API"),
-		vstreamerPacketSize:      env.Exporter().NewGaugeFunc("VStreamPacketSize", "Max packet size for sending vstreamer events", getPacketSize),
-		vstreamerNumPackets:      env.Exporter().NewCounter("VStreamerNumPackets", "Number of packets in vstreamer"),
-		resultStreamerNumPackets: env.Exporter().NewCounter("ResultStreamerNumPackets", "Number of packets in result streamer"),
-		resultStreamerNumRows:    env.Exporter().NewCounter("ResultStreamerNumRows", "Number of rows sent in result streamer"),
-		rowStreamerNumPackets:    env.Exporter().NewCounter("RowStreamerNumPackets", "Number of packets in row streamer"),
-		rowStreamerNumRows:       env.Exporter().NewCounter("RowStreamerNumRows", "Number of rows sent in row streamer"),
+		vstreamerPhaseTimings:     env.Exporter().NewTimings("VStreamerPhaseTiming", "Time taken for different phases during vstream copy", "phase-timing"),
+		vstreamerEventsStreamed:   env.Exporter().NewCounter("VStreamerEventsStreamed", "Count of events streamed in VStream API"),
+		vstreamerPacketSize:       env.Exporter().NewGaugeFunc("VStreamPacketSize", "Max packet size for sending vstreamer events", getPacketSize),
+		vstreamerNumPackets:       env.Exporter().NewCounter("VStreamerNumPackets", "Number of packets in vstreamer"),
+		resultStreamerNumPackets:  env.Exporter().NewCounter("ResultStreamerNumPackets", "Number of packets in result streamer"),
+		resultStreamerNumRows:     env.Exporter().NewCounter("ResultStreamerNumRows", "Number of rows sent in result streamer"),
+		rowStreamerNumPackets:     env.Exporter().NewCounter("RowStreamerNumPackets", "Number of packets in row streamer"),
+		rowStreamerNumRows:        env.Exporter().NewCounter("RowStreamerNumRows", "Number of rows sent in row streamer"),
+		vstreamersCreated:         env.Exporter().NewCounter("VStreamersCreated", "Count of vstreamers created"),
+		vstreamersEndedWithErrors: env.Exporter().NewCounter("VStreamersEndedWithErrors", "Count of vstreamers that ended with errors"),
+		errorCounts:               env.Exporter().NewCountersWithSingleLabel("VStreamerErrors", "Tracks errors in vstreamer", "type", "Catchup", "Copy", "Send", "TablePlan"),
 	}
 	env.Exporter().HandleFunc("/debug/tablet_vschema", vse.ServeHTTP)
 	return vse
@@ -172,6 +186,7 @@ func (vse *Engine) vschema() *vindexes.VSchema {
 }
 
 // Stream starts a new stream.
+// This streams events from the binary logs
 func (vse *Engine) Stream(ctx context.Context, startPos string, tablePKs []*binlogdatapb.TableLastPK, filter *binlogdatapb.Filter, send func([]*binlogdatapb.VEvent) error) error {
 	// Ensure vschema is initialized and the watcher is started.
 	// Starting of the watcher has to be delayed till the first call to Stream
@@ -211,6 +226,7 @@ func (vse *Engine) Stream(ctx context.Context, startPos string, tablePKs []*binl
 }
 
 // StreamRows streams rows.
+// This streams the table data rows (so we can copy the table data snapshot)
 func (vse *Engine) StreamRows(ctx context.Context, query string, lastpk []sqltypes.Value, send func(*binlogdatapb.VStreamRowsResponse) error) error {
 	// Ensure vschema is initialized and the watcher is started.
 	// Starting of the watcher has to be delayed till the first call to Stream
@@ -225,6 +241,7 @@ func (vse *Engine) StreamRows(ctx context.Context, query string, lastpk []sqltyp
 		if !vse.isOpen {
 			return nil, 0, errors.New("VStreamer is not open")
 		}
+
 		rowStreamer := newRowStreamer(ctx, vse.env.Config().DB.AppWithDB(), vse.se, query, lastpk, vse.lvschema, send, vse)
 		idx := vse.streamIdx
 		vse.rowStreamers[idx] = rowStreamer

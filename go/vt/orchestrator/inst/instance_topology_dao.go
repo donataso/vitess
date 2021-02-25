@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/patrickmn/go-cache"
+
 	"vitess.io/vitess/go/vt/orchestrator/config"
 	"vitess.io/vitess/go/vt/orchestrator/db"
 	"vitess.io/vitess/go/vt/orchestrator/external/golib/log"
@@ -806,7 +807,8 @@ func injectEmptyGTIDTransaction(instanceKey *InstanceKey, gtidEntry *OracleGtidS
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.Config.InstanceDBExecContextTimeoutSeconds)*time.Second)
+	defer cancel()
 	conn, err := db.Conn(ctx)
 	if err != nil {
 		return err

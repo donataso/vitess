@@ -77,8 +77,11 @@ type TestCase struct {
 	// query. The check is skipped if Result is nil.
 	Result [][]string
 
-	// Rows affected can be nil or an int.
+	// RowsAffected affected can be nil or an int.
 	RowsAffected interface{}
+
+	// 	RowsReturned affected can be nil or an int.
+	RowsReturned interface{}
 
 	// Rewritten specifies how the query should have be rewritten.
 	Rewritten []string
@@ -105,6 +108,9 @@ func (tc *TestCase) Test(name string, client *QueryClient) error {
 		name = tc.Name
 	}
 
+	// wait for all previous test cases to have been settled in cache
+	client.server.QueryPlanCacheWait()
+
 	catcher := NewQueryCatcher()
 	defer catcher.Close()
 
@@ -124,6 +130,13 @@ func (tc *TestCase) Test(name string, client *QueryClient) error {
 		want := tc.RowsAffected.(int)
 		if int(qr.RowsAffected) != want {
 			errs = append(errs, fmt.Sprintf("RowsAffected mismatch: %d, want %d", int(qr.RowsAffected), want))
+		}
+	}
+
+	if tc.RowsReturned != nil {
+		want := tc.RowsReturned.(int)
+		if len(qr.Rows) != want {
+			errs = append(errs, fmt.Sprintf("RowsReturned mismatch: %d, want %d", len(qr.Rows), want))
 		}
 	}
 

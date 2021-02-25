@@ -25,9 +25,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/golang/protobuf/proto"
+
 	"vitess.io/vitess/go/mysql"
 	"vitess.io/vitess/go/vt/vttablet/sandboxconn"
 
@@ -54,6 +55,7 @@ func TestMySQLProtocolExecute(t *testing.T) {
 
 	options := &querypb.ExecuteOptions{
 		IncludedFields: querypb.ExecuteOptions_ALL,
+		Workload:       querypb.ExecuteOptions_OLTP,
 	}
 	if !proto.Equal(sbc.Options[0], options) {
 		t.Errorf("got ExecuteOptions \n%+v, want \n%+v", sbc.Options[0], options)
@@ -159,7 +161,9 @@ func TestMySQLProtocolClientFoundRows(t *testing.T) {
 	options := &querypb.ExecuteOptions{
 		IncludedFields:  querypb.ExecuteOptions_ALL,
 		ClientFoundRows: true,
+		Workload:        querypb.ExecuteOptions_OLTP,
 	}
+
 	if !proto.Equal(sbc.Options[0], options) {
 		t.Errorf("got ExecuteOptions \n%+v, want \n%+v", sbc.Options[0], options)
 	}

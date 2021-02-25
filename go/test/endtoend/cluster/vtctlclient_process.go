@@ -21,6 +21,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"vitess.io/vitess/go/vt/vterrors"
+
 	"vitess.io/vitess/go/vt/log"
 )
 
@@ -47,12 +49,24 @@ func (vtctlclient *VtctlClientProcess) InitShardMaster(Keyspace string, Shard st
 	return err
 }
 
-// ApplySchema applies SQL schema to the keyspace
-func (vtctlclient *VtctlClientProcess) ApplySchema(Keyspace string, SQL string) (err error) {
-	return vtctlclient.ExecuteCommand(
+// ApplySchemaWithOutput applies SQL schema to the keyspace
+func (vtctlclient *VtctlClientProcess) ApplySchemaWithOutput(Keyspace string, SQL string, ddlStrategy string) (result string, err error) {
+	args := []string{
 		"ApplySchema",
 		"-sql", SQL,
-		Keyspace)
+	}
+	if ddlStrategy != "" {
+		args = append(args, "-ddl_strategy", ddlStrategy)
+	}
+	args = append(args, Keyspace)
+	return vtctlclient.ExecuteCommandWithOutput(args...)
+}
+
+// ApplySchema applies SQL schema to the keyspace
+func (vtctlclient *VtctlClientProcess) ApplySchema(Keyspace string, SQL string) error {
+	message, err := vtctlclient.ApplySchemaWithOutput(Keyspace, SQL, "direct")
+
+	return vterrors.Wrap(err, message)
 }
 
 // ApplyVSchema applies vitess schema (JSON format) to the keyspace
@@ -61,6 +75,50 @@ func (vtctlclient *VtctlClientProcess) ApplyVSchema(Keyspace string, JSON string
 		"ApplyVSchema",
 		"-vschema", JSON,
 		Keyspace,
+	)
+}
+
+// ApplyRoutingRules does it
+func (vtctlclient *VtctlClientProcess) ApplyRoutingRules(JSON string) (err error) {
+	return vtctlclient.ExecuteCommand("ApplyRoutingRules", "-rules", JSON)
+}
+
+// OnlineDDLShowRecent responds with recent schema migration list
+func (vtctlclient *VtctlClientProcess) OnlineDDLShowRecent(Keyspace string) (result string, err error) {
+	return vtctlclient.ExecuteCommandWithOutput(
+		"OnlineDDL",
+		Keyspace,
+		"show",
+		"recent",
+	)
+}
+
+// OnlineDDLCancelMigration cancels a given migration uuid
+func (vtctlclient *VtctlClientProcess) OnlineDDLCancelMigration(Keyspace, uuid string) (result string, err error) {
+	return vtctlclient.ExecuteCommandWithOutput(
+		"OnlineDDL",
+		Keyspace,
+		"cancel",
+		uuid,
+	)
+}
+
+// OnlineDDLCancelAllMigrations cancels all migrations for a keyspace
+func (vtctlclient *VtctlClientProcess) OnlineDDLCancelAllMigrations(Keyspace string) (result string, err error) {
+	return vtctlclient.ExecuteCommandWithOutput(
+		"OnlineDDL",
+		Keyspace,
+		"cancel-all",
+	)
+}
+
+// OnlineDDLRetryMigration retries a given migration uuid
+func (vtctlclient *VtctlClientProcess) OnlineDDLRetryMigration(Keyspace, uuid string) (result string, err error) {
+	return vtctlclient.ExecuteCommandWithOutput(
+		"OnlineDDL",
+		Keyspace,
+		"retry",
+		uuid,
 	)
 }
 

@@ -21,9 +21,10 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/golang/protobuf/proto"
+
 	"vitess.io/vitess/go/sqltypes"
 	"vitess.io/vitess/go/vt/discovery"
 	"vitess.io/vitess/go/vt/vterrors"
@@ -100,7 +101,9 @@ func TestVTGateExecute(t *testing.T) {
 	if err != nil {
 		t.Errorf("want nil, got %v", err)
 	}
-	if !reflect.DeepEqual(sandboxconn.SingleRowResult, qr) {
+	want := *sandboxconn.SingleRowResult
+	want.StatusFlags = 0 // VTGate result set does not contain status flags in sqltypes.Result
+	if !reflect.DeepEqual(&want, qr) {
 		t.Errorf("want \n%+v, got \n%+v", sandboxconn.SingleRowResult, qr)
 	}
 	if !proto.Equal(sbc.Options[0], executeOptions) {
@@ -125,7 +128,9 @@ func TestVTGateExecuteWithKeyspaceShard(t *testing.T) {
 	if err != nil {
 		t.Errorf("want nil, got %v", err)
 	}
-	if !reflect.DeepEqual(sandboxconn.SingleRowResult, qr) {
+	wantQr := *sandboxconn.SingleRowResult
+	wantQr.StatusFlags = 0 // VTGate result set does not contain status flags in sqltypes.Result
+	if !reflect.DeepEqual(&wantQr, qr) {
 		t.Errorf("want \n%+v, got \n%+v", sandboxconn.SingleRowResult, qr)
 	}
 
@@ -155,7 +160,7 @@ func TestVTGateExecuteWithKeyspaceShard(t *testing.T) {
 	if err != nil {
 		t.Errorf("want nil, got %v", err)
 	}
-	if !reflect.DeepEqual(sandboxconn.SingleRowResult, qr) {
+	if !reflect.DeepEqual(&wantQr, qr) {
 		t.Errorf("want \n%+v, got \n%+v", sandboxconn.SingleRowResult, qr)
 	}
 

@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"vitess.io/vitess/go/sqltypes"
 	"vitess.io/vitess/go/streamlog"
@@ -61,6 +61,7 @@ type LogStats struct {
 	TransactionID        int64
 	ReservedID           int64
 	Error                error
+	CachedPlan           bool
 }
 
 // NewLogStats constructs a new LogStats with supplied Method and ctx

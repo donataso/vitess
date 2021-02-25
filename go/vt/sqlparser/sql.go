@@ -15,8 +15,8 @@ func setAllowComments(yylex interface{}, allow bool) {
 	yylex.(*Tokenizer).AllowComments = allow
 }
 
-func setDDL(yylex interface{}, ddl *DDL) {
-	yylex.(*Tokenizer).partialDDL = ddl
+func setDDL(yylex interface{}, node Statement) {
+	yylex.(*Tokenizer).partialDDL = node
 }
 
 func incNesting(yylex interface{}) bool {
@@ -40,74 +40,103 @@ func skipToEnd(yylex interface{}) {
 
 //line sql.y:53
 type yySymType struct {
-	yys                  int
-	empty                struct{}
-	statement            Statement
-	selStmt              SelectStatement
-	ddl                  *DDL
-	ins                  *Insert
-	byt                  byte
-	bytes                []byte
-	bytes2               [][]byte
-	str                  string
-	strs                 []string
-	selectExprs          SelectExprs
-	selectExpr           SelectExpr
-	columns              Columns
-	partitions           Partitions
-	colName              *ColName
-	tableExprs           TableExprs
-	tableExpr            TableExpr
-	joinCondition        JoinCondition
-	tableName            TableName
-	tableNames           TableNames
-	indexHints           *IndexHints
-	expr                 Expr
-	exprs                Exprs
-	boolVal              BoolVal
-	boolean              bool
-	literal              *Literal
-	colTuple             ColTuple
-	values               Values
-	valTuple             ValTuple
-	subquery             *Subquery
-	whens                []*When
-	when                 *When
-	orderBy              OrderBy
-	order                *Order
-	limit                *Limit
-	updateExprs          UpdateExprs
-	setExprs             SetExprs
-	updateExpr           *UpdateExpr
-	setExpr              *SetExpr
-	characteristic       Characteristic
-	characteristics      []Characteristic
-	colIdent             ColIdent
-	tableIdent           TableIdent
-	convertType          *ConvertType
-	aliasedTableName     *AliasedTableExpr
-	TableSpec            *TableSpec
-	columnType           ColumnType
-	colKeyOpt            ColumnKeyOption
-	optVal               Expr
-	LengthScaleOption    LengthScaleOption
-	columnDefinition     *ColumnDefinition
-	indexDefinition      *IndexDefinition
-	indexInfo            *IndexInfo
-	indexOption          *IndexOption
-	indexOptions         []*IndexOption
-	indexColumn          *IndexColumn
-	indexColumns         []*IndexColumn
-	constraintDefinition *ConstraintDefinition
-	constraintInfo       ConstraintInfo
-	ReferenceAction      ReferenceAction
-	partDefs             []*PartitionDefinition
-	partDef              *PartitionDefinition
-	partSpec             *PartitionSpec
-	vindexParam          VindexParam
-	vindexParams         []VindexParam
-	showFilter           *ShowFilter
-	optLike              *OptLike
+	yys                    int
+	empty                  struct{}
+	statement              Statement
+	selStmt                SelectStatement
+	ins                    *Insert
+	byt                    byte
+	bytes                  []byte
+	bytes2                 [][]byte
+	str                    string
+	strs                   []string
+	selectExprs            SelectExprs
+	selectExpr             SelectExpr
+	columns                Columns
+	partitions             Partitions
+	colName                *ColName
+	tableExprs             TableExprs
+	tableExpr              TableExpr
+	joinCondition          JoinCondition
+	tableName              TableName
+	tableNames             TableNames
+	indexHints             *IndexHints
+	expr                   Expr
+	exprs                  Exprs
+	boolVal                BoolVal
+	boolean                bool
+	literal                *Literal
+	colTuple               ColTuple
+	values                 Values
+	valTuple               ValTuple
+	subquery               *Subquery
+	derivedTable           *DerivedTable
+	whens                  []*When
+	when                   *When
+	orderBy                OrderBy
+	order                  *Order
+	limit                  *Limit
+	updateExprs            UpdateExprs
+	setExprs               SetExprs
+	updateExpr             *UpdateExpr
+	setExpr                *SetExpr
+	characteristic         Characteristic
+	characteristics        []Characteristic
+	colIdent               ColIdent
+	tableIdent             TableIdent
+	convertType            *ConvertType
+	aliasedTableName       *AliasedTableExpr
+	TableSpec              *TableSpec
+	columnType             ColumnType
+	colKeyOpt              ColumnKeyOption
+	optVal                 Expr
+	LengthScaleOption      LengthScaleOption
+	columnDefinition       *ColumnDefinition
+	columnDefinitions      []*ColumnDefinition
+	indexDefinition        *IndexDefinition
+	indexInfo              *IndexInfo
+	indexOption            *IndexOption
+	indexOptions           []*IndexOption
+	indexColumn            *IndexColumn
+	indexColumns           []*IndexColumn
+	constraintDefinition   *ConstraintDefinition
+	constraintInfo         ConstraintInfo
+	ReferenceAction        ReferenceAction
+	partDefs               []*PartitionDefinition
+	partDef                *PartitionDefinition
+	partSpec               *PartitionSpec
+	partSpecs              []*PartitionSpec
+	vindexParam            VindexParam
+	vindexParams           []VindexParam
+	showFilter             *ShowFilter
+	optLike                *OptLike
+	isolationLevel         IsolationLevel
+	insertAction           InsertAction
+	scope                  Scope
+	ignore                 Ignore
+	lock                   Lock
+	joinType               JoinType
+	comparisonExprOperator ComparisonExprOperator
+	isExprOperator         IsExprOperator
+	matchExprOption        MatchExprOption
+	orderDirection         OrderDirection
+	explainType            ExplainType
+	selectInto             *SelectInto
+	createDatabase         *CreateDatabase
+	alterDatabase          *AlterDatabase
+	collateAndCharset      CollateAndCharset
+	collateAndCharsets     []CollateAndCharset
+	createTable            *CreateTable
+	tableAndLockTypes      []*TableAndLockType
+	tableAndLockType       *TableAndLockType
+	lockType               LockType
+	alterTable             *AlterTable
+	alterOption            AlterOption
+	alterOptions           []AlterOption
+	tableOption            *TableOption
+	tableOptions           TableOptions
+	renameTablePairs       []*RenameTablePair
+	columnTypeOptions      *ColumnTypeOptions
 }
 
 const LEX_ERROR = 57346
@@ -142,318 +171,421 @@ const LOCK = 57374
 const UNLOCK = 57375
 const KEYS = 57376
 const DO = 57377
-const DISTINCTROW = 57378
-const VALUES = 57379
-const LAST_INSERT_ID = 57380
-const NEXT = 57381
-const VALUE = 57382
-const SHARE = 57383
-const MODE = 57384
-const SQL_NO_CACHE = 57385
-const SQL_CACHE = 57386
-const SQL_CALC_FOUND_ROWS = 57387
-const JOIN = 57388
-const STRAIGHT_JOIN = 57389
-const LEFT = 57390
-const RIGHT = 57391
-const INNER = 57392
-const OUTER = 57393
-const CROSS = 57394
-const NATURAL = 57395
-const USE = 57396
-const FORCE = 57397
-const ON = 57398
-const USING = 57399
-const ID = 57400
-const AT_ID = 57401
-const AT_AT_ID = 57402
-const HEX = 57403
-const STRING = 57404
-const INTEGRAL = 57405
-const FLOAT = 57406
-const HEXNUM = 57407
-const VALUE_ARG = 57408
-const LIST_ARG = 57409
-const COMMENT = 57410
-const COMMENT_KEYWORD = 57411
-const BIT_LITERAL = 57412
-const NULL = 57413
-const TRUE = 57414
-const FALSE = 57415
-const OFF = 57416
-const OR = 57417
-const XOR = 57418
-const AND = 57419
-const NOT = 57420
-const BETWEEN = 57421
-const CASE = 57422
-const WHEN = 57423
-const THEN = 57424
-const ELSE = 57425
-const END = 57426
-const LE = 57427
-const GE = 57428
-const NE = 57429
-const NULL_SAFE_EQUAL = 57430
-const IS = 57431
-const LIKE = 57432
-const REGEXP = 57433
-const IN = 57434
-const SHIFT_LEFT = 57435
-const SHIFT_RIGHT = 57436
-const DIV = 57437
-const MOD = 57438
-const UNARY = 57439
-const COLLATE = 57440
-const BINARY = 57441
-const UNDERSCORE_BINARY = 57442
-const UNDERSCORE_UTF8MB4 = 57443
-const UNDERSCORE_UTF8 = 57444
-const UNDERSCORE_LATIN1 = 57445
-const INTERVAL = 57446
-const JSON_EXTRACT_OP = 57447
-const JSON_UNQUOTE_EXTRACT_OP = 57448
-const CREATE = 57449
-const ALTER = 57450
-const DROP = 57451
-const RENAME = 57452
-const ANALYZE = 57453
-const ADD = 57454
-const FLUSH = 57455
-const SCHEMA = 57456
-const TABLE = 57457
-const INDEX = 57458
-const VIEW = 57459
-const TO = 57460
-const IGNORE = 57461
-const IF = 57462
-const UNIQUE = 57463
-const PRIMARY = 57464
-const COLUMN = 57465
-const SPATIAL = 57466
-const FULLTEXT = 57467
-const KEY_BLOCK_SIZE = 57468
-const CHECK = 57469
-const INDEXES = 57470
-const ACTION = 57471
-const CASCADE = 57472
-const CONSTRAINT = 57473
-const FOREIGN = 57474
-const NO = 57475
-const REFERENCES = 57476
-const RESTRICT = 57477
-const SHOW = 57478
-const DESCRIBE = 57479
-const EXPLAIN = 57480
-const DATE = 57481
-const ESCAPE = 57482
-const REPAIR = 57483
-const OPTIMIZE = 57484
-const TRUNCATE = 57485
-const MAXVALUE = 57486
-const PARTITION = 57487
-const REORGANIZE = 57488
-const LESS = 57489
-const THAN = 57490
-const PROCEDURE = 57491
-const TRIGGER = 57492
-const VINDEX = 57493
-const VINDEXES = 57494
-const STATUS = 57495
-const VARIABLES = 57496
-const WARNINGS = 57497
-const SEQUENCE = 57498
-const BEGIN = 57499
-const START = 57500
-const TRANSACTION = 57501
-const COMMIT = 57502
-const ROLLBACK = 57503
-const SAVEPOINT = 57504
-const RELEASE = 57505
-const WORK = 57506
-const BIT = 57507
-const TINYINT = 57508
-const SMALLINT = 57509
-const MEDIUMINT = 57510
-const INT = 57511
-const INTEGER = 57512
-const BIGINT = 57513
-const INTNUM = 57514
-const REAL = 57515
-const DOUBLE = 57516
-const FLOAT_TYPE = 57517
-const DECIMAL = 57518
-const NUMERIC = 57519
-const TIME = 57520
-const TIMESTAMP = 57521
-const DATETIME = 57522
-const YEAR = 57523
-const CHAR = 57524
-const VARCHAR = 57525
-const BOOL = 57526
-const CHARACTER = 57527
-const VARBINARY = 57528
-const NCHAR = 57529
-const TEXT = 57530
-const TINYTEXT = 57531
-const MEDIUMTEXT = 57532
-const LONGTEXT = 57533
-const BLOB = 57534
-const TINYBLOB = 57535
-const MEDIUMBLOB = 57536
-const LONGBLOB = 57537
-const JSON = 57538
-const ENUM = 57539
-const GEOMETRY = 57540
-const POINT = 57541
-const LINESTRING = 57542
-const POLYGON = 57543
-const GEOMETRYCOLLECTION = 57544
-const MULTIPOINT = 57545
-const MULTILINESTRING = 57546
-const MULTIPOLYGON = 57547
-const NULLX = 57548
-const AUTO_INCREMENT = 57549
-const APPROXNUM = 57550
-const SIGNED = 57551
-const UNSIGNED = 57552
-const ZEROFILL = 57553
-const COLLATION = 57554
-const DATABASES = 57555
-const TABLES = 57556
-const VITESS_METADATA = 57557
-const VSCHEMA = 57558
-const FULL = 57559
-const PROCESSLIST = 57560
-const COLUMNS = 57561
-const FIELDS = 57562
-const ENGINES = 57563
-const PLUGINS = 57564
-const EXTENDED = 57565
-const NAMES = 57566
-const CHARSET = 57567
-const GLOBAL = 57568
-const SESSION = 57569
-const ISOLATION = 57570
-const LEVEL = 57571
-const READ = 57572
-const WRITE = 57573
-const ONLY = 57574
-const REPEATABLE = 57575
-const COMMITTED = 57576
-const UNCOMMITTED = 57577
-const SERIALIZABLE = 57578
-const CURRENT_TIMESTAMP = 57579
-const DATABASE = 57580
-const CURRENT_DATE = 57581
-const CURRENT_TIME = 57582
-const LOCALTIME = 57583
-const LOCALTIMESTAMP = 57584
-const UTC_DATE = 57585
-const UTC_TIME = 57586
-const UTC_TIMESTAMP = 57587
-const REPLACE = 57588
-const CONVERT = 57589
-const CAST = 57590
-const SUBSTR = 57591
-const SUBSTRING = 57592
-const GROUP_CONCAT = 57593
-const SEPARATOR = 57594
-const TIMESTAMPADD = 57595
-const TIMESTAMPDIFF = 57596
-const MATCH = 57597
-const AGAINST = 57598
-const BOOLEAN = 57599
-const LANGUAGE = 57600
-const WITH = 57601
-const QUERY = 57602
-const EXPANSION = 57603
-const UNUSED = 57604
-const ARRAY = 57605
-const CUME_DIST = 57606
-const DESCRIPTION = 57607
-const DENSE_RANK = 57608
-const EMPTY = 57609
-const EXCEPT = 57610
-const FIRST_VALUE = 57611
-const GROUPING = 57612
-const GROUPS = 57613
-const JSON_TABLE = 57614
-const LAG = 57615
-const LAST_VALUE = 57616
-const LATERAL = 57617
-const LEAD = 57618
-const MEMBER = 57619
-const NTH_VALUE = 57620
-const NTILE = 57621
-const OF = 57622
-const OVER = 57623
-const PERCENT_RANK = 57624
-const RANK = 57625
-const RECURSIVE = 57626
-const ROW_NUMBER = 57627
-const SYSTEM = 57628
-const WINDOW = 57629
-const ACTIVE = 57630
-const ADMIN = 57631
-const BUCKETS = 57632
-const CLONE = 57633
-const COMPONENT = 57634
-const DEFINITION = 57635
-const ENFORCED = 57636
-const EXCLUDE = 57637
-const FOLLOWING = 57638
-const GEOMCOLLECTION = 57639
-const GET_MASTER_PUBLIC_KEY = 57640
-const HISTOGRAM = 57641
-const HISTORY = 57642
-const INACTIVE = 57643
-const INVISIBLE = 57644
-const LOCKED = 57645
-const MASTER_COMPRESSION_ALGORITHMS = 57646
-const MASTER_PUBLIC_KEY_PATH = 57647
-const MASTER_TLS_CIPHERSUITES = 57648
-const MASTER_ZSTD_COMPRESSION_LEVEL = 57649
-const NESTED = 57650
-const NETWORK_NAMESPACE = 57651
-const NOWAIT = 57652
-const NULLS = 57653
-const OJ = 57654
-const OLD = 57655
-const OPTIONAL = 57656
-const ORDINALITY = 57657
-const ORGANIZATION = 57658
-const OTHERS = 57659
-const PATH = 57660
-const PERSIST = 57661
-const PERSIST_ONLY = 57662
-const PRECEDING = 57663
-const PRIVILEGE_CHECKS_USER = 57664
-const PROCESS = 57665
-const RANDOM = 57666
-const REFERENCE = 57667
-const REQUIRE_ROW_FORMAT = 57668
-const RESOURCE = 57669
-const RESPECT = 57670
-const RESTART = 57671
-const RETAIN = 57672
-const REUSE = 57673
-const ROLE = 57674
-const SECONDARY = 57675
-const SECONDARY_ENGINE = 57676
-const SECONDARY_LOAD = 57677
-const SECONDARY_UNLOAD = 57678
-const SKIP = 57679
-const SRID = 57680
-const THREAD_PRIORITY = 57681
-const TIES = 57682
-const UNBOUNDED = 57683
-const VCPU = 57684
-const VISIBLE = 57685
-const FORMAT = 57686
-const TREE = 57687
-const VITESS = 57688
-const TRADITIONAL = 57689
+const CALL = 57378
+const DISTINCTROW = 57379
+const PARSER = 57380
+const OUTFILE = 57381
+const S3 = 57382
+const DATA = 57383
+const LOAD = 57384
+const LINES = 57385
+const TERMINATED = 57386
+const ESCAPED = 57387
+const ENCLOSED = 57388
+const DUMPFILE = 57389
+const CSV = 57390
+const HEADER = 57391
+const MANIFEST = 57392
+const OVERWRITE = 57393
+const STARTING = 57394
+const OPTIONALLY = 57395
+const VALUES = 57396
+const LAST_INSERT_ID = 57397
+const NEXT = 57398
+const VALUE = 57399
+const SHARE = 57400
+const MODE = 57401
+const SQL_NO_CACHE = 57402
+const SQL_CACHE = 57403
+const SQL_CALC_FOUND_ROWS = 57404
+const JOIN = 57405
+const STRAIGHT_JOIN = 57406
+const LEFT = 57407
+const RIGHT = 57408
+const INNER = 57409
+const OUTER = 57410
+const CROSS = 57411
+const NATURAL = 57412
+const USE = 57413
+const FORCE = 57414
+const ON = 57415
+const USING = 57416
+const INPLACE = 57417
+const COPY = 57418
+const ALGORITHM = 57419
+const NONE = 57420
+const SHARED = 57421
+const EXCLUSIVE = 57422
+const ID = 57423
+const AT_ID = 57424
+const AT_AT_ID = 57425
+const HEX = 57426
+const STRING = 57427
+const INTEGRAL = 57428
+const FLOAT = 57429
+const HEXNUM = 57430
+const VALUE_ARG = 57431
+const LIST_ARG = 57432
+const COMMENT = 57433
+const COMMENT_KEYWORD = 57434
+const BIT_LITERAL = 57435
+const COMPRESSION = 57436
+const NULL = 57437
+const TRUE = 57438
+const FALSE = 57439
+const OFF = 57440
+const DISCARD = 57441
+const IMPORT = 57442
+const ENABLE = 57443
+const DISABLE = 57444
+const TABLESPACE = 57445
+const OR = 57446
+const XOR = 57447
+const AND = 57448
+const NOT = 57449
+const BETWEEN = 57450
+const CASE = 57451
+const WHEN = 57452
+const THEN = 57453
+const ELSE = 57454
+const END = 57455
+const LE = 57456
+const GE = 57457
+const NE = 57458
+const NULL_SAFE_EQUAL = 57459
+const IS = 57460
+const LIKE = 57461
+const REGEXP = 57462
+const IN = 57463
+const SHIFT_LEFT = 57464
+const SHIFT_RIGHT = 57465
+const DIV = 57466
+const MOD = 57467
+const UNARY = 57468
+const COLLATE = 57469
+const BINARY = 57470
+const UNDERSCORE_BINARY = 57471
+const UNDERSCORE_UTF8MB4 = 57472
+const UNDERSCORE_UTF8 = 57473
+const UNDERSCORE_LATIN1 = 57474
+const INTERVAL = 57475
+const JSON_EXTRACT_OP = 57476
+const JSON_UNQUOTE_EXTRACT_OP = 57477
+const CREATE = 57478
+const ALTER = 57479
+const DROP = 57480
+const RENAME = 57481
+const ANALYZE = 57482
+const ADD = 57483
+const FLUSH = 57484
+const CHANGE = 57485
+const MODIFY = 57486
+const SCHEMA = 57487
+const TABLE = 57488
+const INDEX = 57489
+const VIEW = 57490
+const TO = 57491
+const IGNORE = 57492
+const IF = 57493
+const UNIQUE = 57494
+const PRIMARY = 57495
+const COLUMN = 57496
+const SPATIAL = 57497
+const FULLTEXT = 57498
+const KEY_BLOCK_SIZE = 57499
+const CHECK = 57500
+const INDEXES = 57501
+const ACTION = 57502
+const CASCADE = 57503
+const CONSTRAINT = 57504
+const FOREIGN = 57505
+const NO = 57506
+const REFERENCES = 57507
+const RESTRICT = 57508
+const SHOW = 57509
+const DESCRIBE = 57510
+const EXPLAIN = 57511
+const DATE = 57512
+const ESCAPE = 57513
+const REPAIR = 57514
+const OPTIMIZE = 57515
+const TRUNCATE = 57516
+const COALESCE = 57517
+const EXCHANGE = 57518
+const REBUILD = 57519
+const PARTITIONING = 57520
+const REMOVE = 57521
+const MAXVALUE = 57522
+const PARTITION = 57523
+const REORGANIZE = 57524
+const LESS = 57525
+const THAN = 57526
+const PROCEDURE = 57527
+const TRIGGER = 57528
+const VINDEX = 57529
+const VINDEXES = 57530
+const DIRECTORY = 57531
+const NAME = 57532
+const UPGRADE = 57533
+const STATUS = 57534
+const VARIABLES = 57535
+const WARNINGS = 57536
+const CASCADED = 57537
+const DEFINER = 57538
+const OPTION = 57539
+const SQL = 57540
+const UNDEFINED = 57541
+const SEQUENCE = 57542
+const MERGE = 57543
+const TEMPORARY = 57544
+const TEMPTABLE = 57545
+const INVOKER = 57546
+const SECURITY = 57547
+const FIRST = 57548
+const AFTER = 57549
+const LAST = 57550
+const BEGIN = 57551
+const START = 57552
+const TRANSACTION = 57553
+const COMMIT = 57554
+const ROLLBACK = 57555
+const SAVEPOINT = 57556
+const RELEASE = 57557
+const WORK = 57558
+const BIT = 57559
+const TINYINT = 57560
+const SMALLINT = 57561
+const MEDIUMINT = 57562
+const INT = 57563
+const INTEGER = 57564
+const BIGINT = 57565
+const INTNUM = 57566
+const REAL = 57567
+const DOUBLE = 57568
+const FLOAT_TYPE = 57569
+const DECIMAL = 57570
+const NUMERIC = 57571
+const TIME = 57572
+const TIMESTAMP = 57573
+const DATETIME = 57574
+const YEAR = 57575
+const CHAR = 57576
+const VARCHAR = 57577
+const BOOL = 57578
+const CHARACTER = 57579
+const VARBINARY = 57580
+const NCHAR = 57581
+const TEXT = 57582
+const TINYTEXT = 57583
+const MEDIUMTEXT = 57584
+const LONGTEXT = 57585
+const BLOB = 57586
+const TINYBLOB = 57587
+const MEDIUMBLOB = 57588
+const LONGBLOB = 57589
+const JSON = 57590
+const ENUM = 57591
+const GEOMETRY = 57592
+const POINT = 57593
+const LINESTRING = 57594
+const POLYGON = 57595
+const GEOMETRYCOLLECTION = 57596
+const MULTIPOINT = 57597
+const MULTILINESTRING = 57598
+const MULTIPOLYGON = 57599
+const NULLX = 57600
+const AUTO_INCREMENT = 57601
+const APPROXNUM = 57602
+const SIGNED = 57603
+const UNSIGNED = 57604
+const ZEROFILL = 57605
+const COLLATION = 57606
+const DATABASES = 57607
+const SCHEMAS = 57608
+const TABLES = 57609
+const VITESS_METADATA = 57610
+const VSCHEMA = 57611
+const FULL = 57612
+const PROCESSLIST = 57613
+const COLUMNS = 57614
+const FIELDS = 57615
+const ENGINES = 57616
+const PLUGINS = 57617
+const EXTENDED = 57618
+const KEYSPACES = 57619
+const VITESS_KEYSPACES = 57620
+const VITESS_SHARDS = 57621
+const VITESS_TABLETS = 57622
+const CODE = 57623
+const PRIVILEGES = 57624
+const FUNCTION = 57625
+const OPEN = 57626
+const TRIGGERS = 57627
+const EVENT = 57628
+const USER = 57629
+const NAMES = 57630
+const CHARSET = 57631
+const GLOBAL = 57632
+const SESSION = 57633
+const ISOLATION = 57634
+const LEVEL = 57635
+const READ = 57636
+const WRITE = 57637
+const ONLY = 57638
+const REPEATABLE = 57639
+const COMMITTED = 57640
+const UNCOMMITTED = 57641
+const SERIALIZABLE = 57642
+const CURRENT_TIMESTAMP = 57643
+const DATABASE = 57644
+const CURRENT_DATE = 57645
+const CURRENT_TIME = 57646
+const LOCALTIME = 57647
+const LOCALTIMESTAMP = 57648
+const CURRENT_USER = 57649
+const UTC_DATE = 57650
+const UTC_TIME = 57651
+const UTC_TIMESTAMP = 57652
+const REPLACE = 57653
+const CONVERT = 57654
+const CAST = 57655
+const SUBSTR = 57656
+const SUBSTRING = 57657
+const GROUP_CONCAT = 57658
+const SEPARATOR = 57659
+const TIMESTAMPADD = 57660
+const TIMESTAMPDIFF = 57661
+const MATCH = 57662
+const AGAINST = 57663
+const BOOLEAN = 57664
+const LANGUAGE = 57665
+const WITH = 57666
+const QUERY = 57667
+const EXPANSION = 57668
+const WITHOUT = 57669
+const VALIDATION = 57670
+const UNUSED = 57671
+const ARRAY = 57672
+const CUME_DIST = 57673
+const DESCRIPTION = 57674
+const DENSE_RANK = 57675
+const EMPTY = 57676
+const EXCEPT = 57677
+const FIRST_VALUE = 57678
+const GROUPING = 57679
+const GROUPS = 57680
+const JSON_TABLE = 57681
+const LAG = 57682
+const LAST_VALUE = 57683
+const LATERAL = 57684
+const LEAD = 57685
+const MEMBER = 57686
+const NTH_VALUE = 57687
+const NTILE = 57688
+const OF = 57689
+const OVER = 57690
+const PERCENT_RANK = 57691
+const RANK = 57692
+const RECURSIVE = 57693
+const ROW_NUMBER = 57694
+const SYSTEM = 57695
+const WINDOW = 57696
+const ACTIVE = 57697
+const ADMIN = 57698
+const BUCKETS = 57699
+const CLONE = 57700
+const COMPONENT = 57701
+const DEFINITION = 57702
+const ENFORCED = 57703
+const EXCLUDE = 57704
+const FOLLOWING = 57705
+const GEOMCOLLECTION = 57706
+const GET_MASTER_PUBLIC_KEY = 57707
+const HISTOGRAM = 57708
+const HISTORY = 57709
+const INACTIVE = 57710
+const INVISIBLE = 57711
+const LOCKED = 57712
+const MASTER_COMPRESSION_ALGORITHMS = 57713
+const MASTER_PUBLIC_KEY_PATH = 57714
+const MASTER_TLS_CIPHERSUITES = 57715
+const MASTER_ZSTD_COMPRESSION_LEVEL = 57716
+const NESTED = 57717
+const NETWORK_NAMESPACE = 57718
+const NOWAIT = 57719
+const NULLS = 57720
+const OJ = 57721
+const OLD = 57722
+const OPTIONAL = 57723
+const ORDINALITY = 57724
+const ORGANIZATION = 57725
+const OTHERS = 57726
+const PATH = 57727
+const PERSIST = 57728
+const PERSIST_ONLY = 57729
+const PRECEDING = 57730
+const PRIVILEGE_CHECKS_USER = 57731
+const PROCESS = 57732
+const RANDOM = 57733
+const REFERENCE = 57734
+const REQUIRE_ROW_FORMAT = 57735
+const RESOURCE = 57736
+const RESPECT = 57737
+const RESTART = 57738
+const RETAIN = 57739
+const REUSE = 57740
+const ROLE = 57741
+const SECONDARY = 57742
+const SECONDARY_ENGINE = 57743
+const SECONDARY_LOAD = 57744
+const SECONDARY_UNLOAD = 57745
+const SKIP = 57746
+const SRID = 57747
+const THREAD_PRIORITY = 57748
+const TIES = 57749
+const UNBOUNDED = 57750
+const VCPU = 57751
+const VISIBLE = 57752
+const FORMAT = 57753
+const TREE = 57754
+const VITESS = 57755
+const TRADITIONAL = 57756
+const LOCAL = 57757
+const LOW_PRIORITY = 57758
+const NO_WRITE_TO_BINLOG = 57759
+const LOGS = 57760
+const ERROR = 57761
+const GENERAL = 57762
+const HOSTS = 57763
+const OPTIMIZER_COSTS = 57764
+const USER_RESOURCES = 57765
+const SLOW = 57766
+const CHANNEL = 57767
+const RELAY = 57768
+const EXPORT = 57769
+const AVG_ROW_LENGTH = 57770
+const CONNECTION = 57771
+const CHECKSUM = 57772
+const DELAY_KEY_WRITE = 57773
+const ENCRYPTION = 57774
+const ENGINE = 57775
+const INSERT_METHOD = 57776
+const MAX_ROWS = 57777
+const MIN_ROWS = 57778
+const PACK_KEYS = 57779
+const PASSWORD = 57780
+const FIXED = 57781
+const DYNAMIC = 57782
+const COMPRESSED = 57783
+const REDUNDANT = 57784
+const COMPACT = 57785
+const ROW_FORMAT = 57786
+const STATS_AUTO_RECALC = 57787
+const STATS_PERSISTENT = 57788
+const STATS_SAMPLE_PAGES = 57789
+const STORAGE = 57790
+const MEMORY = 57791
+const DISK = 57792
 
 var yyToknames = [...]string{
 	"$end",
@@ -491,7 +623,24 @@ var yyToknames = [...]string{
 	"UNLOCK",
 	"KEYS",
 	"DO",
+	"CALL",
 	"DISTINCTROW",
+	"PARSER",
+	"OUTFILE",
+	"S3",
+	"DATA",
+	"LOAD",
+	"LINES",
+	"TERMINATED",
+	"ESCAPED",
+	"ENCLOSED",
+	"DUMPFILE",
+	"CSV",
+	"HEADER",
+	"MANIFEST",
+	"OVERWRITE",
+	"STARTING",
+	"OPTIONALLY",
 	"VALUES",
 	"LAST_INSERT_ID",
 	"NEXT",
@@ -513,6 +662,12 @@ var yyToknames = [...]string{
 	"FORCE",
 	"ON",
 	"USING",
+	"INPLACE",
+	"COPY",
+	"ALGORITHM",
+	"NONE",
+	"SHARED",
+	"EXCLUSIVE",
 	"'('",
 	"','",
 	"')'",
@@ -529,10 +684,16 @@ var yyToknames = [...]string{
 	"COMMENT",
 	"COMMENT_KEYWORD",
 	"BIT_LITERAL",
+	"COMPRESSION",
 	"NULL",
 	"TRUE",
 	"FALSE",
 	"OFF",
+	"DISCARD",
+	"IMPORT",
+	"ENABLE",
+	"DISABLE",
+	"TABLESPACE",
 	"OR",
 	"XOR",
 	"AND",
@@ -586,6 +747,8 @@ var yyToknames = [...]string{
 	"ANALYZE",
 	"ADD",
 	"FLUSH",
+	"CHANGE",
+	"MODIFY",
 	"SCHEMA",
 	"TABLE",
 	"INDEX",
@@ -616,6 +779,11 @@ var yyToknames = [...]string{
 	"REPAIR",
 	"OPTIMIZE",
 	"TRUNCATE",
+	"COALESCE",
+	"EXCHANGE",
+	"REBUILD",
+	"PARTITIONING",
+	"REMOVE",
 	"MAXVALUE",
 	"PARTITION",
 	"REORGANIZE",
@@ -625,10 +793,26 @@ var yyToknames = [...]string{
 	"TRIGGER",
 	"VINDEX",
 	"VINDEXES",
+	"DIRECTORY",
+	"NAME",
+	"UPGRADE",
 	"STATUS",
 	"VARIABLES",
 	"WARNINGS",
+	"CASCADED",
+	"DEFINER",
+	"OPTION",
+	"SQL",
+	"UNDEFINED",
 	"SEQUENCE",
+	"MERGE",
+	"TEMPORARY",
+	"TEMPTABLE",
+	"INVOKER",
+	"SECURITY",
+	"FIRST",
+	"AFTER",
+	"LAST",
 	"BEGIN",
 	"START",
 	"TRANSACTION",
@@ -686,6 +870,7 @@ var yyToknames = [...]string{
 	"ZEROFILL",
 	"COLLATION",
 	"DATABASES",
+	"SCHEMAS",
 	"TABLES",
 	"VITESS_METADATA",
 	"VSCHEMA",
@@ -696,6 +881,17 @@ var yyToknames = [...]string{
 	"ENGINES",
 	"PLUGINS",
 	"EXTENDED",
+	"KEYSPACES",
+	"VITESS_KEYSPACES",
+	"VITESS_SHARDS",
+	"VITESS_TABLETS",
+	"CODE",
+	"PRIVILEGES",
+	"FUNCTION",
+	"OPEN",
+	"TRIGGERS",
+	"EVENT",
+	"USER",
 	"NAMES",
 	"CHARSET",
 	"GLOBAL",
@@ -715,6 +911,7 @@ var yyToknames = [...]string{
 	"CURRENT_TIME",
 	"LOCALTIME",
 	"LOCALTIMESTAMP",
+	"CURRENT_USER",
 	"UTC_DATE",
 	"UTC_TIME",
 	"UTC_TIMESTAMP",
@@ -734,6 +931,8 @@ var yyToknames = [...]string{
 	"WITH",
 	"QUERY",
 	"EXPANSION",
+	"WITHOUT",
+	"VALIDATION",
 	"UNUSED",
 	"ARRAY",
 	"CUME_DIST",
@@ -820,8 +1019,45 @@ var yyToknames = [...]string{
 	"TREE",
 	"VITESS",
 	"TRADITIONAL",
+	"LOCAL",
+	"LOW_PRIORITY",
+	"NO_WRITE_TO_BINLOG",
+	"LOGS",
+	"ERROR",
+	"GENERAL",
+	"HOSTS",
+	"OPTIMIZER_COSTS",
+	"USER_RESOURCES",
+	"SLOW",
+	"CHANNEL",
+	"RELAY",
+	"EXPORT",
+	"AVG_ROW_LENGTH",
+	"CONNECTION",
+	"CHECKSUM",
+	"DELAY_KEY_WRITE",
+	"ENCRYPTION",
+	"ENGINE",
+	"INSERT_METHOD",
+	"MAX_ROWS",
+	"MIN_ROWS",
+	"PACK_KEYS",
+	"PASSWORD",
+	"FIXED",
+	"DYNAMIC",
+	"COMPRESSED",
+	"REDUNDANT",
+	"COMPACT",
+	"ROW_FORMAT",
+	"STATS_AUTO_RECALC",
+	"STATS_PERSISTENT",
+	"STATS_SAMPLE_PAGES",
+	"STORAGE",
+	"MEMORY",
+	"DISK",
 	"';'",
 }
+
 var yyStatenames = [...]string{}
 
 const yyEofCode = 1
@@ -833,1897 +1069,2936 @@ var yyExca = [...]int{
 	-1, 1,
 	1, -1,
 	-2, 0,
+	-1, 43,
+	163, 923,
+	-2, 90,
 	-1, 44,
-	34, 307,
-	133, 307,
-	145, 307,
-	170, 321,
-	171, 321,
-	-2, 309,
-	-1, 49,
-	135, 331,
-	-2, 329,
-	-1, 72,
-	39, 367,
-	-2, 375,
-	-1, 391,
-	121, 698,
-	-2, 694,
-	-1, 392,
-	121, 699,
-	-2, 695,
-	-1, 406,
-	39, 368,
-	-2, 380,
-	-1, 407,
-	39, 369,
-	-2, 381,
-	-1, 431,
-	89, 952,
-	-2, 74,
-	-1, 432,
-	89, 868,
-	-2, 75,
-	-1, 437,
-	89, 835,
-	-2, 660,
-	-1, 439,
-	89, 899,
-	-2, 662,
-	-1, 760,
-	57, 56,
-	59, 56,
-	-2, 60,
-	-1, 938,
-	121, 701,
-	-2, 697,
-	-1, 1369,
-	5, 619,
-	18, 619,
-	20, 619,
-	32, 619,
-	60, 619,
-	-2, 406,
+	1, 111,
+	468, 111,
+	-2, 117,
+	-1, 45,
+	143, 117,
+	254, 117,
+	306, 117,
+	-2, 324,
+	-1, 52,
+	34, 465,
+	164, 465,
+	176, 465,
+	209, 479,
+	210, 479,
+	-2, 467,
+	-1, 57,
+	166, 489,
+	-2, 487,
+	-1, 82,
+	56, 556,
+	-2, 564,
+	-1, 107,
+	1, 112,
+	468, 112,
+	-2, 117,
+	-1, 117,
+	169, 229,
+	170, 229,
+	-2, 318,
+	-1, 136,
+	143, 117,
+	254, 117,
+	306, 117,
+	-2, 333,
+	-1, 570,
+	150, 944,
+	-2, 940,
+	-1, 571,
+	150, 945,
+	-2, 941,
+	-1, 589,
+	56, 557,
+	-2, 569,
+	-1, 590,
+	56, 558,
+	-2, 570,
+	-1, 610,
+	118, 1283,
+	-2, 83,
+	-1, 611,
+	118, 1166,
+	-2, 84,
+	-1, 617,
+	118, 1216,
+	-2, 917,
+	-1, 754,
+	118, 1104,
+	-2, 914,
+	-1, 789,
+	175, 37,
+	180, 37,
+	-2, 240,
+	-1, 868,
+	1, 371,
+	468, 371,
+	-2, 117,
+	-1, 1104,
+	1, 267,
+	468, 267,
+	-2, 117,
+	-1, 1182,
+	169, 229,
+	170, 229,
+	-2, 318,
+	-1, 1191,
+	175, 38,
+	180, 38,
+	-2, 241,
+	-1, 1399,
+	150, 947,
+	-2, 943,
+	-1, 1491,
+	74, 65,
+	82, 65,
+	-2, 69,
+	-1, 1512,
+	1, 268,
+	468, 268,
+	-2, 117,
+	-1, 1920,
+	5, 811,
+	18, 811,
+	20, 811,
+	32, 811,
+	83, 811,
+	-2, 595,
+	-1, 2132,
+	46, 885,
+	-2, 883,
 }
 
 const yyPrivate = 57344
 
-const yyLast = 17848
+const yyLast = 27976
 
 var yyAct = [...]int{
-
-	391, 1608, 1598, 1408, 1565, 1295, 1200, 1044, 1514, 1481,
-	335, 1220, 1468, 1349, 350, 1382, 1017, 1201, 364, 1246,
-	592, 1346, 1043, 726, 1350, 1087, 1040, 1053, 1361, 1355,
-	436, 1314, 733, 687, 1138, 1187, 925, 879, 399, 92,
-	603, 321, 860, 286, 1272, 306, 286, 774, 71, 3,
-	1263, 92, 1057, 286, 1019, 932, 1003, 736, 408, 731,
-	1014, 69, 416, 1083, 754, 958, 902, 28, 393, 753,
-	759, 337, 771, 773, 561, 996, 422, 425, 67, 286,
-	92, 743, 762, 562, 286, 888, 286, 66, 8, 1073,
-	7, 6, 326, 700, 72, 581, 322, 1601, 1585, 325,
-	1596, 701, 1573, 1593, 1409, 1584, 333, 1572, 1331, 1438,
-	566, 1377, 1378, 284, 1035, 1036, 1376, 94, 95, 96,
-	433, 327, 775, 317, 776, 1034, 74, 75, 76, 77,
-	78, 79, 414, 418, 324, 394, 323, 30, 1254, 1106,
-	60, 34, 35, 282, 278, 279, 280, 621, 1066, 424,
-	1297, 1471, 430, 1105, 563, 1074, 565, 1540, 649, 648,
-	658, 659, 651, 652, 653, 654, 655, 656, 657, 650,
-	1429, 1427, 660, 1067, 274, 1234, 314, 272, 1233, 276,
-	887, 1235, 935, 316, 94, 95, 96, 616, 598, 59,
-	600, 617, 614, 615, 376, 1104, 382, 383, 380, 381,
-	379, 378, 377, 94, 95, 96, 1298, 312, 619, 620,
-	384, 385, 849, 1299, 609, 610, 846, 1595, 848, 1592,
-	1558, 1566, 597, 599, 1315, 1294, 997, 1058, 606, 1616,
-	1612, 1523, 1221, 1223, 889, 890, 891, 582, 1060, 568,
-	1515, 276, 1300, 853, 837, 1291, 623, 1372, 1101, 1098,
-	1099, 1293, 1097, 850, 847, 1517, 571, 1060, 1371, 1370,
-	564, 289, 277, 1118, 1157, 1317, 1117, 281, 672, 673,
-	94, 95, 96, 286, 573, 574, 275, 1547, 286, 1154,
-	583, 1451, 1230, 1192, 286, 1108, 1111, 1167, 1146, 768,
-	286, 590, 747, 685, 596, 92, 588, 650, 273, 92,
-	660, 92, 1319, 1041, 1323, 660, 1318, 92, 1316, 1030,
-	975, 595, 578, 1321, 1222, 909, 884, 92, 92, 94,
-	95, 96, 1320, 640, 880, 1103, 1516, 605, 1571, 907,
-	908, 906, 874, 82, 1541, 1322, 1324, 1282, 1556, 607,
-	1524, 1522, 1059, 572, 1074, 1333, 1610, 1102, 580, 1611,
-	594, 1609, 637, 1532, 587, 1292, 959, 1290, 1359, 807,
-	589, 1059, 639, 637, 567, 634, 635, 629, 640, 1278,
-	1279, 1280, 83, 1395, 672, 673, 584, 585, 586, 640,
-	575, 777, 576, 633, 959, 577, 1164, 1107, 839, 672,
-	673, 1152, 641, 1151, 61, 653, 654, 655, 656, 657,
-	650, 1063, 1109, 660, 670, 1252, 740, 632, 1064, 630,
-	631, 881, 638, 639, 637, 772, 271, 92, 1561, 875,
-	286, 286, 286, 94, 95, 96, 723, 1576, 327, 92,
-	640, 1153, 1477, 688, 593, 92, 1476, 698, 897, 899,
-	900, 1281, 1267, 795, 724, 898, 1286, 1283, 1274, 1284,
-	1277, 1266, 1273, 569, 570, 1255, 1275, 1276, 1617, 560,
-	638, 639, 637, 729, 732, 1578, 1557, 737, 1335, 433,
-	1285, 703, 705, 707, 709, 711, 713, 714, 640, 704,
-	706, 752, 710, 712, 808, 715, 638, 639, 637, 1494,
-	751, 725, 760, 419, 420, 428, 1474, 1264, 761, 638,
-	639, 637, 1618, 1128, 640, 865, 766, 1131, 1132, 1133,
-	821, 824, 825, 826, 827, 828, 829, 640, 830, 831,
-	832, 833, 834, 809, 810, 811, 812, 793, 794, 822,
-	403, 796, 1529, 797, 798, 799, 800, 801, 802, 803,
-	804, 805, 806, 813, 814, 815, 816, 817, 818, 819,
-	820, 658, 659, 651, 652, 653, 654, 655, 656, 657,
-	650, 286, 1528, 660, 59, 835, 92, 1391, 838, 1061,
-	840, 286, 286, 92, 92, 92, 905, 1520, 1594, 286,
-	1580, 403, 286, 980, 981, 286, 858, 859, 735, 286,
-	68, 92, 94, 95, 96, 1358, 92, 92, 92, 286,
-	92, 92, 823, 94, 95, 96, 977, 927, 1520, 1569,
-	92, 92, 864, 94, 95, 96, 1024, 1237, 763, 862,
-	648, 658, 659, 651, 652, 653, 654, 655, 656, 657,
-	650, 785, 1447, 660, 1520, 403, 638, 639, 637, 1520,
-	1548, 841, 842, 1520, 1519, 403, 976, 1466, 1465, 851,
-	1453, 403, 424, 1347, 640, 857, 1358, 866, 854, 1450,
-	403, 926, 903, 1401, 1400, 638, 639, 637, 636, 870,
-	928, 1531, 651, 652, 653, 654, 655, 656, 657, 650,
-	764, 882, 660, 640, 92, 353, 352, 355, 356, 357,
-	358, 1397, 1398, 1399, 354, 359, 1397, 1396, 30, 892,
-	893, 894, 895, 1000, 947, 950, 988, 403, 1000, 403,
-	960, 636, 403, 784, 783, 904, 938, 92, 92, 999,
-	1188, 942, 30, 1195, 989, 765, 936, 767, 937, 1196,
-	1005, 1008, 1009, 1010, 1006, 92, 1007, 1011, 70, 688,
-	1362, 1363, 286, 396, 764, 92, 1188, 1000, 1238, 286,
-	59, 286, 1033, 1501, 945, 946, 1170, 1169, 988, 286,
-	286, 763, 972, 286, 286, 939, 1000, 286, 286, 286,
-	92, 988, 982, 92, 59, 968, 969, 978, 938, 929,
-	930, 988, 852, 769, 92, 562, 59, 1586, 936, 765,
-	994, 763, 1358, 1483, 30, 59, 990, 1068, 1458, 862,
-	1088, 1387, 1005, 1008, 1009, 1010, 1006, 1015, 1007, 1011,
-	433, 1241, 991, 433, 1362, 1363, 1368, 1084, 1079, 995,
-	1078, 998, 1296, 1025, 1045, 1484, 992, 1027, 1091, 1603,
-	1599, 1389, 1365, 1347, 1026, 1268, 1023, 885, 286, 92,
-	1039, 92, 1031, 1110, 1032, 1028, 59, 286, 286, 286,
-	286, 286, 856, 286, 286, 1367, 1212, 286, 92, 1048,
-	1089, 1213, 1210, 1214, 1209, 1009, 1010, 1211, 1208, 1590,
-	1583, 1177, 943, 944, 286, 1339, 949, 952, 953, 286,
-	734, 286, 286, 1588, 1186, 1185, 286, 92, 1075, 1076,
-	1077, 727, 955, 1259, 782, 1085, 1086, 591, 1251, 1479,
-	1125, 967, 1563, 728, 970, 971, 956, 1562, 1092, 1499,
-	1249, 1243, 1445, 1094, 855, 1013, 400, 1112, 1113, 1114,
-	1115, 1116, 1444, 1119, 1120, 903, 401, 1121, 70, 649,
-	648, 658, 659, 651, 652, 653, 654, 655, 656, 657,
-	650, 409, 1184, 660, 1123, 397, 398, 1443, 1342, 1124,
-	1183, 1188, 618, 1605, 1604, 410, 1129, 1158, 1155, 878,
-	748, 741, 738, 739, 412, 1605, 411, 1069, 1070, 1071,
-	1072, 1545, 1472, 1134, 974, 396, 68, 73, 904, 65,
-	1, 1148, 1597, 1080, 1081, 1082, 1139, 1410, 1480, 1100,
-	286, 1564, 1513, 1381, 1051, 1042, 1176, 81, 559, 80,
-	1555, 286, 286, 286, 286, 286, 1181, 394, 1147, 873,
-	1202, 604, 409, 286, 1050, 1049, 1521, 286, 1253, 1065,
-	1470, 286, 1165, 1163, 1388, 286, 410, 1250, 1560, 790,
-	788, 1193, 789, 406, 407, 412, 787, 411, 1180, 1178,
-	1179, 732, 1236, 792, 92, 1197, 1189, 791, 392, 1191,
-	1190, 1239, 786, 1242, 299, 886, 313, 1247, 1247, 1226,
-	1012, 1228, 778, 1229, 1090, 1219, 1204, 1205, 1215, 1207,
-	1203, 742, 84, 1206, 1289, 1225, 1288, 1248, 1096, 1062,
-	883, 1231, 296, 612, 1045, 1227, 613, 93, 301, 668,
-	1182, 287, 92, 92, 287, 1232, 434, 427, 1353, 93,
-	1258, 287, 1260, 1261, 1262, 979, 730, 1442, 1244, 1245,
-	1341, 1162, 697, 957, 757, 336, 1143, 1144, 896, 351,
-	348, 349, 92, 983, 1194, 642, 334, 287, 93, 328,
-	1265, 756, 287, 749, 287, 1004, 1002, 1161, 1271, 1001,
-	423, 1364, 1360, 1287, 755, 987, 405, 92, 1437, 1539,
-	404, 954, 52, 926, 625, 318, 33, 413, 23, 1256,
-	1257, 1302, 1303, 22, 21, 20, 19, 25, 18, 17,
-	1304, 16, 1313, 579, 37, 27, 26, 15, 14, 13,
-	1312, 12, 11, 286, 1060, 1326, 10, 1311, 9, 1325,
-	5, 4, 628, 92, 1332, 24, 686, 2, 938, 92,
-	92, 1310, 1348, 0, 0, 0, 1202, 0, 1336, 0,
-	937, 0, 0, 0, 0, 1351, 94, 95, 96, 0,
-	0, 0, 0, 0, 0, 92, 0, 1334, 0, 601,
-	0, 0, 1345, 1311, 0, 1366, 1357, 0, 0, 92,
-	0, 92, 92, 0, 0, 1247, 1247, 0, 1380, 0,
-	0, 1343, 0, 1340, 1373, 0, 0, 0, 0, 1374,
-	1394, 1379, 0, 1375, 1385, 1386, 0, 0, 963, 286,
-	1384, 0, 0, 0, 0, 0, 0, 0, 0, 1045,
-	0, 1045, 0, 1392, 1393, 0, 0, 0, 1059, 286,
-	0, 0, 0, 1056, 1054, 92, 1055, 1411, 92, 92,
-	92, 286, 0, 1052, 1058, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 1403, 0, 0, 0, 0, 0,
-	0, 287, 0, 1416, 1417, 0, 287, 0, 0, 1404,
-	0, 1406, 287, 0, 0, 0, 0, 0, 287, 1402,
-	402, 0, 0, 93, 0, 1425, 0, 93, 0, 93,
-	0, 1420, 0, 0, 0, 93, 0, 0, 0, 1405,
-	0, 0, 0, 0, 0, 93, 93, 365, 29, 1202,
-	1446, 1415, 0, 0, 0, 0, 1455, 0, 0, 0,
-	92, 0, 0, 0, 0, 0, 0, 1239, 92, 0,
-	1454, 0, 0, 0, 0, 0, 0, 29, 1439, 0,
-	0, 0, 0, 92, 0, 0, 0, 0, 0, 0,
-	92, 0, 0, 1464, 0, 327, 0, 0, 0, 0,
-	1045, 0, 1456, 0, 1487, 1457, 0, 0, 1459, 0,
-	0, 0, 0, 0, 0, 395, 0, 0, 0, 0,
-	0, 0, 0, 0, 1485, 0, 0, 0, 0, 0,
-	1482, 92, 92, 0, 92, 0, 0, 0, 0, 92,
-	0, 92, 92, 92, 286, 93, 1351, 92, 287, 287,
-	287, 1507, 1500, 1508, 1510, 1511, 1493, 93, 1498, 0,
-	1512, 0, 1518, 93, 92, 286, 1473, 1525, 1475, 1422,
-	1423, 0, 1424, 1506, 0, 1426, 1533, 1428, 1502, 0,
-	1526, 0, 1527, 0, 0, 0, 1497, 327, 0, 0,
-	0, 0, 0, 1486, 0, 1546, 1554, 0, 0, 0,
-	1351, 92, 1553, 0, 1552, 0, 0, 0, 608, 0,
-	611, 0, 92, 92, 0, 0, 622, 0, 0, 0,
-	1568, 1567, 0, 0, 0, 0, 0, 0, 92, 0,
-	0, 0, 1574, 0, 0, 1534, 1202, 1467, 0, 286,
-	0, 0, 0, 0, 0, 0, 0, 92, 0, 0,
-	0, 0, 1482, 1045, 0, 1582, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 1587, 1589, 92, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 1591,
-	1602, 0, 0, 0, 0, 0, 0, 1613, 0, 287,
-	0, 0, 0, 0, 93, 0, 0, 0, 0, 287,
-	287, 93, 93, 93, 0, 0, 0, 287, 0, 1577,
-	287, 0, 0, 287, 0, 0, 0, 287, 0, 93,
-	0, 0, 0, 0, 93, 93, 93, 287, 93, 93,
-	0, 0, 0, 0, 0, 0, 0, 0, 93, 93,
-	0, 0, 602, 0, 0, 0, 602, 0, 602, 0,
-	0, 0, 0, 0, 602, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 29, 0, 0, 0,
-	0, 0, 0, 644, 0, 647, 0, 0, 0, 669,
-	671, 661, 662, 663, 664, 665, 666, 667, 0, 645,
-	646, 643, 649, 648, 658, 659, 651, 652, 653, 654,
-	655, 656, 657, 650, 0, 0, 660, 403, 0, 0,
-	684, 0, 93, 0, 689, 690, 691, 692, 693, 694,
-	695, 696, 0, 699, 702, 702, 702, 708, 702, 702,
-	708, 702, 716, 717, 718, 719, 720, 721, 722, 0,
-	0, 0, 0, 29, 0, 93, 93, 649, 648, 658,
-	659, 651, 652, 653, 654, 655, 656, 657, 650, 0,
-	0, 660, 0, 93, 0, 0, 0, 0, 758, 0,
-	287, 0, 0, 93, 0, 836, 0, 287, 0, 287,
-	0, 0, 843, 844, 845, 0, 0, 287, 287, 0,
-	0, 287, 287, 0, 0, 287, 287, 287, 93, 1441,
-	863, 93, 0, 0, 0, 867, 868, 869, 0, 871,
-	872, 0, 93, 0, 0, 0, 0, 0, 0, 876,
-	877, 0, 0, 362, 0, 0, 0, 0, 0, 0,
-	0, 0, 30, 31, 32, 60, 34, 35, 0, 0,
-	649, 648, 658, 659, 651, 652, 653, 654, 655, 656,
-	657, 650, 64, 0, 660, 0, 0, 36, 55, 56,
-	0, 58, 91, 0, 0, 0, 287, 93, 0, 93,
-	1305, 0, 0, 0, 315, 287, 287, 287, 287, 287,
-	45, 287, 287, 0, 59, 287, 93, 0, 0, 0,
-	649, 648, 658, 659, 651, 652, 653, 654, 655, 656,
-	657, 650, 287, 435, 660, 0, 0, 287, 0, 287,
-	287, 0, 0, 602, 287, 93, 0, 0, 0, 1440,
-	602, 602, 602, 649, 648, 658, 659, 651, 652, 653,
-	654, 655, 656, 657, 650, 940, 941, 660, 602, 0,
-	0, 0, 0, 602, 602, 602, 0, 602, 602, 0,
-	38, 39, 41, 40, 43, 0, 57, 602, 602, 0,
-	649, 648, 658, 659, 651, 652, 653, 654, 655, 656,
-	657, 650, 0, 973, 660, 0, 0, 0, 0, 44,
-	63, 62, 0, 0, 53, 54, 42, 0, 94, 95,
-	96, 0, 0, 1435, 0, 0, 0, 0, 0, 0,
-	46, 47, 0, 48, 49, 50, 51, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 287, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 287,
-	287, 287, 287, 287, 0, 0, 0, 0, 0, 0,
-	0, 287, 290, 0, 0, 287, 0, 0, 1093, 287,
-	1095, 293, 0, 287, 0, 0, 0, 0, 0, 300,
-	0, 0, 0, 0, 0, 0, 0, 1122, 0, 0,
-	0, 0, 93, 649, 648, 658, 659, 651, 652, 653,
-	654, 655, 656, 657, 650, 0, 0, 660, 0, 61,
-	0, 0, 0, 298, 0, 0, 0, 0, 0, 305,
-	0, 0, 0, 0, 0, 0, 1016, 0, 0, 0,
-	758, 0, 0, 0, 758, 0, 0, 0, 435, 0,
-	93, 93, 435, 0, 435, 0, 0, 0, 0, 291,
-	435, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	624, 626, 0, 0, 0, 0, 0, 0, 0, 0,
-	93, 0, 0, 0, 0, 0, 302, 294, 0, 303,
-	304, 310, 0, 0, 0, 295, 297, 307, 0, 292,
-	309, 308, 0, 0, 0, 93, 0, 1141, 0, 0,
-	0, 1142, 0, 0, 0, 0, 602, 330, 602, 0,
-	0, 1434, 1149, 1150, 0, 0, 0, 0, 1156, 0,
-	0, 1159, 1160, 0, 0, 602, 0, 0, 0, 1166,
-	0, 287, 0, 1168, 0, 0, 1171, 1172, 1173, 1174,
-	1175, 93, 0, 0, 1433, 0, 0, 93, 93, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	745, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 435, 93, 0, 0, 0, 0, 779, 0,
-	0, 0, 0, 1217, 1218, 0, 0, 93, 0, 93,
-	93, 649, 648, 658, 659, 651, 652, 653, 654, 655,
-	656, 657, 650, 0, 1145, 660, 0, 395, 0, 0,
-	0, 0, 0, 1432, 0, 0, 0, 287, 0, 0,
-	0, 0, 1270, 0, 649, 648, 658, 659, 651, 652,
-	653, 654, 655, 656, 657, 650, 0, 287, 660, 0,
-	0, 0, 0, 93, 0, 0, 93, 93, 93, 287,
-	0, 1301, 0, 0, 0, 0, 0, 758, 0, 0,
-	0, 0, 0, 0, 1198, 1199, 0, 0, 758, 758,
-	758, 758, 758, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 1016, 0, 1224, 0, 0, 0,
-	0, 0, 758, 649, 648, 658, 659, 651, 652, 653,
-	654, 655, 656, 657, 650, 0, 0, 660, 0, 435,
-	0, 0, 1308, 1309, 0, 0, 435, 435, 435, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 93, 0,
-	0, 0, 0, 0, 435, 0, 93, 0, 0, 435,
-	435, 435, 1140, 435, 435, 0, 0, 0, 0, 0,
-	0, 93, 0, 435, 435, 0, 0, 0, 93, 0,
-	602, 0, 649, 648, 658, 659, 651, 652, 653, 654,
-	655, 656, 657, 650, 0, 0, 660, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 1369, 602,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 93,
-	93, 0, 93, 0, 0, 0, 0, 93, 0, 93,
-	93, 93, 287, 0, 0, 93, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 931, 0, 435,
-	0, 0, 93, 287, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 961, 0, 0, 674, 675, 676, 677,
-	678, 679, 680, 681, 682, 683, 0, 0, 0, 0,
-	965, 966, 0, 0, 1352, 0, 29, 0, 0, 93,
-	0, 0, 0, 0, 0, 0, 0, 0, 984, 1419,
-	93, 93, 0, 1421, 0, 0, 0, 0, 745, 0,
-	0, 435, 0, 0, 1430, 1431, 93, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 287, 0, 0,
-	0, 0, 0, 435, 0, 93, 435, 0, 0, 0,
-	0, 1448, 1449, 0, 1452, 0, 0, 435, 0, 0,
-	0, 0, 1478, 0, 0, 93, 0, 0, 0, 0,
-	0, 0, 1463, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 435, 0, 435, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 1436,
-	0, 435, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 1509,
-	1130, 0, 0, 0, 0, 0, 0, 0, 1460, 1461,
-	1462, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 363, 0, 0, 0, 0, 0, 1535, 1536, 1537,
-	1538, 0, 1542, 0, 1543, 1544, 0, 0, 0, 0,
-	602, 0, 0, 0, 0, 0, 0, 1549, 0, 1550,
-	1551, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 285, 0, 0, 311, 0, 0,
-	0, 0, 0, 0, 285, 0, 0, 0, 1570, 0,
-	0, 0, 0, 0, 0, 1352, 0, 29, 0, 0,
-	0, 0, 0, 0, 0, 0, 417, 417, 0, 0,
-	426, 0, 0, 1579, 0, 285, 0, 285, 0, 0,
-	0, 0, 0, 961, 0, 0, 0, 1530, 0, 0,
-	901, 0, 0, 910, 911, 912, 913, 914, 915, 916,
-	917, 918, 919, 920, 921, 922, 923, 924, 0, 1352,
-	0, 0, 0, 0, 0, 1614, 1615, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 435, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	964, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 1269, 435, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 1600, 0, 435, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	435, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 435, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 285, 0, 0, 0, 0, 285,
-	0, 0, 0, 0, 0, 285, 435, 0, 0, 961,
-	0, 285, 1354, 1356, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 1356, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 435, 0, 435, 1383, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 1135, 1136, 1137, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 1407, 0,
-	0, 1412, 1413, 1414, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 417, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 285, 285, 285, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 961, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 435, 0, 0, 0, 0, 0, 0,
-	0, 1469, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 435, 0, 0, 0,
-	0, 0, 0, 435, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 1503, 1504, 0, 1505, 0, 0,
-	0, 0, 1469, 0, 1469, 1469, 1469, 0, 0, 0,
-	1383, 0, 285, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 285, 285, 0, 0, 0, 1469, 0, 0,
-	285, 0, 0, 285, 0, 0, 285, 0, 0, 0,
-	861, 0, 0, 0, 0, 0, 0, 1306, 1307, 0,
-	285, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 1327, 1328, 1559, 1329, 1330, 0, 0, 0,
-	0, 0, 0, 0, 0, 435, 435, 1337, 1338, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 961,
-	0, 1575, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1581, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1469, 0, 0, 0, 0, 0, 417, 861, 0, 0,
-	0, 417, 417, 0, 0, 417, 417, 417, 0, 0,
-	0, 962, 0, 0, 0, 0, 0, 0, 0, 1390,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	417, 417, 417, 417, 417, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 285, 0, 0, 0, 0, 0, 861,
-	285, 0, 285, 0, 0, 0, 0, 0, 0, 0,
-	285, 1021, 0, 1418, 285, 285, 0, 0, 285, 1029,
-	861, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 285,
-	0, 0, 0, 0, 0, 0, 0, 0, 285, 285,
-	285, 285, 285, 0, 285, 285, 0, 0, 285, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 285, 0, 0, 0, 0,
-	285, 0, 1126, 1127, 0, 0, 0, 285, 0, 0,
-	1488, 1489, 1490, 1491, 1492, 0, 0, 0, 1495, 1496,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 417, 417, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 417, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	417, 285, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 962, 285, 285, 285, 285, 285, 0, 0, 0,
-	0, 0, 0, 0, 1216, 0, 0, 0, 285, 0,
-	0, 0, 1021, 0, 0, 0, 285, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 1606, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 417, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 861,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 285, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 962, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	285, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	285, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 285, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	962, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 1021, 0, 0, 0, 0,
-	545, 533, 0, 0, 490, 548, 463, 480, 556, 481,
-	484, 521, 448, 503, 183, 478, 285, 467, 443, 474,
-	444, 465, 492, 126, 496, 462, 535, 506, 547, 155,
-	0, 468, 554, 157, 512, 0, 230, 171, 0, 0,
-	0, 494, 537, 501, 530, 489, 522, 453, 511, 549,
-	479, 519, 550, 0, 0, 0, 94, 95, 96, 0,
-	1046, 1047, 0, 0, 0, 0, 0, 116, 0, 516,
-	544, 476, 518, 520, 558, 442, 513, 962, 446, 449,
-	555, 540, 471, 472, 1240, 0, 0, 0, 0, 0,
-	285, 493, 502, 527, 487, 0, 0, 0, 0, 0,
-	0, 0, 0, 469, 0, 510, 0, 0, 0, 450,
-	447, 0, 0, 0, 0, 491, 0, 0, 0, 452,
-	0, 470, 528, 0, 440, 135, 532, 539, 488, 288,
-	543, 486, 485, 546, 202, 0, 234, 139, 154, 112,
-	151, 98, 108, 0, 137, 180, 210, 214, 536, 466,
-	475, 120, 473, 212, 190, 251, 509, 192, 211, 158,
-	240, 203, 250, 260, 261, 237, 258, 266, 227, 101,
-	236, 248, 117, 222, 0, 0, 0, 103, 246, 233,
-	169, 148, 149, 102, 0, 208, 125, 133, 122, 182,
-	243, 244, 121, 269, 109, 257, 105, 110, 256, 176,
-	239, 247, 170, 163, 104, 245, 168, 162, 153, 129,
-	141, 200, 160, 201, 142, 173, 172, 174, 0, 445,
-	0, 231, 254, 270, 114, 461, 238, 264, 265, 0,
-	204, 115, 134, 128, 199, 132, 175, 111, 144, 228,
-	152, 159, 207, 268, 189, 213, 118, 253, 229, 457,
-	460, 455, 456, 504, 505, 551, 552, 553, 529, 451,
-	0, 458, 459, 0, 534, 541, 542, 508, 97, 106,
-	156, 267, 205, 131, 255, 441, 454, 124, 464, 0,
-	0, 477, 482, 483, 495, 497, 498, 499, 500, 507,
-	514, 515, 517, 523, 524, 525, 526, 531, 538, 557,
-	99, 100, 107, 113, 119, 123, 127, 130, 136, 140,
-	143, 145, 146, 147, 150, 161, 164, 165, 166, 167,
-	177, 178, 179, 181, 184, 185, 186, 187, 188, 191,
-	193, 194, 195, 196, 197, 198, 206, 209, 215, 216,
-	217, 218, 219, 220, 221, 223, 224, 225, 226, 232,
-	235, 241, 242, 252, 259, 262, 138, 249, 263, 545,
-	533, 0, 0, 490, 548, 463, 480, 556, 481, 484,
-	521, 448, 503, 183, 478, 0, 467, 443, 474, 444,
-	465, 492, 126, 496, 462, 535, 506, 547, 155, 0,
-	468, 554, 157, 512, 0, 230, 171, 0, 0, 0,
-	494, 537, 501, 530, 489, 522, 453, 511, 549, 479,
-	519, 550, 0, 0, 0, 94, 95, 96, 0, 1046,
-	1047, 0, 0, 0, 0, 0, 116, 0, 516, 544,
-	476, 518, 520, 558, 442, 513, 0, 446, 449, 555,
-	540, 471, 472, 0, 0, 0, 0, 0, 0, 0,
-	493, 502, 527, 487, 0, 0, 0, 0, 0, 0,
-	0, 0, 469, 0, 510, 0, 0, 0, 450, 447,
-	0, 0, 0, 0, 491, 0, 0, 0, 452, 0,
-	470, 528, 0, 440, 135, 532, 539, 488, 288, 543,
-	486, 485, 546, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 536, 466, 475,
-	120, 473, 212, 190, 251, 509, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 445, 0,
-	231, 254, 270, 114, 461, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 457, 460,
-	455, 456, 504, 505, 551, 552, 553, 529, 451, 0,
-	458, 459, 0, 534, 541, 542, 508, 97, 106, 156,
-	267, 205, 131, 255, 441, 454, 124, 464, 0, 0,
-	477, 482, 483, 495, 497, 498, 499, 500, 507, 514,
-	515, 517, 523, 524, 525, 526, 531, 538, 557, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 138, 249, 263, 545, 533,
-	0, 0, 490, 548, 463, 480, 556, 481, 484, 521,
-	448, 503, 183, 478, 0, 467, 443, 474, 444, 465,
-	492, 126, 496, 462, 535, 506, 547, 155, 0, 468,
-	554, 157, 512, 0, 230, 171, 0, 0, 0, 494,
-	537, 501, 530, 489, 522, 453, 511, 549, 479, 519,
-	550, 59, 0, 0, 94, 95, 96, 0, 0, 0,
-	0, 0, 0, 0, 0, 116, 0, 516, 544, 476,
-	518, 520, 558, 442, 513, 0, 446, 449, 555, 540,
-	471, 472, 0, 0, 0, 0, 0, 0, 0, 493,
-	502, 527, 487, 0, 0, 0, 0, 0, 0, 0,
-	0, 469, 0, 510, 0, 0, 0, 450, 447, 0,
-	0, 0, 0, 491, 0, 0, 0, 452, 0, 470,
-	528, 0, 440, 135, 532, 539, 488, 288, 543, 486,
-	485, 546, 202, 0, 234, 139, 154, 112, 151, 98,
-	108, 0, 137, 180, 210, 214, 536, 466, 475, 120,
-	473, 212, 190, 251, 509, 192, 211, 158, 240, 203,
-	250, 260, 261, 237, 258, 266, 227, 101, 236, 248,
-	117, 222, 0, 0, 0, 103, 246, 233, 169, 148,
-	149, 102, 0, 208, 125, 133, 122, 182, 243, 244,
-	121, 269, 109, 257, 105, 110, 256, 176, 239, 247,
-	170, 163, 104, 245, 168, 162, 153, 129, 141, 200,
-	160, 201, 142, 173, 172, 174, 0, 445, 0, 231,
-	254, 270, 114, 461, 238, 264, 265, 0, 204, 115,
-	134, 128, 199, 132, 175, 111, 144, 228, 152, 159,
-	207, 268, 189, 213, 118, 253, 229, 457, 460, 455,
-	456, 504, 505, 551, 552, 553, 529, 451, 0, 458,
-	459, 0, 534, 541, 542, 508, 97, 106, 156, 267,
-	205, 131, 255, 441, 454, 124, 464, 0, 0, 477,
-	482, 483, 495, 497, 498, 499, 500, 507, 514, 515,
-	517, 523, 524, 525, 526, 531, 538, 557, 99, 100,
-	107, 113, 119, 123, 127, 130, 136, 140, 143, 145,
-	146, 147, 150, 161, 164, 165, 166, 167, 177, 178,
-	179, 181, 184, 185, 186, 187, 188, 191, 193, 194,
-	195, 196, 197, 198, 206, 209, 215, 216, 217, 218,
-	219, 220, 221, 223, 224, 225, 226, 232, 235, 241,
-	242, 252, 259, 262, 138, 249, 263, 545, 533, 0,
-	0, 490, 548, 463, 480, 556, 481, 484, 521, 448,
-	503, 183, 478, 0, 467, 443, 474, 444, 465, 492,
-	126, 496, 462, 535, 506, 547, 155, 0, 468, 554,
-	157, 512, 0, 230, 171, 0, 0, 0, 494, 537,
-	501, 530, 489, 522, 453, 511, 549, 479, 519, 550,
-	0, 0, 0, 94, 95, 96, 0, 0, 0, 0,
-	0, 0, 0, 0, 116, 0, 516, 544, 476, 518,
-	520, 558, 442, 513, 0, 446, 449, 555, 540, 471,
-	472, 0, 0, 0, 0, 0, 0, 0, 493, 502,
-	527, 487, 0, 0, 0, 0, 0, 0, 1344, 0,
-	469, 0, 510, 0, 0, 0, 450, 447, 0, 0,
-	0, 0, 491, 0, 0, 0, 452, 0, 470, 528,
-	0, 440, 135, 532, 539, 488, 288, 543, 486, 485,
-	546, 202, 0, 234, 139, 154, 112, 151, 98, 108,
-	0, 137, 180, 210, 214, 536, 466, 475, 120, 473,
-	212, 190, 251, 509, 192, 211, 158, 240, 203, 250,
-	260, 261, 237, 258, 266, 227, 101, 236, 248, 117,
-	222, 0, 0, 0, 103, 246, 233, 169, 148, 149,
-	102, 0, 208, 125, 133, 122, 182, 243, 244, 121,
-	269, 109, 257, 105, 110, 256, 176, 239, 247, 170,
-	163, 104, 245, 168, 162, 153, 129, 141, 200, 160,
-	201, 142, 173, 172, 174, 0, 445, 0, 231, 254,
-	270, 114, 461, 238, 264, 265, 0, 204, 115, 134,
-	128, 199, 132, 175, 111, 144, 228, 152, 159, 207,
-	268, 189, 213, 118, 253, 229, 457, 460, 455, 456,
-	504, 505, 551, 552, 553, 529, 451, 0, 458, 459,
-	0, 534, 541, 542, 508, 97, 106, 156, 267, 205,
-	131, 255, 441, 454, 124, 464, 0, 0, 477, 482,
-	483, 495, 497, 498, 499, 500, 507, 514, 515, 517,
-	523, 524, 525, 526, 531, 538, 557, 99, 100, 107,
-	113, 119, 123, 127, 130, 136, 140, 143, 145, 146,
-	147, 150, 161, 164, 165, 166, 167, 177, 178, 179,
-	181, 184, 185, 186, 187, 188, 191, 193, 194, 195,
-	196, 197, 198, 206, 209, 215, 216, 217, 218, 219,
-	220, 221, 223, 224, 225, 226, 232, 235, 241, 242,
-	252, 259, 262, 138, 249, 263, 545, 533, 0, 0,
-	490, 548, 463, 480, 556, 481, 484, 521, 448, 503,
-	183, 478, 0, 467, 443, 474, 444, 465, 492, 126,
-	496, 462, 535, 506, 547, 155, 0, 468, 554, 157,
-	512, 0, 230, 171, 0, 0, 0, 494, 537, 501,
-	530, 489, 522, 453, 511, 549, 479, 519, 550, 0,
-	0, 0, 94, 95, 96, 0, 0, 0, 0, 0,
-	0, 0, 0, 116, 0, 516, 544, 476, 518, 520,
-	558, 442, 513, 0, 446, 449, 555, 540, 471, 472,
-	0, 0, 0, 0, 0, 0, 0, 493, 502, 527,
-	487, 0, 0, 0, 0, 0, 0, 1030, 0, 469,
-	0, 510, 0, 0, 0, 450, 447, 0, 0, 0,
-	0, 491, 0, 0, 0, 452, 0, 470, 528, 0,
-	440, 135, 532, 539, 488, 288, 543, 486, 485, 546,
-	202, 0, 234, 139, 154, 112, 151, 98, 108, 0,
-	137, 180, 210, 214, 536, 466, 475, 120, 473, 212,
-	190, 251, 509, 192, 211, 158, 240, 203, 250, 260,
-	261, 237, 258, 266, 227, 101, 236, 248, 117, 222,
-	0, 0, 0, 103, 246, 233, 169, 148, 149, 102,
-	0, 208, 125, 133, 122, 182, 243, 244, 121, 269,
-	109, 257, 105, 110, 256, 176, 239, 247, 170, 163,
-	104, 245, 168, 162, 153, 129, 141, 200, 160, 201,
-	142, 173, 172, 174, 0, 445, 0, 231, 254, 270,
-	114, 461, 238, 264, 265, 0, 204, 115, 134, 128,
-	199, 132, 175, 111, 144, 228, 152, 159, 207, 268,
-	189, 213, 118, 253, 229, 457, 460, 455, 456, 504,
-	505, 551, 552, 553, 529, 451, 0, 458, 459, 0,
-	534, 541, 542, 508, 97, 106, 156, 267, 205, 131,
-	255, 441, 454, 124, 464, 0, 0, 477, 482, 483,
-	495, 497, 498, 499, 500, 507, 514, 515, 517, 523,
-	524, 525, 526, 531, 538, 557, 99, 100, 107, 113,
-	119, 123, 127, 130, 136, 140, 143, 145, 146, 147,
-	150, 161, 164, 165, 166, 167, 177, 178, 179, 181,
-	184, 185, 186, 187, 188, 191, 193, 194, 195, 196,
-	197, 198, 206, 209, 215, 216, 217, 218, 219, 220,
-	221, 223, 224, 225, 226, 232, 235, 241, 242, 252,
-	259, 262, 138, 249, 263, 545, 533, 0, 0, 490,
-	548, 463, 480, 556, 481, 484, 521, 448, 503, 183,
-	478, 0, 467, 443, 474, 444, 465, 492, 126, 496,
-	462, 535, 506, 547, 155, 0, 468, 554, 157, 512,
-	0, 230, 171, 0, 0, 0, 494, 537, 501, 530,
-	489, 522, 453, 511, 549, 479, 519, 550, 0, 0,
-	0, 94, 95, 96, 0, 0, 0, 0, 0, 0,
-	0, 0, 116, 0, 516, 544, 476, 518, 520, 558,
-	442, 513, 0, 446, 449, 555, 540, 471, 472, 0,
-	0, 0, 0, 0, 0, 0, 493, 502, 527, 487,
-	0, 0, 0, 0, 0, 0, 993, 0, 469, 0,
-	510, 0, 0, 0, 450, 447, 0, 0, 0, 0,
-	491, 0, 0, 0, 452, 0, 470, 528, 0, 440,
-	135, 532, 539, 488, 288, 543, 486, 485, 546, 202,
-	0, 234, 139, 154, 112, 151, 98, 108, 0, 137,
-	180, 210, 214, 536, 466, 475, 120, 473, 212, 190,
-	251, 509, 192, 211, 158, 240, 203, 250, 260, 261,
-	237, 258, 266, 227, 101, 236, 248, 117, 222, 0,
-	0, 0, 103, 246, 233, 169, 148, 149, 102, 0,
-	208, 125, 133, 122, 182, 243, 244, 121, 269, 109,
-	257, 105, 110, 256, 176, 239, 247, 170, 163, 104,
-	245, 168, 162, 153, 129, 141, 200, 160, 201, 142,
-	173, 172, 174, 0, 445, 0, 231, 254, 270, 114,
-	461, 238, 264, 265, 0, 204, 115, 134, 128, 199,
-	132, 175, 111, 144, 228, 152, 159, 207, 268, 189,
-	213, 118, 253, 229, 457, 460, 455, 456, 504, 505,
-	551, 552, 553, 529, 451, 0, 458, 459, 0, 534,
-	541, 542, 508, 97, 106, 156, 267, 205, 131, 255,
-	441, 454, 124, 464, 0, 0, 477, 482, 483, 495,
-	497, 498, 499, 500, 507, 514, 515, 517, 523, 524,
-	525, 526, 531, 538, 557, 99, 100, 107, 113, 119,
-	123, 127, 130, 136, 140, 143, 145, 146, 147, 150,
-	161, 164, 165, 166, 167, 177, 178, 179, 181, 184,
-	185, 186, 187, 188, 191, 193, 194, 195, 196, 197,
-	198, 206, 209, 215, 216, 217, 218, 219, 220, 221,
-	223, 224, 225, 226, 232, 235, 241, 242, 252, 259,
-	262, 138, 249, 263, 545, 533, 0, 0, 490, 548,
-	463, 480, 556, 481, 484, 521, 448, 503, 183, 478,
-	0, 467, 443, 474, 444, 465, 492, 126, 496, 462,
-	535, 506, 547, 155, 0, 468, 554, 157, 512, 0,
-	230, 171, 0, 0, 0, 494, 537, 501, 530, 489,
-	522, 453, 511, 549, 479, 519, 550, 0, 0, 0,
-	94, 95, 96, 0, 0, 0, 0, 0, 0, 0,
-	0, 116, 0, 516, 544, 476, 518, 520, 558, 442,
-	513, 0, 446, 449, 555, 540, 471, 472, 0, 0,
-	0, 0, 0, 0, 0, 493, 502, 527, 487, 0,
-	0, 0, 0, 0, 0, 0, 0, 469, 0, 510,
-	0, 0, 0, 450, 447, 0, 0, 0, 0, 491,
-	0, 0, 0, 452, 0, 470, 528, 0, 440, 135,
-	532, 539, 488, 288, 543, 486, 485, 546, 202, 0,
-	234, 139, 154, 112, 151, 98, 108, 0, 137, 180,
-	210, 214, 536, 466, 475, 120, 473, 212, 190, 251,
-	509, 192, 211, 158, 240, 203, 250, 260, 261, 237,
-	258, 266, 227, 101, 236, 248, 117, 222, 0, 0,
-	0, 103, 246, 233, 169, 148, 149, 102, 0, 208,
-	125, 133, 122, 182, 243, 244, 121, 269, 109, 257,
-	105, 110, 256, 176, 239, 247, 170, 163, 104, 245,
-	168, 162, 153, 129, 141, 200, 160, 201, 142, 173,
-	172, 174, 0, 445, 0, 231, 254, 270, 114, 461,
-	238, 264, 265, 0, 204, 115, 134, 128, 199, 132,
-	175, 111, 144, 228, 152, 159, 207, 268, 189, 213,
-	118, 253, 229, 457, 460, 455, 456, 504, 505, 551,
-	552, 553, 529, 451, 0, 458, 459, 0, 534, 541,
-	542, 508, 97, 106, 156, 267, 205, 131, 255, 441,
-	454, 124, 464, 0, 0, 477, 482, 483, 495, 497,
-	498, 499, 500, 507, 514, 515, 517, 523, 524, 525,
-	526, 531, 538, 557, 99, 100, 107, 113, 119, 123,
-	127, 130, 136, 140, 143, 145, 146, 147, 150, 161,
-	164, 165, 166, 167, 177, 178, 179, 181, 184, 185,
-	186, 187, 188, 191, 193, 194, 195, 196, 197, 198,
-	206, 209, 215, 216, 217, 218, 219, 220, 221, 223,
-	224, 225, 226, 232, 235, 241, 242, 252, 259, 262,
-	138, 249, 263, 545, 533, 0, 0, 490, 548, 463,
-	480, 556, 481, 484, 521, 448, 503, 183, 478, 0,
-	467, 443, 474, 444, 465, 492, 126, 496, 462, 535,
-	506, 547, 155, 0, 468, 554, 157, 512, 0, 230,
-	171, 0, 0, 0, 494, 537, 501, 530, 489, 522,
-	453, 511, 549, 479, 519, 550, 0, 0, 0, 94,
-	95, 96, 0, 0, 0, 0, 0, 0, 0, 0,
-	116, 0, 516, 544, 476, 518, 520, 558, 442, 513,
-	0, 446, 449, 555, 540, 471, 472, 0, 0, 0,
-	0, 0, 0, 0, 493, 502, 527, 487, 0, 0,
-	0, 0, 0, 0, 0, 0, 469, 0, 510, 0,
-	0, 0, 450, 447, 0, 0, 0, 0, 491, 0,
-	0, 0, 452, 0, 470, 528, 0, 440, 135, 532,
-	539, 488, 288, 543, 486, 485, 546, 202, 0, 234,
-	139, 154, 112, 151, 98, 108, 0, 137, 180, 210,
-	214, 536, 466, 475, 120, 473, 212, 190, 251, 509,
-	192, 211, 158, 240, 203, 250, 260, 261, 237, 258,
-	266, 227, 101, 236, 248, 117, 222, 0, 0, 0,
-	103, 246, 233, 169, 148, 149, 102, 0, 208, 125,
-	133, 122, 182, 243, 244, 121, 269, 109, 257, 105,
-	438, 256, 176, 239, 247, 170, 163, 104, 245, 168,
-	162, 153, 129, 141, 200, 160, 201, 142, 173, 172,
-	174, 0, 445, 0, 231, 254, 270, 114, 461, 238,
-	264, 265, 0, 204, 115, 134, 128, 199, 132, 439,
-	437, 432, 431, 152, 159, 207, 268, 189, 213, 118,
-	253, 229, 457, 460, 455, 456, 504, 505, 551, 552,
-	553, 529, 451, 0, 458, 459, 0, 534, 541, 542,
-	508, 97, 106, 156, 267, 205, 131, 255, 441, 454,
-	124, 464, 0, 0, 477, 482, 483, 495, 497, 498,
-	499, 500, 507, 514, 515, 517, 523, 524, 525, 526,
-	531, 538, 557, 99, 100, 107, 113, 119, 123, 127,
-	130, 136, 140, 143, 145, 146, 147, 150, 161, 164,
-	165, 166, 167, 177, 178, 179, 181, 184, 185, 186,
-	187, 188, 191, 193, 194, 195, 196, 197, 198, 206,
-	209, 215, 216, 217, 218, 219, 220, 221, 223, 224,
-	225, 226, 232, 235, 241, 242, 252, 259, 262, 138,
-	249, 263, 545, 533, 0, 0, 490, 548, 463, 480,
-	556, 481, 484, 521, 448, 503, 183, 478, 0, 467,
-	443, 474, 444, 465, 492, 126, 496, 462, 535, 506,
-	547, 155, 0, 468, 554, 157, 512, 0, 230, 171,
-	0, 0, 0, 494, 537, 501, 530, 489, 522, 453,
-	511, 549, 479, 519, 550, 0, 0, 0, 94, 95,
-	96, 0, 0, 0, 0, 0, 0, 0, 0, 116,
-	0, 516, 544, 476, 518, 520, 558, 442, 513, 0,
-	446, 449, 555, 540, 471, 472, 0, 0, 0, 0,
-	0, 0, 0, 493, 502, 527, 487, 0, 0, 0,
-	0, 0, 0, 0, 0, 469, 0, 510, 0, 0,
-	0, 450, 447, 0, 0, 0, 0, 491, 0, 0,
-	0, 452, 0, 470, 528, 0, 440, 135, 532, 539,
-	488, 288, 543, 486, 485, 546, 202, 0, 234, 139,
-	154, 112, 151, 98, 108, 0, 137, 180, 210, 214,
-	536, 466, 475, 120, 473, 212, 190, 251, 509, 192,
-	211, 158, 240, 203, 250, 260, 261, 237, 258, 266,
-	227, 101, 236, 770, 117, 222, 0, 0, 0, 103,
-	246, 233, 169, 148, 149, 102, 0, 208, 125, 133,
-	122, 182, 243, 244, 121, 269, 109, 257, 105, 438,
-	256, 176, 239, 247, 170, 163, 104, 245, 168, 162,
-	153, 129, 141, 200, 160, 201, 142, 173, 172, 174,
-	0, 445, 0, 231, 254, 270, 114, 461, 238, 264,
-	265, 0, 204, 115, 134, 128, 199, 132, 439, 437,
-	432, 431, 152, 159, 207, 268, 189, 213, 118, 253,
-	229, 457, 460, 455, 456, 504, 505, 551, 552, 553,
-	529, 451, 0, 458, 459, 0, 534, 541, 542, 508,
-	97, 106, 156, 267, 205, 131, 255, 441, 454, 124,
-	464, 0, 0, 477, 482, 483, 495, 497, 498, 499,
-	500, 507, 514, 515, 517, 523, 524, 525, 526, 531,
-	538, 557, 99, 100, 107, 113, 119, 123, 127, 130,
-	136, 140, 143, 145, 146, 147, 150, 161, 164, 165,
-	166, 167, 177, 178, 179, 181, 184, 185, 186, 187,
-	188, 191, 193, 194, 195, 196, 197, 198, 206, 209,
-	215, 216, 217, 218, 219, 220, 221, 223, 224, 225,
-	226, 232, 235, 241, 242, 252, 259, 262, 138, 249,
-	263, 545, 533, 0, 0, 490, 548, 463, 480, 556,
-	481, 484, 521, 448, 503, 183, 478, 0, 467, 443,
-	474, 444, 465, 492, 126, 496, 462, 535, 506, 547,
-	155, 0, 468, 554, 157, 512, 0, 230, 171, 0,
-	0, 0, 494, 537, 501, 530, 489, 522, 453, 511,
-	549, 479, 519, 550, 0, 0, 0, 94, 95, 96,
-	0, 0, 0, 0, 0, 0, 0, 0, 116, 0,
-	516, 544, 476, 518, 520, 558, 442, 513, 0, 446,
-	449, 555, 540, 471, 472, 0, 0, 0, 0, 0,
-	0, 0, 493, 502, 527, 487, 0, 0, 0, 0,
-	0, 0, 0, 0, 469, 0, 510, 0, 0, 0,
-	450, 447, 0, 0, 0, 0, 491, 0, 0, 0,
-	452, 0, 470, 528, 0, 440, 135, 532, 539, 488,
-	288, 543, 486, 485, 546, 202, 0, 234, 139, 154,
-	112, 151, 98, 108, 0, 137, 180, 210, 214, 536,
-	466, 475, 120, 473, 212, 190, 251, 509, 192, 211,
-	158, 240, 203, 250, 260, 261, 237, 258, 266, 227,
-	101, 236, 429, 117, 222, 0, 0, 0, 103, 246,
-	233, 169, 148, 149, 102, 0, 208, 125, 133, 122,
-	182, 243, 244, 121, 269, 109, 257, 105, 438, 256,
-	176, 239, 247, 170, 163, 104, 245, 168, 162, 153,
-	129, 141, 200, 160, 201, 142, 173, 172, 174, 0,
-	445, 0, 231, 254, 270, 114, 461, 238, 264, 265,
-	0, 204, 115, 134, 128, 199, 132, 439, 437, 432,
-	431, 152, 159, 207, 268, 189, 213, 118, 253, 229,
-	457, 460, 455, 456, 504, 505, 551, 552, 553, 529,
-	451, 0, 458, 459, 0, 534, 541, 542, 508, 97,
-	106, 156, 267, 205, 131, 255, 441, 454, 124, 464,
-	0, 0, 477, 482, 483, 495, 497, 498, 499, 500,
-	507, 514, 515, 517, 523, 524, 525, 526, 531, 538,
-	557, 99, 100, 107, 113, 119, 123, 127, 130, 136,
-	140, 143, 145, 146, 147, 150, 161, 164, 165, 166,
-	167, 177, 178, 179, 181, 184, 185, 186, 187, 188,
-	191, 193, 194, 195, 196, 197, 198, 206, 209, 215,
-	216, 217, 218, 219, 220, 221, 223, 224, 225, 226,
-	232, 235, 241, 242, 252, 259, 262, 138, 249, 263,
-	183, 0, 0, 933, 0, 332, 0, 0, 0, 126,
-	0, 331, 0, 0, 0, 155, 0, 934, 375, 157,
-	0, 0, 230, 171, 0, 0, 0, 0, 0, 366,
-	367, 0, 0, 0, 0, 0, 0, 0, 0, 59,
-	0, 0, 94, 95, 96, 353, 352, 355, 356, 357,
-	358, 0, 0, 116, 354, 359, 360, 361, 0, 0,
-	0, 0, 329, 346, 0, 374, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 343, 344, 415, 0, 0,
-	0, 389, 0, 345, 0, 0, 338, 339, 341, 340,
-	342, 347, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 135, 388, 0, 0, 288, 0, 0, 386, 0,
-	202, 0, 234, 139, 154, 112, 151, 98, 108, 0,
-	137, 180, 210, 214, 0, 0, 0, 120, 0, 212,
-	190, 251, 0, 192, 211, 158, 240, 203, 250, 260,
-	261, 237, 258, 266, 227, 101, 236, 248, 117, 222,
-	0, 0, 0, 103, 246, 233, 169, 148, 149, 102,
-	0, 208, 125, 133, 122, 182, 243, 244, 121, 269,
-	109, 257, 105, 110, 256, 176, 239, 247, 170, 163,
-	104, 245, 168, 162, 153, 129, 141, 200, 160, 201,
-	142, 173, 172, 174, 0, 0, 0, 231, 254, 270,
-	114, 0, 238, 264, 265, 0, 204, 115, 134, 128,
-	199, 132, 175, 111, 144, 228, 152, 159, 207, 268,
-	189, 213, 118, 253, 229, 376, 387, 382, 383, 380,
-	381, 379, 378, 377, 390, 368, 369, 370, 371, 373,
-	0, 384, 385, 372, 97, 106, 156, 267, 205, 131,
-	255, 0, 0, 124, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 99, 100, 107, 113,
-	119, 123, 127, 130, 136, 140, 143, 145, 146, 147,
-	150, 161, 164, 165, 166, 167, 177, 178, 179, 181,
-	184, 185, 186, 187, 188, 191, 193, 194, 195, 196,
-	197, 198, 206, 209, 215, 216, 217, 218, 219, 220,
-	221, 223, 224, 225, 226, 232, 235, 241, 242, 252,
-	259, 262, 138, 249, 263, 183, 0, 0, 0, 0,
-	332, 0, 0, 0, 126, 0, 331, 0, 0, 0,
-	155, 0, 0, 375, 157, 0, 0, 230, 171, 0,
-	0, 0, 0, 0, 366, 367, 0, 0, 0, 0,
-	0, 0, 1037, 0, 59, 0, 0, 94, 95, 96,
-	353, 352, 355, 356, 357, 358, 0, 0, 116, 354,
-	359, 360, 361, 1038, 0, 0, 0, 329, 346, 0,
-	374, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	343, 344, 0, 0, 0, 0, 389, 0, 345, 0,
-	0, 338, 339, 341, 340, 342, 347, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 135, 388, 0, 0,
-	288, 0, 0, 386, 0, 202, 0, 234, 139, 154,
-	112, 151, 98, 108, 0, 137, 180, 210, 214, 0,
-	0, 0, 120, 0, 212, 190, 251, 0, 192, 211,
-	158, 240, 203, 250, 260, 261, 237, 258, 266, 227,
-	101, 236, 248, 117, 222, 0, 0, 0, 103, 246,
-	233, 169, 148, 149, 102, 0, 208, 125, 133, 122,
-	182, 243, 244, 121, 269, 109, 257, 105, 110, 256,
-	176, 239, 247, 170, 163, 104, 245, 168, 162, 153,
-	129, 141, 200, 160, 201, 142, 173, 172, 174, 0,
-	0, 0, 231, 254, 270, 114, 0, 238, 264, 265,
-	0, 204, 115, 134, 128, 199, 132, 175, 111, 144,
-	228, 152, 159, 207, 268, 189, 213, 118, 253, 229,
-	376, 387, 382, 383, 380, 381, 379, 378, 377, 390,
-	368, 369, 370, 371, 373, 0, 384, 385, 372, 97,
-	106, 156, 267, 205, 131, 255, 0, 0, 124, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 99, 100, 107, 113, 119, 123, 127, 130, 136,
-	140, 143, 145, 146, 147, 150, 161, 164, 165, 166,
-	167, 177, 178, 179, 181, 184, 185, 186, 187, 188,
-	191, 193, 194, 195, 196, 197, 198, 206, 209, 215,
-	216, 217, 218, 219, 220, 221, 223, 224, 225, 226,
-	232, 235, 241, 242, 252, 259, 262, 138, 249, 263,
-	183, 0, 0, 0, 0, 332, 0, 0, 0, 126,
-	0, 331, 0, 0, 0, 155, 0, 0, 375, 157,
-	0, 0, 230, 171, 0, 0, 0, 0, 0, 366,
-	367, 0, 0, 0, 0, 0, 0, 0, 0, 59,
-	0, 403, 94, 95, 96, 353, 352, 355, 356, 357,
-	358, 0, 0, 116, 354, 359, 360, 361, 0, 0,
-	0, 0, 329, 346, 0, 374, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 343, 344, 0, 0, 0,
-	0, 389, 0, 345, 0, 0, 338, 339, 341, 340,
-	342, 347, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 135, 388, 0, 0, 288, 0, 0, 386, 0,
-	202, 0, 234, 139, 154, 112, 151, 98, 108, 0,
-	137, 180, 210, 214, 0, 0, 0, 120, 0, 212,
-	190, 251, 0, 192, 211, 158, 240, 203, 250, 260,
-	261, 237, 258, 266, 227, 101, 236, 248, 117, 222,
-	0, 0, 0, 103, 246, 233, 169, 148, 149, 102,
-	0, 208, 125, 133, 122, 182, 243, 244, 121, 269,
-	109, 257, 105, 110, 256, 176, 239, 247, 170, 163,
-	104, 245, 168, 162, 153, 129, 141, 200, 160, 201,
-	142, 173, 172, 174, 0, 0, 0, 231, 254, 270,
-	114, 0, 238, 264, 265, 0, 204, 115, 134, 128,
-	199, 132, 175, 111, 144, 228, 152, 159, 207, 268,
-	189, 213, 118, 253, 229, 376, 387, 382, 383, 380,
-	381, 379, 378, 377, 390, 368, 369, 370, 371, 373,
-	0, 384, 385, 372, 97, 106, 156, 267, 205, 131,
-	255, 0, 0, 124, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 99, 100, 107, 113,
-	119, 123, 127, 130, 136, 140, 143, 145, 146, 147,
-	150, 161, 164, 165, 166, 167, 177, 178, 179, 181,
-	184, 185, 186, 187, 188, 191, 193, 194, 195, 196,
-	197, 198, 206, 209, 215, 216, 217, 218, 219, 220,
-	221, 223, 224, 225, 226, 232, 235, 241, 242, 252,
-	259, 262, 138, 249, 263, 183, 0, 0, 0, 0,
-	332, 0, 0, 0, 126, 0, 331, 0, 0, 0,
-	155, 0, 0, 375, 157, 0, 0, 230, 171, 0,
-	0, 0, 0, 0, 366, 367, 0, 0, 0, 0,
-	0, 0, 0, 0, 59, 0, 0, 94, 95, 96,
-	353, 352, 355, 356, 357, 358, 0, 0, 116, 354,
-	359, 360, 361, 0, 0, 0, 0, 329, 346, 0,
-	374, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	343, 344, 415, 0, 0, 0, 389, 0, 345, 0,
-	0, 338, 339, 341, 340, 342, 347, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 135, 388, 0, 0,
-	288, 0, 0, 386, 0, 202, 0, 234, 139, 154,
-	112, 151, 98, 108, 0, 137, 180, 210, 214, 0,
-	0, 0, 120, 0, 212, 190, 251, 0, 192, 211,
-	158, 240, 203, 250, 260, 261, 237, 258, 266, 227,
-	101, 236, 248, 117, 222, 0, 0, 0, 103, 246,
-	233, 169, 148, 149, 102, 0, 208, 125, 133, 122,
-	182, 243, 244, 121, 269, 109, 257, 105, 110, 256,
-	176, 239, 247, 170, 163, 104, 245, 168, 162, 153,
-	129, 141, 200, 160, 201, 142, 173, 172, 174, 0,
-	0, 0, 231, 254, 270, 114, 0, 238, 264, 265,
-	0, 204, 115, 134, 128, 199, 132, 175, 111, 144,
-	228, 152, 159, 207, 268, 189, 213, 118, 253, 229,
-	376, 387, 382, 383, 380, 381, 379, 378, 377, 390,
-	368, 369, 370, 371, 373, 0, 384, 385, 372, 97,
-	106, 156, 267, 205, 131, 255, 0, 0, 124, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 99, 100, 107, 113, 119, 123, 127, 130, 136,
-	140, 143, 145, 146, 147, 150, 161, 164, 165, 166,
-	167, 177, 178, 179, 181, 184, 185, 186, 187, 188,
-	191, 193, 194, 195, 196, 197, 198, 206, 209, 215,
-	216, 217, 218, 219, 220, 221, 223, 224, 225, 226,
-	232, 235, 241, 242, 252, 259, 262, 138, 249, 263,
-	183, 0, 0, 0, 0, 332, 0, 0, 0, 126,
-	0, 331, 0, 0, 0, 155, 0, 0, 375, 157,
-	0, 0, 230, 171, 0, 0, 0, 0, 0, 366,
-	367, 0, 0, 0, 0, 0, 0, 0, 0, 59,
-	0, 0, 94, 95, 96, 353, 951, 355, 356, 357,
-	358, 0, 0, 116, 354, 359, 360, 361, 0, 0,
-	0, 0, 329, 346, 0, 374, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 343, 344, 415, 0, 0,
-	0, 389, 0, 345, 0, 0, 338, 339, 341, 340,
-	342, 347, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 135, 388, 0, 0, 288, 0, 0, 386, 0,
-	202, 0, 234, 139, 154, 112, 151, 98, 108, 0,
-	137, 180, 210, 214, 0, 0, 0, 120, 0, 212,
-	190, 251, 0, 192, 211, 158, 240, 203, 250, 260,
-	261, 237, 258, 266, 227, 101, 236, 248, 117, 222,
-	0, 0, 0, 103, 246, 233, 169, 148, 149, 102,
-	0, 208, 125, 133, 122, 182, 243, 244, 121, 269,
-	109, 257, 105, 110, 256, 176, 239, 247, 170, 163,
-	104, 245, 168, 162, 153, 129, 141, 200, 160, 201,
-	142, 173, 172, 174, 0, 0, 0, 231, 254, 270,
-	114, 0, 238, 264, 265, 0, 204, 115, 134, 128,
-	199, 132, 175, 111, 144, 228, 152, 159, 207, 268,
-	189, 213, 118, 253, 229, 376, 387, 382, 383, 380,
-	381, 379, 378, 377, 390, 368, 369, 370, 371, 373,
-	0, 384, 385, 372, 97, 106, 156, 267, 205, 131,
-	255, 0, 0, 124, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 99, 100, 107, 113,
-	119, 123, 127, 130, 136, 140, 143, 145, 146, 147,
-	150, 161, 164, 165, 166, 167, 177, 178, 179, 181,
-	184, 185, 186, 187, 188, 191, 193, 194, 195, 196,
-	197, 198, 206, 209, 215, 216, 217, 218, 219, 220,
-	221, 223, 224, 225, 226, 232, 235, 241, 242, 252,
-	259, 262, 138, 249, 263, 183, 0, 0, 0, 0,
-	332, 0, 0, 0, 126, 0, 331, 0, 0, 0,
-	155, 0, 0, 375, 157, 0, 0, 230, 171, 0,
-	0, 0, 0, 0, 366, 367, 0, 0, 0, 0,
-	0, 0, 0, 0, 59, 0, 0, 94, 95, 96,
-	353, 948, 355, 356, 357, 358, 0, 0, 116, 354,
-	359, 360, 361, 0, 0, 0, 0, 329, 346, 0,
-	374, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	343, 344, 415, 0, 0, 0, 389, 0, 345, 0,
-	0, 338, 339, 341, 340, 342, 347, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 135, 388, 0, 0,
-	288, 0, 0, 386, 0, 202, 0, 234, 139, 154,
-	112, 151, 98, 108, 0, 137, 180, 210, 214, 0,
-	0, 0, 120, 0, 212, 190, 251, 0, 192, 211,
-	158, 240, 203, 250, 260, 261, 237, 258, 266, 227,
-	101, 236, 248, 117, 222, 0, 0, 0, 103, 246,
-	233, 169, 148, 149, 102, 0, 208, 125, 133, 122,
-	182, 243, 244, 121, 269, 109, 257, 105, 110, 256,
-	176, 239, 247, 170, 163, 104, 245, 168, 162, 153,
-	129, 141, 200, 160, 201, 142, 173, 172, 174, 0,
-	0, 0, 231, 254, 270, 114, 0, 238, 264, 265,
-	0, 204, 115, 134, 128, 199, 132, 175, 111, 144,
-	228, 152, 159, 207, 268, 189, 213, 118, 253, 229,
-	376, 387, 382, 383, 380, 381, 379, 378, 377, 390,
-	368, 369, 370, 371, 373, 0, 384, 385, 372, 97,
-	106, 156, 267, 205, 131, 255, 0, 0, 124, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 99, 100, 107, 113, 119, 123, 127, 130, 136,
-	140, 143, 145, 146, 147, 150, 161, 164, 165, 166,
-	167, 177, 178, 179, 181, 184, 185, 186, 187, 188,
-	191, 193, 194, 195, 196, 197, 198, 206, 209, 215,
-	216, 217, 218, 219, 220, 221, 223, 224, 225, 226,
-	232, 235, 241, 242, 252, 259, 262, 138, 249, 263,
-	396, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 183, 0, 0, 0, 0, 332, 0,
-	0, 0, 126, 0, 331, 0, 0, 0, 155, 0,
-	0, 375, 157, 0, 0, 230, 171, 0, 0, 0,
-	0, 0, 366, 367, 0, 0, 0, 0, 0, 0,
-	0, 0, 59, 0, 0, 94, 95, 96, 353, 352,
-	355, 356, 357, 358, 0, 0, 116, 354, 359, 360,
-	361, 0, 0, 0, 0, 329, 346, 0, 374, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 343, 344,
-	0, 0, 0, 0, 389, 0, 345, 0, 0, 338,
-	339, 341, 340, 342, 347, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 135, 388, 0, 0, 288, 0,
-	0, 386, 0, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 0, 0, 0,
-	120, 0, 212, 190, 251, 0, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 0, 0,
-	231, 254, 270, 114, 0, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 376, 387,
-	382, 383, 380, 381, 379, 378, 377, 390, 368, 369,
-	370, 371, 373, 0, 384, 385, 372, 97, 106, 156,
-	267, 205, 131, 255, 0, 0, 124, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 138, 249, 263, 183, 0,
-	0, 0, 0, 332, 0, 0, 0, 126, 0, 331,
-	0, 0, 0, 155, 0, 0, 375, 157, 0, 0,
-	230, 171, 0, 0, 0, 0, 0, 366, 367, 0,
-	0, 0, 0, 0, 0, 0, 0, 59, 0, 0,
-	94, 95, 96, 353, 352, 355, 356, 357, 358, 0,
-	0, 116, 354, 359, 360, 361, 0, 0, 0, 0,
-	329, 346, 0, 374, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 343, 344, 0, 0, 0, 0, 389,
-	0, 345, 0, 0, 338, 339, 341, 340, 342, 347,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 135,
-	388, 0, 0, 288, 0, 0, 386, 0, 202, 0,
-	234, 139, 154, 112, 151, 98, 108, 0, 137, 180,
-	210, 214, 0, 0, 0, 120, 0, 212, 190, 251,
-	0, 192, 211, 158, 240, 203, 250, 260, 261, 237,
-	258, 266, 227, 101, 236, 248, 117, 222, 0, 0,
-	0, 103, 246, 233, 169, 148, 149, 102, 0, 208,
-	125, 133, 122, 182, 243, 244, 121, 269, 109, 257,
-	105, 110, 256, 176, 239, 247, 170, 163, 104, 245,
-	168, 162, 153, 129, 141, 200, 160, 201, 142, 173,
-	172, 174, 0, 0, 0, 231, 254, 270, 114, 0,
-	238, 264, 265, 0, 204, 115, 134, 128, 199, 132,
-	175, 111, 144, 228, 152, 159, 207, 268, 189, 213,
-	118, 253, 229, 376, 387, 382, 383, 380, 381, 379,
-	378, 377, 390, 368, 369, 370, 371, 373, 0, 384,
-	385, 372, 97, 106, 156, 267, 205, 131, 255, 0,
-	0, 124, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 99, 100, 107, 113, 119, 123,
-	127, 130, 136, 140, 143, 145, 146, 147, 150, 161,
-	164, 165, 166, 167, 177, 178, 179, 181, 184, 185,
-	186, 187, 188, 191, 193, 194, 195, 196, 197, 198,
-	206, 209, 215, 216, 217, 218, 219, 220, 221, 223,
-	224, 225, 226, 232, 235, 241, 242, 252, 259, 262,
-	138, 249, 263, 183, 0, 0, 0, 0, 0, 0,
-	0, 0, 126, 0, 0, 0, 0, 0, 155, 0,
-	0, 375, 157, 0, 0, 230, 171, 0, 0, 0,
-	0, 0, 366, 367, 0, 0, 0, 0, 0, 0,
-	0, 0, 59, 0, 0, 94, 95, 96, 353, 352,
-	355, 356, 357, 358, 0, 0, 116, 354, 359, 360,
-	361, 0, 0, 0, 0, 0, 346, 0, 374, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 343, 344,
-	0, 0, 0, 0, 389, 0, 345, 0, 0, 338,
-	339, 341, 340, 342, 347, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 135, 388, 0, 0, 288, 0,
-	0, 386, 0, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 0, 0, 0,
-	120, 0, 212, 190, 251, 1607, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 0, 0,
-	231, 254, 270, 114, 0, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 376, 387,
-	382, 383, 380, 381, 379, 378, 377, 390, 368, 369,
-	370, 371, 373, 0, 384, 385, 372, 97, 106, 156,
-	267, 205, 131, 255, 0, 0, 124, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 138, 249, 263, 183, 0,
-	0, 0, 0, 0, 0, 0, 0, 126, 0, 0,
-	0, 0, 0, 155, 0, 0, 375, 157, 0, 0,
-	230, 171, 0, 0, 0, 0, 0, 366, 367, 0,
-	0, 0, 0, 0, 0, 0, 0, 59, 0, 403,
-	94, 95, 96, 353, 352, 355, 356, 357, 358, 0,
-	0, 116, 354, 359, 360, 361, 0, 0, 0, 0,
-	0, 346, 0, 374, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 343, 344, 0, 0, 0, 0, 389,
-	0, 345, 0, 0, 338, 339, 341, 340, 342, 347,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 135,
-	388, 0, 0, 288, 0, 0, 386, 0, 202, 0,
-	234, 139, 154, 112, 151, 98, 108, 0, 137, 180,
-	210, 214, 0, 0, 0, 120, 0, 212, 190, 251,
-	0, 192, 211, 158, 240, 203, 250, 260, 261, 237,
-	258, 266, 227, 101, 236, 248, 117, 222, 0, 0,
-	0, 103, 246, 233, 169, 148, 149, 102, 0, 208,
-	125, 133, 122, 182, 243, 244, 121, 269, 109, 257,
-	105, 110, 256, 176, 239, 247, 170, 163, 104, 245,
-	168, 162, 153, 129, 141, 200, 160, 201, 142, 173,
-	172, 174, 0, 0, 0, 231, 254, 270, 114, 0,
-	238, 264, 265, 0, 204, 115, 134, 128, 199, 132,
-	175, 111, 144, 228, 152, 159, 207, 268, 189, 213,
-	118, 253, 229, 376, 387, 382, 383, 380, 381, 379,
-	378, 377, 390, 368, 369, 370, 371, 373, 0, 384,
-	385, 372, 97, 106, 156, 267, 205, 131, 255, 0,
-	0, 124, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 99, 100, 107, 113, 119, 123,
-	127, 130, 136, 140, 143, 145, 146, 147, 150, 161,
-	164, 165, 166, 167, 177, 178, 179, 181, 184, 185,
-	186, 187, 188, 191, 193, 194, 195, 196, 197, 198,
-	206, 209, 215, 216, 217, 218, 219, 220, 221, 223,
-	224, 225, 226, 232, 235, 241, 242, 252, 259, 262,
-	138, 249, 263, 183, 0, 0, 0, 0, 0, 0,
-	0, 0, 126, 0, 0, 0, 0, 0, 155, 0,
-	0, 375, 157, 0, 0, 230, 171, 0, 0, 0,
-	0, 0, 366, 367, 0, 0, 0, 0, 0, 0,
-	0, 0, 59, 0, 0, 94, 95, 96, 353, 352,
-	355, 356, 357, 358, 0, 0, 116, 354, 359, 360,
-	361, 0, 0, 0, 0, 0, 346, 0, 374, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 343, 344,
-	0, 0, 0, 0, 389, 0, 345, 0, 0, 338,
-	339, 341, 340, 342, 347, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 135, 388, 0, 0, 288, 0,
-	0, 386, 0, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 0, 0, 0,
-	120, 0, 212, 190, 251, 0, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 0, 0,
-	231, 254, 270, 114, 0, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 376, 387,
-	382, 383, 380, 381, 379, 378, 377, 390, 368, 369,
-	370, 371, 373, 0, 384, 385, 372, 97, 106, 156,
-	267, 205, 131, 255, 0, 0, 124, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 138, 249, 263, 183, 0,
-	0, 0, 0, 0, 0, 0, 0, 126, 0, 0,
-	0, 0, 0, 155, 0, 0, 0, 157, 0, 0,
-	230, 171, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	94, 95, 96, 0, 0, 0, 0, 0, 0, 0,
-	0, 116, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 649,
-	648, 658, 659, 651, 652, 653, 654, 655, 656, 657,
-	650, 0, 0, 660, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 135,
-	0, 0, 0, 288, 0, 0, 0, 0, 202, 0,
-	234, 139, 154, 112, 151, 98, 108, 0, 137, 180,
-	210, 214, 0, 0, 0, 120, 0, 212, 190, 251,
-	0, 192, 211, 158, 240, 203, 250, 260, 261, 237,
-	258, 266, 227, 101, 236, 248, 117, 222, 0, 0,
-	0, 103, 246, 233, 169, 148, 149, 102, 0, 208,
-	125, 133, 122, 182, 243, 244, 121, 269, 109, 257,
-	105, 110, 256, 176, 239, 247, 170, 163, 104, 245,
-	168, 162, 153, 129, 141, 200, 160, 201, 142, 173,
-	172, 174, 0, 0, 0, 231, 254, 270, 114, 0,
-	238, 264, 265, 0, 204, 115, 134, 128, 199, 132,
-	175, 111, 144, 228, 152, 159, 207, 268, 189, 213,
-	118, 253, 229, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 97, 106, 156, 267, 205, 131, 255, 0,
-	0, 124, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 99, 100, 107, 113, 119, 123,
-	127, 130, 136, 140, 143, 145, 146, 147, 150, 161,
-	164, 165, 166, 167, 177, 178, 179, 181, 184, 185,
-	186, 187, 188, 191, 193, 194, 195, 196, 197, 198,
-	206, 209, 215, 216, 217, 218, 219, 220, 221, 223,
-	224, 225, 226, 232, 235, 241, 242, 252, 259, 262,
-	138, 249, 263, 183, 0, 0, 0, 744, 0, 0,
-	0, 0, 126, 0, 0, 0, 0, 0, 155, 0,
-	0, 0, 157, 0, 0, 230, 171, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 94, 95, 96, 0, 746,
-	0, 0, 0, 0, 0, 0, 116, 0, 0, 0,
-	0, 0, 638, 639, 637, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	640, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 135, 0, 0, 0, 288, 0,
-	0, 0, 0, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 0, 0, 0,
-	120, 0, 212, 190, 251, 0, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 0, 0,
-	231, 254, 270, 114, 0, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 97, 106, 156,
-	267, 205, 131, 255, 0, 0, 124, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 138, 249, 263, 183, 0,
-	0, 0, 0, 0, 0, 0, 0, 126, 0, 0,
-	0, 0, 0, 155, 0, 0, 0, 157, 0, 0,
-	230, 171, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	94, 95, 96, 0, 0, 0, 0, 0, 0, 0,
-	0, 116, 0, 0, 0, 0, 0, 86, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 135,
-	88, 89, 0, 85, 0, 0, 0, 90, 202, 0,
-	234, 139, 154, 112, 151, 98, 108, 0, 137, 180,
-	210, 214, 0, 0, 0, 120, 0, 212, 190, 251,
-	0, 192, 211, 158, 240, 203, 250, 260, 261, 237,
-	258, 266, 227, 101, 236, 248, 117, 222, 0, 0,
-	0, 103, 246, 233, 169, 148, 149, 102, 0, 208,
-	125, 133, 122, 182, 243, 244, 121, 269, 109, 257,
-	105, 110, 256, 176, 239, 247, 170, 163, 104, 245,
-	168, 162, 153, 129, 141, 200, 160, 201, 142, 173,
-	172, 174, 0, 0, 0, 231, 254, 270, 114, 0,
-	238, 264, 265, 0, 204, 115, 134, 128, 199, 132,
-	175, 111, 144, 228, 152, 159, 207, 268, 189, 213,
-	118, 253, 229, 0, 87, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 97, 106, 156, 267, 205, 131, 255, 0,
-	0, 124, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 99, 100, 107, 113, 119, 123,
-	127, 130, 136, 140, 143, 145, 146, 147, 150, 161,
-	164, 165, 166, 167, 177, 178, 179, 181, 184, 185,
-	186, 187, 188, 191, 193, 194, 195, 196, 197, 198,
-	206, 209, 215, 216, 217, 218, 219, 220, 221, 223,
-	224, 225, 226, 232, 235, 241, 242, 252, 259, 262,
-	138, 249, 263, 183, 0, 0, 0, 1020, 0, 0,
-	0, 0, 126, 0, 0, 0, 0, 0, 155, 0,
-	0, 0, 157, 0, 0, 230, 171, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 94, 95, 96, 0, 1022,
-	0, 0, 0, 0, 0, 0, 116, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 135, 0, 0, 0, 288, 0,
-	0, 0, 0, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 0, 0, 0,
-	120, 0, 212, 190, 251, 0, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 0, 0,
-	231, 254, 270, 114, 0, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 97, 106, 156,
-	267, 205, 131, 255, 0, 0, 124, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 138, 249, 263, 30, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 183, 0, 0, 0, 0, 0, 0, 0, 0,
-	126, 0, 0, 0, 0, 0, 155, 0, 0, 0,
-	157, 0, 0, 230, 171, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	59, 0, 0, 94, 95, 96, 0, 0, 0, 0,
-	0, 0, 0, 0, 116, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 135, 0, 0, 0, 288, 0, 0, 0,
-	0, 202, 0, 234, 139, 154, 112, 151, 98, 108,
-	0, 137, 180, 210, 214, 0, 0, 0, 120, 0,
-	212, 190, 251, 0, 192, 211, 158, 240, 203, 250,
-	260, 261, 237, 258, 266, 227, 101, 236, 248, 117,
-	222, 0, 0, 0, 103, 246, 233, 169, 148, 149,
-	102, 0, 208, 125, 133, 122, 182, 243, 244, 121,
-	269, 109, 257, 105, 110, 256, 176, 239, 247, 170,
-	163, 104, 245, 168, 162, 153, 129, 141, 200, 160,
-	201, 142, 173, 172, 174, 0, 0, 0, 231, 254,
-	270, 114, 0, 238, 264, 265, 0, 204, 115, 134,
-	128, 199, 132, 175, 111, 144, 228, 152, 159, 207,
-	268, 189, 213, 118, 253, 229, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 97, 106, 156, 267, 205,
-	131, 255, 0, 0, 124, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 99, 100, 107,
-	113, 119, 123, 127, 130, 136, 140, 143, 145, 146,
-	147, 150, 161, 164, 165, 166, 167, 177, 178, 179,
-	181, 184, 185, 186, 187, 188, 191, 193, 194, 195,
-	196, 197, 198, 206, 209, 215, 216, 217, 218, 219,
-	220, 221, 223, 224, 225, 226, 232, 235, 241, 242,
-	252, 259, 262, 138, 249, 263, 183, 0, 0, 0,
-	1020, 0, 0, 0, 0, 126, 0, 0, 0, 0,
-	0, 155, 0, 0, 0, 157, 0, 0, 230, 171,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 94, 95,
-	96, 0, 1022, 0, 0, 0, 0, 0, 0, 116,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 135, 0, 0,
-	0, 288, 0, 0, 0, 0, 202, 0, 234, 139,
-	154, 112, 151, 98, 108, 0, 137, 180, 210, 214,
-	0, 0, 0, 120, 0, 212, 190, 251, 0, 1018,
-	211, 158, 240, 203, 250, 260, 261, 237, 258, 266,
-	227, 101, 236, 248, 117, 222, 0, 0, 0, 103,
-	246, 233, 169, 148, 149, 102, 0, 208, 125, 133,
-	122, 182, 243, 244, 121, 269, 109, 257, 105, 110,
-	256, 176, 239, 247, 170, 163, 104, 245, 168, 162,
-	153, 129, 141, 200, 160, 201, 142, 173, 172, 174,
-	0, 0, 0, 231, 254, 270, 114, 0, 238, 264,
-	265, 0, 204, 115, 134, 128, 199, 132, 175, 111,
-	144, 228, 152, 159, 207, 268, 189, 213, 118, 253,
-	229, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	97, 106, 156, 267, 205, 131, 255, 0, 0, 124,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 99, 100, 107, 113, 119, 123, 127, 130,
-	136, 140, 143, 145, 146, 147, 150, 161, 164, 165,
-	166, 167, 177, 178, 179, 181, 184, 185, 186, 187,
-	188, 191, 193, 194, 195, 196, 197, 198, 206, 209,
-	215, 216, 217, 218, 219, 220, 221, 223, 224, 225,
-	226, 232, 235, 241, 242, 252, 259, 262, 138, 249,
-	263, 183, 0, 0, 0, 0, 0, 0, 0, 0,
-	126, 0, 0, 0, 0, 0, 155, 0, 0, 0,
-	157, 0, 0, 230, 171, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 94, 95, 96, 0, 0, 985, 0,
-	0, 986, 0, 0, 116, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 135, 0, 0, 0, 288, 0, 0, 0,
-	0, 202, 0, 234, 139, 154, 112, 151, 98, 108,
-	0, 137, 180, 210, 214, 0, 0, 0, 120, 0,
-	212, 190, 251, 0, 192, 211, 158, 240, 203, 250,
-	260, 261, 237, 258, 266, 227, 101, 236, 248, 117,
-	222, 0, 0, 0, 103, 246, 233, 169, 148, 149,
-	102, 0, 208, 125, 133, 122, 182, 243, 244, 121,
-	269, 109, 257, 105, 110, 256, 176, 239, 247, 170,
-	163, 104, 245, 168, 162, 153, 129, 141, 200, 160,
-	201, 142, 173, 172, 174, 0, 0, 0, 231, 254,
-	270, 114, 0, 238, 264, 265, 0, 204, 115, 134,
-	128, 199, 132, 175, 111, 144, 228, 152, 159, 207,
-	268, 189, 213, 118, 253, 229, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 97, 106, 156, 267, 205,
-	131, 255, 0, 0, 124, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 99, 100, 107,
-	113, 119, 123, 127, 130, 136, 140, 143, 145, 146,
-	147, 150, 161, 164, 165, 166, 167, 177, 178, 179,
-	181, 184, 185, 186, 187, 188, 191, 193, 194, 195,
-	196, 197, 198, 206, 209, 215, 216, 217, 218, 219,
-	220, 221, 223, 224, 225, 226, 232, 235, 241, 242,
-	252, 259, 262, 138, 249, 263, 183, 0, 0, 0,
-	0, 0, 0, 0, 0, 126, 0, 781, 0, 0,
-	0, 155, 0, 0, 0, 157, 0, 0, 230, 171,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 94, 95,
-	96, 0, 780, 0, 0, 0, 0, 0, 0, 116,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 135, 0, 0,
-	0, 288, 0, 0, 0, 0, 202, 0, 234, 139,
-	154, 112, 151, 98, 108, 0, 137, 180, 210, 214,
-	0, 0, 0, 120, 0, 212, 190, 251, 0, 192,
-	211, 158, 240, 203, 250, 260, 261, 237, 258, 266,
-	227, 101, 236, 248, 117, 222, 0, 0, 0, 103,
-	246, 233, 169, 148, 149, 102, 0, 208, 125, 133,
-	122, 182, 243, 244, 121, 269, 109, 257, 105, 110,
-	256, 176, 239, 247, 170, 163, 104, 245, 168, 162,
-	153, 129, 141, 200, 160, 201, 142, 173, 172, 174,
-	0, 0, 0, 231, 254, 270, 114, 0, 238, 264,
-	265, 0, 204, 115, 134, 128, 199, 132, 175, 111,
-	144, 228, 152, 159, 207, 268, 189, 213, 118, 253,
-	229, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	97, 106, 156, 267, 205, 131, 255, 0, 0, 124,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 99, 100, 107, 113, 119, 123, 127, 130,
-	136, 140, 143, 145, 146, 147, 150, 161, 164, 165,
-	166, 167, 177, 178, 179, 181, 184, 185, 186, 187,
-	188, 191, 193, 194, 195, 196, 197, 198, 206, 209,
-	215, 216, 217, 218, 219, 220, 221, 223, 224, 225,
-	226, 232, 235, 241, 242, 252, 259, 262, 138, 249,
-	263, 183, 0, 0, 0, 0, 0, 0, 0, 0,
-	126, 0, 0, 0, 0, 0, 155, 0, 0, 0,
-	157, 0, 0, 230, 171, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 403, 94, 95, 96, 0, 0, 0, 0,
-	0, 0, 0, 0, 116, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 135, 0, 0, 0, 288, 0, 0, 0,
-	0, 202, 0, 234, 139, 154, 112, 151, 98, 108,
-	0, 137, 180, 210, 214, 0, 0, 0, 120, 0,
-	212, 190, 251, 0, 192, 211, 158, 240, 203, 250,
-	260, 261, 237, 258, 266, 227, 101, 236, 248, 117,
-	222, 0, 0, 0, 103, 246, 233, 169, 148, 149,
-	102, 0, 208, 125, 133, 122, 182, 243, 244, 121,
-	269, 109, 257, 105, 110, 256, 176, 239, 247, 170,
-	163, 104, 245, 168, 162, 153, 129, 141, 200, 160,
-	201, 142, 173, 172, 174, 0, 0, 0, 231, 254,
-	270, 114, 0, 238, 264, 265, 0, 204, 115, 134,
-	128, 199, 132, 175, 111, 144, 228, 152, 159, 207,
-	268, 189, 213, 118, 253, 229, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 97, 106, 156, 267, 205,
-	131, 255, 0, 0, 124, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 99, 100, 107,
-	113, 119, 123, 127, 130, 136, 140, 143, 145, 146,
-	147, 150, 161, 164, 165, 166, 167, 177, 178, 179,
-	181, 184, 185, 186, 187, 188, 191, 193, 194, 195,
-	196, 197, 198, 206, 209, 215, 216, 217, 218, 219,
-	220, 221, 223, 224, 225, 226, 232, 235, 241, 242,
-	252, 259, 262, 138, 249, 263, 183, 0, 0, 0,
-	0, 0, 0, 0, 0, 126, 0, 0, 0, 0,
-	0, 155, 0, 0, 0, 157, 0, 0, 230, 171,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 59, 0, 0, 94, 95,
-	96, 0, 0, 0, 0, 0, 0, 0, 0, 116,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 135, 0, 0,
-	0, 288, 0, 0, 0, 0, 202, 0, 234, 139,
-	154, 112, 151, 98, 108, 0, 137, 180, 210, 214,
-	0, 0, 0, 120, 0, 212, 190, 251, 0, 192,
-	211, 158, 240, 203, 250, 260, 261, 237, 258, 266,
-	227, 101, 236, 248, 117, 222, 0, 0, 0, 103,
-	246, 233, 169, 148, 149, 102, 0, 208, 125, 133,
-	122, 182, 243, 244, 121, 269, 109, 257, 105, 110,
-	256, 176, 239, 247, 170, 163, 104, 245, 168, 162,
-	153, 129, 141, 200, 160, 201, 142, 173, 172, 174,
-	0, 0, 0, 231, 254, 270, 114, 0, 238, 264,
-	265, 0, 204, 115, 134, 128, 199, 132, 175, 111,
-	144, 228, 152, 159, 207, 268, 189, 213, 118, 253,
-	229, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	97, 106, 156, 267, 205, 131, 255, 0, 0, 124,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 99, 100, 107, 113, 119, 123, 127, 130,
-	136, 140, 143, 145, 146, 147, 150, 161, 164, 165,
-	166, 167, 177, 178, 179, 181, 184, 185, 186, 187,
-	188, 191, 193, 194, 195, 196, 197, 198, 206, 209,
-	215, 216, 217, 218, 219, 220, 221, 223, 224, 225,
-	226, 232, 235, 241, 242, 252, 259, 262, 138, 249,
-	263, 183, 0, 0, 0, 0, 0, 0, 0, 0,
-	126, 0, 0, 0, 0, 0, 155, 0, 0, 0,
-	157, 0, 0, 230, 171, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 94, 95, 96, 0, 1022, 0, 0,
-	0, 0, 0, 0, 116, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 135, 0, 0, 0, 288, 0, 0, 0,
-	0, 202, 0, 234, 139, 154, 112, 151, 98, 108,
-	0, 137, 180, 210, 214, 0, 0, 0, 120, 0,
-	212, 190, 251, 0, 192, 211, 158, 240, 203, 250,
-	260, 261, 237, 258, 266, 227, 101, 236, 248, 117,
-	222, 0, 0, 0, 103, 246, 233, 169, 148, 149,
-	102, 0, 208, 125, 133, 122, 182, 243, 244, 121,
-	269, 109, 257, 105, 110, 256, 176, 239, 247, 170,
-	163, 104, 245, 168, 162, 153, 129, 141, 200, 160,
-	201, 142, 173, 172, 174, 0, 0, 0, 231, 254,
-	270, 114, 0, 238, 264, 265, 0, 204, 115, 134,
-	128, 199, 132, 175, 111, 144, 228, 152, 159, 207,
-	268, 189, 213, 118, 253, 229, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 97, 106, 156, 267, 205,
-	131, 255, 0, 0, 124, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 99, 100, 107,
-	113, 119, 123, 127, 130, 136, 140, 143, 145, 146,
-	147, 150, 161, 164, 165, 166, 167, 177, 178, 179,
-	181, 184, 185, 186, 187, 188, 191, 193, 194, 195,
-	196, 197, 198, 206, 209, 215, 216, 217, 218, 219,
-	220, 221, 223, 224, 225, 226, 232, 235, 241, 242,
-	252, 259, 262, 138, 249, 263, 183, 0, 0, 0,
-	0, 0, 0, 0, 0, 126, 0, 0, 0, 0,
-	0, 155, 0, 0, 0, 157, 0, 0, 230, 171,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 94, 95,
-	96, 0, 746, 0, 0, 0, 0, 0, 0, 116,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 135, 0, 0,
-	0, 288, 0, 0, 0, 0, 202, 0, 234, 139,
-	154, 112, 151, 98, 108, 0, 137, 180, 210, 214,
-	0, 0, 0, 120, 0, 212, 190, 251, 0, 192,
-	211, 158, 240, 203, 250, 260, 261, 237, 258, 266,
-	227, 101, 236, 248, 117, 222, 0, 0, 0, 103,
-	246, 233, 169, 148, 149, 102, 0, 208, 125, 133,
-	122, 182, 243, 244, 121, 269, 109, 257, 105, 110,
-	256, 176, 239, 247, 170, 163, 104, 245, 168, 162,
-	153, 129, 141, 200, 160, 201, 142, 173, 172, 174,
-	0, 0, 0, 231, 254, 270, 114, 0, 238, 264,
-	265, 0, 204, 115, 134, 128, 199, 132, 175, 111,
-	144, 228, 152, 159, 207, 268, 189, 213, 118, 253,
-	229, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	97, 106, 156, 267, 205, 131, 255, 0, 0, 124,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 99, 100, 107, 113, 119, 123, 127, 130,
-	136, 140, 143, 145, 146, 147, 150, 161, 164, 165,
-	166, 167, 177, 178, 179, 181, 184, 185, 186, 187,
-	188, 191, 193, 194, 195, 196, 197, 198, 206, 209,
-	215, 216, 217, 218, 219, 220, 221, 223, 224, 225,
-	226, 232, 235, 241, 242, 252, 259, 262, 138, 249,
-	263, 183, 0, 0, 0, 0, 0, 0, 0, 750,
-	126, 0, 0, 0, 0, 0, 155, 0, 0, 0,
-	157, 0, 0, 230, 171, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 94, 95, 96, 0, 0, 0, 0,
-	0, 0, 0, 0, 116, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 135, 0, 0, 0, 288, 0, 0, 0,
-	0, 202, 0, 234, 139, 154, 112, 151, 98, 108,
-	0, 137, 180, 210, 214, 0, 0, 0, 120, 0,
-	212, 190, 251, 0, 192, 211, 158, 240, 203, 250,
-	260, 261, 237, 258, 266, 227, 101, 236, 248, 117,
-	222, 0, 0, 0, 103, 246, 233, 169, 148, 149,
-	102, 0, 208, 125, 133, 122, 182, 243, 244, 121,
-	269, 109, 257, 105, 110, 256, 176, 239, 247, 170,
-	163, 104, 245, 168, 162, 153, 129, 141, 200, 160,
-	201, 142, 173, 172, 174, 0, 0, 0, 231, 254,
-	270, 114, 0, 238, 264, 265, 0, 204, 115, 134,
-	128, 199, 132, 175, 111, 144, 228, 152, 159, 207,
-	268, 189, 213, 118, 253, 229, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 97, 106, 156, 267, 205,
-	131, 255, 0, 0, 124, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 99, 100, 107,
-	113, 119, 123, 127, 130, 136, 140, 143, 145, 146,
-	147, 150, 161, 164, 165, 166, 167, 177, 178, 179,
-	181, 184, 185, 186, 187, 188, 191, 193, 194, 195,
-	196, 197, 198, 206, 209, 215, 216, 217, 218, 219,
-	220, 221, 223, 224, 225, 226, 232, 235, 241, 242,
-	252, 259, 262, 138, 249, 263, 183, 0, 0, 0,
-	0, 0, 0, 0, 0, 126, 0, 0, 0, 0,
-	0, 155, 0, 0, 0, 157, 0, 0, 230, 171,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 94, 95,
-	96, 0, 627, 0, 0, 0, 0, 0, 0, 116,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 135, 0, 0,
-	0, 288, 0, 0, 0, 0, 202, 0, 234, 139,
-	154, 112, 151, 98, 108, 0, 137, 180, 210, 214,
-	0, 0, 0, 120, 0, 212, 190, 251, 0, 192,
-	211, 158, 240, 203, 250, 260, 261, 237, 258, 266,
-	227, 101, 236, 248, 117, 222, 0, 0, 0, 103,
-	246, 233, 169, 148, 149, 102, 0, 208, 125, 133,
-	122, 182, 243, 244, 121, 269, 109, 257, 105, 110,
-	256, 176, 239, 247, 170, 163, 104, 245, 168, 162,
-	153, 129, 141, 200, 160, 201, 142, 173, 172, 174,
-	0, 0, 0, 231, 254, 270, 114, 0, 238, 264,
-	265, 0, 204, 115, 134, 128, 199, 132, 175, 111,
-	144, 228, 152, 159, 207, 268, 189, 213, 118, 253,
-	229, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	97, 106, 156, 267, 205, 131, 255, 0, 0, 124,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 99, 100, 107, 113, 119, 123, 127, 130,
-	136, 140, 143, 145, 146, 147, 150, 161, 164, 165,
-	166, 167, 177, 178, 179, 181, 184, 185, 186, 187,
-	188, 191, 193, 194, 195, 196, 197, 198, 206, 209,
-	215, 216, 217, 218, 219, 220, 221, 223, 224, 225,
-	226, 232, 235, 241, 242, 252, 259, 262, 138, 249,
-	263, 421, 0, 0, 0, 0, 0, 0, 183, 0,
-	0, 0, 0, 0, 0, 0, 0, 126, 0, 0,
-	0, 0, 0, 155, 0, 0, 0, 157, 0, 0,
-	230, 171, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	94, 95, 96, 0, 0, 0, 0, 0, 0, 0,
-	0, 116, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 135,
-	0, 0, 0, 288, 0, 0, 0, 0, 202, 0,
-	234, 139, 154, 112, 151, 98, 108, 0, 137, 180,
-	210, 214, 0, 0, 0, 120, 0, 212, 190, 251,
-	0, 192, 211, 158, 240, 203, 250, 260, 261, 237,
-	258, 266, 227, 101, 236, 248, 117, 222, 0, 0,
-	0, 103, 246, 233, 169, 148, 149, 102, 0, 208,
-	125, 133, 122, 182, 243, 244, 121, 269, 109, 257,
-	105, 110, 256, 176, 239, 247, 170, 163, 104, 245,
-	168, 162, 153, 129, 141, 200, 160, 201, 142, 173,
-	172, 174, 0, 0, 0, 231, 254, 270, 114, 0,
-	238, 264, 265, 0, 204, 115, 134, 128, 199, 132,
-	175, 111, 144, 228, 152, 159, 207, 268, 189, 213,
-	118, 253, 229, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 97, 106, 156, 267, 205, 131, 255, 0,
-	0, 124, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 99, 100, 107, 113, 119, 123,
-	127, 130, 136, 140, 143, 145, 146, 147, 150, 161,
-	164, 165, 166, 167, 177, 178, 179, 181, 184, 185,
-	186, 187, 188, 191, 193, 194, 195, 196, 197, 198,
-	206, 209, 215, 216, 217, 218, 219, 220, 221, 223,
-	224, 225, 226, 232, 235, 241, 242, 252, 259, 262,
-	138, 249, 263, 183, 0, 0, 0, 0, 0, 0,
-	0, 0, 126, 0, 0, 0, 0, 0, 155, 0,
-	0, 0, 157, 0, 0, 230, 171, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 94, 95, 96, 0, 0,
-	0, 0, 0, 0, 0, 0, 116, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 320, 0, 135, 0, 0, 0, 288, 0,
-	0, 0, 0, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 0, 0, 0,
-	120, 0, 212, 190, 251, 0, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 0, 0,
-	231, 254, 270, 114, 0, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 97, 106, 156,
-	267, 205, 131, 255, 0, 0, 124, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 319, 249, 263, 183, 0,
-	0, 0, 0, 0, 0, 0, 0, 126, 0, 0,
-	0, 0, 0, 155, 0, 0, 0, 157, 0, 0,
-	230, 171, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	94, 95, 96, 0, 0, 0, 0, 0, 0, 0,
-	0, 116, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 135,
-	0, 283, 0, 288, 0, 0, 0, 0, 202, 0,
-	234, 139, 154, 112, 151, 98, 108, 0, 137, 180,
-	210, 214, 0, 0, 0, 120, 0, 212, 190, 251,
-	0, 192, 211, 158, 240, 203, 250, 260, 261, 237,
-	258, 266, 227, 101, 236, 248, 117, 222, 0, 0,
-	0, 103, 246, 233, 169, 148, 149, 102, 0, 208,
-	125, 133, 122, 182, 243, 244, 121, 269, 109, 257,
-	105, 110, 256, 176, 239, 247, 170, 163, 104, 245,
-	168, 162, 153, 129, 141, 200, 160, 201, 142, 173,
-	172, 174, 0, 0, 0, 231, 254, 270, 114, 0,
-	238, 264, 265, 0, 204, 115, 134, 128, 199, 132,
-	175, 111, 144, 228, 152, 159, 207, 268, 189, 213,
-	118, 253, 229, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 97, 106, 156, 267, 205, 131, 255, 0,
-	0, 124, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 99, 100, 107, 113, 119, 123,
-	127, 130, 136, 140, 143, 145, 146, 147, 150, 161,
-	164, 165, 166, 167, 177, 178, 179, 181, 184, 185,
-	186, 187, 188, 191, 193, 194, 195, 196, 197, 198,
-	206, 209, 215, 216, 217, 218, 219, 220, 221, 223,
-	224, 225, 226, 232, 235, 241, 242, 252, 259, 262,
-	138, 249, 263, 183, 0, 0, 0, 0, 0, 0,
-	0, 0, 126, 0, 0, 0, 0, 0, 155, 0,
-	0, 0, 157, 0, 0, 230, 171, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 94, 95, 96, 0, 0,
-	0, 0, 0, 0, 0, 0, 116, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 135, 0, 0, 0, 288, 0,
-	0, 0, 0, 202, 0, 234, 139, 154, 112, 151,
-	98, 108, 0, 137, 180, 210, 214, 0, 0, 0,
-	120, 0, 212, 190, 251, 0, 192, 211, 158, 240,
-	203, 250, 260, 261, 237, 258, 266, 227, 101, 236,
-	248, 117, 222, 0, 0, 0, 103, 246, 233, 169,
-	148, 149, 102, 0, 208, 125, 133, 122, 182, 243,
-	244, 121, 269, 109, 257, 105, 110, 256, 176, 239,
-	247, 170, 163, 104, 245, 168, 162, 153, 129, 141,
-	200, 160, 201, 142, 173, 172, 174, 0, 0, 0,
-	231, 254, 270, 114, 0, 238, 264, 265, 0, 204,
-	115, 134, 128, 199, 132, 175, 111, 144, 228, 152,
-	159, 207, 268, 189, 213, 118, 253, 229, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 97, 106, 156,
-	267, 205, 131, 255, 0, 0, 124, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 99,
-	100, 107, 113, 119, 123, 127, 130, 136, 140, 143,
-	145, 146, 147, 150, 161, 164, 165, 166, 167, 177,
-	178, 179, 181, 184, 185, 186, 187, 188, 191, 193,
-	194, 195, 196, 197, 198, 206, 209, 215, 216, 217,
-	218, 219, 220, 221, 223, 224, 225, 226, 232, 235,
-	241, 242, 252, 259, 262, 138, 249, 263,
+	570, 2213, 2200, 1972, 2177, 1833, 1802, 1723, 514, 2141,
+	2132, 2083, 2061, 926, 81, 3, 1900, 1575, 543, 1690,
+	1509, 1901, 582, 1436, 1969, 1059, 1724, 1007, 529, 1897,
+	1542, 1806, 1710, 512, 1527, 1166, 1547, 758, 1787, 1488,
+	1788, 1912, 1859, 145, 1650, 1786, 880, 1625, 176, 1393,
+	1573, 188, 1300, 477, 188, 907, 1052, 1189, 79, 493,
+	819, 188, 131, 1385, 1549, 1096, 1780, 1089, 1477, 188,
+	784, 1470, 1062, 1057, 1438, 1082, 1045, 1419, 615, 576,
+	591, 1362, 32, 516, 943, 1080, 797, 1161, 765, 762,
+	493, 1165, 505, 493, 188, 493, 1196, 1079, 770, 790,
+	1279, 1453, 1086, 612, 766, 1538, 785, 786, 1095, 1069,
+	1493, 77, 924, 787, 1093, 1305, 1207, 774, 874, 861,
+	1181, 500, 8, 114, 115, 7, 108, 109, 148, 76,
+	6, 1825, 1824, 1604, 2085, 1847, 1848, 1351, 175, 1020,
+	1266, 1433, 1434, 1528, 1350, 1349, 1021, 177, 178, 179,
+	1348, 82, 1347, 1346, 503, 1339, 504, 597, 601, 1688,
+	577, 2129, 509, 759, 2169, 2040, 116, 2107, 2106, 1946,
+	823, 188, 2056, 110, 822, 2057, 2219, 2174, 2212, 1167,
+	824, 188, 78, 873, 501, 2152, 188, 84, 85, 86,
+	87, 88, 89, 944, 821, 2203, 453, 177, 178, 179,
+	1552, 1973, 1592, 1640, 609, 801, 2173, 835, 836, 1876,
+	839, 840, 841, 842, 2004, 776, 845, 846, 847, 848,
+	849, 850, 851, 852, 853, 854, 855, 856, 857, 858,
+	859, 832, 800, 616, 778, 777, 110, 944, 555, 2151,
+	561, 562, 559, 560, 102, 558, 557, 556, 1097, 174,
+	1098, 825, 826, 827, 779, 563, 564, 470, 954, 1927,
+	1928, 1504, 1505, 1435, 34, 1494, 469, 70, 38, 39,
+	1611, 1689, 1754, 1926, 1610, 1753, 467, 1846, 1755, 1551,
+	169, 105, 1638, 182, 183, 1503, 914, 900, 916, 177,
+	178, 179, 837, 481, 893, 887, 888, 899, 574, 105,
+	838, 97, 954, 876, 110, 111, 100, 133, 922, 99,
+	98, 573, 1771, 780, 1521, 464, 153, 2154, 1835, 1340,
+	1341, 1342, 1995, 1993, 475, 913, 915, 491, 1338, 495,
+	489, 1256, 1807, 942, 105, 170, 1396, 885, 103, 69,
+	1574, 886, 887, 888, 1607, 480, 1829, 143, 950, 1280,
+	2202, 1288, 132, 1289, 1830, 1290, 103, 862, 904, 905,
+	902, 903, 1285, 920, 906, 1619, 869, 481, 1838, 844,
+	150, 843, 151, 1257, 2103, 1258, 901, 120, 121, 142,
+	141, 168, 1837, 894, 2170, 1282, 781, 921, 2051, 808,
+	1836, 1576, 950, 1284, 454, 456, 457, 1175, 473, 474,
+	482, 806, 1471, 818, 471, 472, 483, 458, 459, 487,
+	486, 481, 463, 460, 462, 468, 1286, 817, 816, 480,
+	466, 484, 815, 912, 481, 814, 911, 917, 2220, 137,
+	118, 144, 125, 117, 1283, 138, 139, 1945, 104, 154,
+	813, 812, 910, 811, 810, 805, 1553, 2052, 1494, 159,
+	126, 1624, 763, 188, 897, 2189, 104, 793, 173, 481,
+	763, 1195, 1194, 480, 129, 127, 122, 123, 124, 128,
+	107, 918, 1768, 1763, 119, 792, 480, 875, 493, 493,
+	493, 809, 775, 130, 949, 946, 947, 948, 953, 955,
+	952, 104, 951, 807, 603, 1839, 493, 493, 919, 945,
+	2217, 883, 1598, 889, 890, 891, 892, 1293, 2150, 930,
+	1609, 480, 936, 799, 828, 763, 1764, 1796, 2142, 761,
+	1606, 1691, 1693, 923, 1639, 799, 2155, 1885, 949, 946,
+	947, 948, 953, 955, 952, 1884, 951, 1883, 1766, 773,
+	772, 1761, 771, 945, 1627, 485, 1817, 1627, 872, 1626,
+	769, 146, 1626, 1762, 452, 180, 1860, 1618, 992, 993,
+	1617, 2136, 1510, 478, 2024, 1925, 1268, 1267, 1269, 1270,
+	1271, 834, 1715, 1658, 188, 1584, 1669, 799, 479, 1499,
+	1073, 1594, 1005, 878, 896, 866, 71, 980, 1750, 1449,
+	884, 927, 928, 1050, 970, 990, 898, 980, 799, 1862,
+	493, 908, 1049, 188, 140, 188, 188, 1666, 493, 177,
+	178, 179, 1769, 1767, 493, 799, 134, 1692, 1335, 135,
+	939, 612, 882, 937, 960, 2111, 92, 1008, 938, 820,
+	2119, 969, 968, 978, 979, 971, 972, 973, 974, 975,
+	976, 977, 970, 799, 1078, 980, 868, 2215, 798, 1046,
+	2216, 1910, 2214, 1306, 802, 792, 1281, 1864, 1099, 1868,
+	798, 1863, 940, 1861, 803, 863, 1878, 864, 1866, 1776,
+	865, 93, 1063, 867, 177, 178, 179, 1865, 1387, 1420,
+	994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003,
+	1867, 1869, 957, 1591, 1043, 1665, 1023, 1025, 1027, 1029,
+	1031, 1033, 1034, 1024, 1026, 1593, 1030, 1032, 960, 1035,
+	1172, 1420, 798, 1676, 833, 992, 993, 909, 1589, 1765,
+	147, 152, 149, 155, 156, 157, 158, 160, 161, 162,
+	163, 1051, 808, 798, 1388, 881, 164, 165, 166, 167,
+	792, 795, 796, 806, 763, 1369, 992, 993, 789, 793,
+	798, 616, 1586, 1586, 1454, 1455, 802, 792, 188, 1367,
+	1368, 1366, 1157, 1451, 2204, 1930, 803, 788, 2039, 1307,
+	172, 2221, 1168, 1169, 1170, 1171, 1590, 1588, 798, 958,
+	959, 957, 959, 957, 804, 792, 795, 796, 493, 763,
+	1191, 69, 2205, 789, 793, 1066, 1664, 960, 1200, 960,
+	2038, 1951, 1204, 1365, 1663, 493, 493, 1784, 493, 1201,
+	493, 493, 1783, 493, 493, 493, 493, 493, 493, 973,
+	974, 975, 976, 977, 970, 1187, 1450, 980, 493, 958,
+	959, 957, 188, 1240, 1235, 1236, 958, 959, 957, 2222,
+	1173, 1174, 2194, 2120, 1556, 1276, 1180, 960, 1253, 602,
+	1261, 958, 959, 957, 960, 1199, 958, 959, 957, 493,
+	958, 959, 957, 1094, 1880, 1237, 768, 188, 1260, 960,
+	2195, 1643, 1644, 1645, 960, 188, 1259, 1299, 960, 188,
+	1275, 1887, 1197, 1197, 1357, 1359, 1360, 1164, 1163, 1251,
+	177, 178, 179, 1198, 1757, 188, 1358, 1273, 1243, 1244,
+	1156, 1245, 188, 1177, 1249, 1250, 1178, 1176, 599, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 493, 493,
+	493, 1263, 1209, 1242, 1210, 1061, 1212, 1214, 1190, 1888,
+	1218, 1220, 1222, 1224, 1226, 1785, 1241, 604, 605, 1274,
+	1310, 1308, 1309, 188, 177, 178, 179, 1314, 1568, 1316,
+	1317, 1318, 1319, 607, 1321, 1313, 1272, 1302, 1216, 958,
+	959, 957, 1320, 2207, 971, 972, 973, 974, 975, 976,
+	977, 970, 1238, 506, 980, 2206, 2196, 960, 2185, 1832,
+	1262, 1386, 1363, 532, 531, 534, 535, 536, 537, 2074,
+	1389, 1294, 533, 2036, 538, 778, 777, 110, 177, 178,
+	179, 2012, 1566, 1933, 493, 177, 178, 179, 1889, 1254,
+	1793, 1312, 177, 178, 179, 1781, 78, 1634, 1602, 1397,
+	1601, 1303, 1408, 1411, 1264, 1252, 1390, 1391, 1421, 1248,
+	1331, 1332, 1333, 1247, 1403, 1246, 586, 493, 493, 1958,
+	2188, 1958, 2148, 1958, 2137, 1345, 2101, 1364, 188, 1958,
+	586, 1958, 2109, 2054, 586, 1586, 586, 1495, 1398, 2022,
+	586, 493, 1958, 1963, 1943, 1942, 1939, 1940, 188, 1939,
+	1938, 493, 1444, 2100, 1008, 188, 1443, 188, 1462, 586,
+	1494, 1826, 1456, 1495, 1399, 188, 188, 1397, 1711, 1427,
+	1428, 1971, 493, 1711, 586, 493, 1160, 1811, 34, 1489,
+	1804, 1805, 1474, 586, 1809, 612, 493, 1898, 612, 956,
+	586, 1160, 1159, 1105, 1104, 34, 1909, 80, 1400, 1496,
+	1795, 2041, 1587, 1718, 1518, 1361, 1468, 1498, 1370, 1371,
+	1372, 1373, 1374, 1375, 1376, 1377, 1378, 1379, 1380, 1381,
+	1382, 1383, 1384, 1514, 1464, 1496, 1719, 1463, 1513, 1909,
+	1744, 2019, 1399, 1494, 1529, 1530, 1531, 1474, 1494, 1473,
+	956, 493, 1909, 2090, 2110, 188, 1231, 34, 493, 2042,
+	2043, 2044, 1958, 69, 1565, 1567, 1517, 1586, 1941, 1474,
+	1466, 1502, 1681, 1462, 1680, 1423, 1544, 493, 1492, 1462,
+	69, 579, 1586, 493, 1569, 1550, 1452, 1200, 1497, 1200,
+	1522, 1501, 1523, 1524, 1525, 1526, 1500, 1585, 1431, 1343,
+	1474, 1292, 1516, 1515, 1232, 1233, 1234, 1462, 1534, 1535,
+	1536, 1537, 1091, 783, 1572, 782, 2140, 69, 2063, 1970,
+	2030, 1162, 1543, 1831, 1579, 616, 1539, 493, 616, 1386,
+	1533, 1532, 69, 1278, 1386, 1386, 1545, 1192, 1188, 1158,
+	94, 1790, 2045, 174, 1582, 1789, 1583, 1834, 1540, 1541,
+	1561, 1562, 1563, 1555, 1557, 1554, 69, 1913, 1914, 1228,
+	2064, 571, 801, 1167, 1595, 2209, 2201, 1916, 1898, 188,
+	1545, 1578, 1197, 188, 188, 188, 188, 188, 1596, 1800,
+	1577, 1799, 1581, 188, 188, 188, 188, 2046, 2047, 800,
+	1790, 1798, 1597, 1559, 1336, 1295, 188, 1599, 1600, 1919,
+	1918, 1735, 1732, 188, 1229, 1230, 1736, 1479, 1482, 1483,
+	1484, 1480, 189, 1481, 1485, 189, 1733, 1913, 1914, 1731,
+	494, 1734, 189, 2191, 2172, 1060, 1890, 188, 493, 1737,
+	189, 1483, 1484, 1700, 2023, 1961, 1404, 1405, 1709, 1708,
+	1410, 1413, 1414, 2160, 2157, 1629, 1630, 2193, 2176, 2178,
+	1632, 494, 96, 2184, 494, 189, 494, 1633, 101, 2183,
+	1479, 1482, 1483, 1484, 1480, 1426, 1481, 1485, 1429, 1430,
+	2133, 1605, 2131, 1291, 572, 1363, 978, 979, 971, 972,
+	973, 974, 975, 976, 977, 970, 592, 1622, 980, 969,
+	968, 978, 979, 971, 972, 973, 974, 975, 976, 977,
+	970, 593, 181, 980, 1698, 171, 1794, 961, 184, 830,
+	829, 1053, 1699, 1982, 1789, 1845, 1660, 929, 1637, 592,
+	1416, 2088, 188, 1054, 1064, 1065, 595, 2017, 594, 1422,
+	188, 1819, 189, 1818, 593, 1417, 111, 1935, 1646, 1934,
+	1364, 1580, 189, 506, 1206, 1205, 1193, 189, 1651, 1454,
+	1455, 1564, 1018, 1447, 188, 1298, 2102, 589, 590, 595,
+	2058, 594, 1487, 580, 581, 188, 188, 188, 188, 188,
+	1659, 1707, 1725, 577, 1642, 1720, 583, 188, 2198, 1706,
+	2197, 188, 1055, 1058, 188, 188, 1675, 2181, 188, 188,
+	188, 1697, 1716, 1713, 2161, 1742, 2016, 1046, 1687, 1957,
+	1570, 1756, 584, 1704, 1695, 80, 2015, 1893, 1711, 2211,
+	2210, 585, 1670, 1667, 1074, 1067, 1703, 2211, 579, 1775,
+	1647, 1648, 1649, 1745, 2134, 1712, 1932, 1747, 1448, 78,
+	83, 75, 1, 465, 1432, 1714, 1044, 476, 1774, 2199,
+	1777, 1778, 1779, 1265, 1738, 1255, 1759, 1974, 1772, 1773,
+	188, 1727, 1728, 1743, 1730, 2060, 1748, 1964, 1751, 1548,
+	791, 493, 1726, 136, 1511, 1729, 1512, 493, 1302, 2144,
+	493, 91, 1200, 1808, 1550, 1760, 1812, 493, 756, 90,
+	794, 895, 1571, 2055, 1770, 1520, 1111, 1109, 1814, 1823,
+	1782, 586, 1110, 1108, 1113, 1112, 1107, 188, 1337, 490,
+	1486, 1100, 1792, 1791, 1068, 831, 455, 1944, 1822, 1334,
+	1603, 461, 988, 1705, 1752, 188, 613, 542, 1821, 606,
+	1904, 2182, 1180, 2158, 2156, 2130, 2084, 1398, 2159, 1813,
+	2128, 2192, 2175, 1519, 1446, 1056, 1820, 969, 968, 978,
+	979, 971, 972, 973, 974, 975, 976, 977, 970, 493,
+	2014, 980, 1892, 1399, 1674, 1386, 1017, 1418, 1083, 1841,
+	1840, 515, 1856, 1442, 1356, 530, 527, 528, 187, 1457,
+	1717, 488, 962, 513, 1843, 1857, 507, 1844, 187, 1075,
+	1478, 1476, 1849, 1475, 1296, 493, 187, 1087, 1915, 1877,
+	1911, 1081, 1461, 1608, 1828, 941, 188, 1855, 1871, 588,
+	502, 95, 600, 600, 1415, 2118, 493, 1858, 1641, 2003,
+	587, 187, 493, 493, 189, 60, 1899, 1725, 1870, 1856,
+	37, 1655, 1656, 497, 2168, 932, 596, 31, 1902, 1896,
+	30, 29, 28, 23, 22, 188, 21, 20, 19, 494,
+	494, 494, 1673, 25, 18, 17, 1908, 16, 106, 47,
+	44, 42, 113, 112, 45, 41, 870, 494, 494, 27,
+	26, 1917, 15, 14, 13, 12, 1921, 11, 1923, 10,
+	1924, 9, 5, 4, 1922, 935, 24, 1006, 2, 0,
+	0, 1304, 0, 1936, 1937, 1952, 0, 188, 187, 188,
+	188, 188, 1929, 0, 0, 493, 0, 0, 187, 0,
+	0, 1886, 0, 187, 1851, 1852, 1960, 0, 188, 0,
+	0, 0, 0, 0, 0, 0, 0, 1948, 1947, 1872,
+	1873, 0, 1874, 1875, 1965, 1975, 493, 493, 493, 1907,
+	188, 0, 1959, 1881, 1882, 189, 0, 1550, 1962, 1983,
+	1949, 1950, 1968, 1967, 2007, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 1352, 1353, 1354, 1355, 0,
+	0, 494, 0, 0, 189, 0, 189, 189, 0, 494,
+	1986, 0, 0, 0, 0, 494, 0, 0, 0, 0,
+	1980, 1981, 0, 0, 0, 1991, 0, 0, 0, 0,
+	0, 969, 968, 978, 979, 971, 972, 973, 974, 975,
+	976, 977, 970, 0, 0, 980, 0, 0, 1725, 0,
+	1406, 1407, 0, 2013, 0, 0, 1931, 0, 0, 2018,
+	0, 0, 0, 0, 2026, 0, 2027, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 2032, 1988, 1989,
+	0, 1990, 0, 0, 1992, 2033, 1994, 506, 493, 493,
+	169, 2034, 0, 0, 2049, 0, 0, 0, 0, 0,
+	0, 493, 0, 2035, 493, 2037, 0, 2059, 2048, 0,
+	0, 0, 0, 0, 0, 111, 0, 2062, 0, 0,
+	2067, 0, 0, 0, 0, 0, 153, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 1508, 493,
+	493, 493, 188, 1984, 0, 2077, 2079, 2080, 0, 0,
+	0, 0, 0, 493, 2066, 493, 2073, 0, 0, 189,
+	0, 493, 0, 0, 0, 2081, 2091, 2096, 1902, 0,
+	2093, 2089, 1902, 2065, 2087, 0, 0, 2082, 0, 2095,
+	150, 0, 151, 188, 0, 2097, 2098, 0, 2099, 494,
+	0, 168, 0, 0, 493, 188, 0, 1546, 0, 0,
+	2112, 0, 2105, 2108, 0, 0, 494, 494, 0, 494,
+	187, 494, 494, 0, 494, 494, 494, 494, 494, 494,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 494,
+	0, 2127, 0, 189, 0, 0, 0, 2135, 0, 1902,
+	0, 493, 493, 0, 0, 0, 0, 2138, 0, 154,
+	0, 0, 0, 2143, 2062, 2145, 0, 0, 0, 159,
+	494, 0, 0, 0, 0, 0, 0, 493, 189, 0,
+	2153, 493, 2162, 1725, 0, 0, 189, 2167, 2164, 0,
+	189, 0, 0, 0, 2171, 0, 0, 0, 0, 0,
+	2179, 2068, 2069, 2070, 2071, 2072, 189, 2180, 0, 2075,
+	2076, 0, 0, 189, 2001, 2190, 0, 0, 0, 0,
+	189, 189, 189, 189, 189, 189, 189, 189, 189, 494,
+	494, 494, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 187, 2208, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 2218, 189, 2006, 600, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 964, 0, 967, 0,
+	187, 146, 187, 1090, 981, 982, 983, 984, 985, 986,
+	987, 0, 965, 966, 963, 969, 968, 978, 979, 971,
+	972, 973, 974, 975, 976, 977, 970, 0, 0, 980,
+	0, 0, 969, 968, 978, 979, 971, 972, 973, 974,
+	975, 976, 977, 970, 0, 494, 980, 0, 0, 0,
+	0, 169, 0, 969, 968, 978, 979, 971, 972, 973,
+	974, 975, 976, 977, 970, 0, 0, 980, 0, 0,
+	0, 0, 2165, 0, 0, 0, 111, 0, 494, 494,
+	0, 0, 0, 0, 0, 0, 0, 153, 0, 189,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 1677,
+	0, 0, 494, 0, 0, 0, 0, 0, 0, 189,
+	0, 0, 494, 0, 0, 0, 189, 0, 189, 0,
+	0, 0, 0, 0, 0, 0, 189, 189, 1758, 1701,
+	1702, 1058, 2000, 494, 0, 0, 494, 0, 0, 0,
+	0, 150, 0, 151, 0, 0, 0, 494, 0, 0,
+	0, 0, 168, 0, 0, 187, 968, 978, 979, 971,
+	972, 973, 974, 975, 976, 977, 970, 0, 0, 980,
+	147, 152, 149, 155, 156, 157, 158, 160, 161, 162,
+	163, 0, 0, 0, 0, 0, 164, 165, 166, 167,
+	0, 0, 0, 0, 0, 0, 0, 0, 1203, 0,
+	0, 0, 494, 0, 0, 0, 189, 0, 0, 494,
+	154, 0, 0, 0, 0, 0, 1401, 1402, 0, 0,
+	159, 0, 0, 1203, 1203, 0, 0, 0, 494, 187,
+	0, 0, 0, 0, 494, 0, 0, 0, 0, 0,
+	0, 969, 968, 978, 979, 971, 972, 973, 974, 975,
+	976, 977, 970, 1999, 0, 980, 0, 0, 0, 1850,
+	1445, 0, 0, 0, 187, 0, 0, 0, 0, 0,
+	0, 0, 187, 0, 0, 0, 1301, 0, 494, 969,
+	968, 978, 979, 971, 972, 973, 974, 975, 976, 977,
+	970, 0, 187, 980, 0, 0, 0, 0, 0, 187,
+	0, 0, 0, 0, 0, 0, 1322, 1323, 187, 187,
+	187, 187, 187, 187, 187, 0, 0, 0, 0, 0,
+	189, 0, 146, 0, 189, 189, 189, 189, 189, 0,
+	541, 0, 0, 0, 189, 189, 189, 189, 1998, 0,
+	187, 0, 0, 0, 0, 0, 0, 189, 0, 0,
+	0, 0, 0, 0, 189, 1879, 0, 0, 0, 0,
+	0, 0, 969, 968, 978, 979, 971, 972, 973, 974,
+	975, 976, 977, 970, 0, 0, 980, 0, 189, 494,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 492,
+	1894, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 600, 1301, 0, 0, 0, 600, 600, 0,
+	0, 600, 600, 600, 0, 0, 0, 1203, 0, 0,
+	614, 0, 0, 760, 0, 767, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 600, 600, 600, 600,
+	600, 0, 0, 0, 0, 1440, 0, 969, 968, 978,
+	979, 971, 972, 973, 974, 975, 976, 977, 970, 0,
+	0, 980, 0, 0, 0, 187, 0, 0, 0, 0,
+	0, 1301, 187, 189, 187, 0, 0, 0, 0, 0,
+	0, 189, 187, 187, 0, 0, 0, 0, 0, 0,
+	0, 147, 152, 149, 155, 156, 157, 158, 160, 161,
+	162, 163, 0, 0, 0, 189, 0, 164, 165, 166,
+	167, 0, 0, 0, 0, 0, 189, 189, 189, 189,
+	189, 0, 1652, 0, 0, 0, 0, 0, 189, 0,
+	0, 0, 189, 0, 0, 189, 189, 0, 0, 189,
+	189, 189, 969, 968, 978, 979, 971, 972, 973, 974,
+	975, 976, 977, 970, 0, 0, 980, 0, 0, 2005,
+	0, 0, 187, 969, 968, 978, 979, 971, 972, 973,
+	974, 975, 976, 977, 970, 0, 0, 980, 0, 0,
+	0, 0, 506, 0, 0, 0, 0, 0, 0, 2028,
+	0, 0, 2029, 0, 0, 2031, 0, 0, 0, 1653,
+	0, 189, 0, 1654, 0, 0, 0, 0, 0, 0,
+	0, 0, 494, 0, 1661, 1662, 0, 0, 494, 0,
+	1668, 494, 0, 1671, 1672, 0, 0, 0, 494, 0,
+	0, 1678, 0, 1679, 0, 0, 1682, 1683, 1684, 1685,
+	1686, 0, 0, 0, 0, 0, 0, 0, 189, 0,
+	0, 0, 1696, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 189, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 187, 0, 0, 0,
+	187, 187, 187, 187, 187, 0, 0, 0, 0, 0,
+	187, 187, 187, 187, 2086, 506, 0, 0, 1740, 1741,
+	494, 0, 0, 187, 0, 0, 0, 0, 0, 0,
+	187, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 187, 0, 494, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 189, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 494, 0, 0,
+	0, 0, 0, 494, 494, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 189, 0, 0, 0,
+	0, 0, 600, 600, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 614, 614,
+	614, 0, 0, 600, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 931, 933, 0, 187,
+	0, 0, 0, 0, 0, 0, 0, 1440, 189, 0,
+	189, 189, 189, 0, 0, 0, 494, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 189,
+	600, 187, 0, 0, 0, 1853, 1854, 0, 0, 0,
+	0, 1203, 187, 187, 187, 187, 187, 494, 494, 494,
+	0, 189, 0, 0, 1739, 0, 0, 0, 187, 0,
+	0, 187, 187, 0, 0, 187, 1749, 1301, 0, 0,
+	0, 0, 0, 0, 1047, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1071, 1905, 0, 0, 0, 0, 0, 0, 614, 0,
+	0, 0, 0, 0, 1101, 0, 0, 0, 0, 0,
+	0, 0, 1920, 0, 0, 186, 0, 187, 0, 0,
+	0, 0, 0, 0, 0, 496, 0, 0, 0, 0,
+	0, 0, 1203, 575, 0, 0, 0, 0, 0, 0,
+	0, 0, 1301, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 764, 494,
+	494, 0, 0, 0, 187, 0, 0, 0, 0, 0,
+	0, 0, 494, 0, 0, 494, 0, 0, 0, 0,
+	0, 0, 187, 544, 33, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	494, 494, 494, 189, 0, 600, 0, 33, 0, 0,
+	0, 0, 0, 0, 494, 1985, 494, 0, 0, 1987,
+	0, 0, 494, 0, 0, 860, 0, 0, 0, 0,
+	1996, 1997, 0, 0, 0, 871, 0, 0, 0, 0,
+	877, 0, 0, 0, 189, 0, 2011, 0, 0, 0,
+	0, 578, 0, 187, 0, 494, 189, 0, 0, 0,
+	0, 0, 0, 2020, 2021, 0, 1203, 2025, 760, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 1202, 0, 0, 0, 1208, 1208, 0, 1208, 0,
+	1208, 1208, 187, 1217, 1208, 1208, 1208, 1208, 1208, 0,
+	0, 0, 494, 494, 0, 0, 1202, 1202, 760, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 2053, 0, 0, 0, 494, 0,
+	0, 0, 494, 0, 0, 0, 0, 0, 0, 1277,
+	0, 0, 0, 0, 187, 0, 187, 187, 187, 0,
+	0, 0, 0, 0, 0, 1203, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 187, 0, 0, 2078, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 187, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 614, 614,
+	614, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 2114, 2115,
+	2116, 2117, 0, 2121, 0, 2122, 2123, 2124, 0, 2125,
+	2126, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 1203, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 2149, 0,
+	0, 0, 0, 0, 1392, 0, 614, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1202, 0, 0, 0, 0, 0, 0, 879, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 1424, 1425, 0,
+	0, 0, 0, 0, 0, 2186, 2187, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 169, 0, 0,
+	0, 1458, 0, 0, 0, 0, 0, 0, 1801, 0,
+	0, 1071, 0, 0, 614, 1128, 0, 0, 0, 1440,
+	0, 0, 111, 0, 133, 0, 0, 0, 0, 0,
+	0, 0, 614, 153, 0, 614, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 760, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	187, 0, 0, 0, 143, 0, 0, 0, 0, 132,
+	0, 0, 187, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 150, 0, 151,
+	0, 0, 0, 0, 1183, 1184, 142, 141, 168, 0,
+	0, 767, 0, 0, 0, 0, 0, 0, 1560, 0,
+	0, 925, 925, 925, 0, 0, 0, 1077, 0, 0,
+	1088, 0, 0, 0, 0, 0, 0, 760, 1116, 0,
+	0, 33, 0, 767, 0, 0, 0, 0, 0, 0,
+	0, 0, 1203, 0, 989, 991, 137, 1185, 144, 0,
+	1182, 0, 138, 139, 0, 0, 154, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 159, 0, 0, 0,
+	0, 1129, 0, 0, 0, 1004, 0, 760, 0, 1009,
+	1010, 1011, 1012, 1013, 1014, 1015, 1016, 0, 1019, 1022,
+	1022, 1022, 1028, 1022, 1022, 1028, 1022, 1036, 1037, 1038,
+	1039, 1040, 1041, 1042, 0, 0, 0, 0, 0, 1048,
+	0, 0, 33, 0, 0, 0, 0, 0, 1142, 1145,
+	1146, 1147, 1148, 1149, 1150, 0, 1151, 1152, 1153, 1154,
+	1155, 1130, 1131, 1132, 1133, 1114, 1115, 1143, 1084, 1117,
+	0, 1118, 1119, 1120, 1121, 1122, 1123, 1124, 1125, 1126,
+	1127, 1134, 1135, 1136, 1137, 1138, 1139, 1140, 1141, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 146, 0,
+	0, 0, 1106, 0, 0, 0, 0, 0, 1636, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 140, 0, 1144, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 134, 0, 0, 135, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 1239, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 1287, 0, 0, 0, 0, 0, 0, 0, 1297,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 1311,
+	0, 0, 0, 0, 1202, 0, 1315, 0, 0, 0,
+	0, 0, 0, 0, 0, 1324, 1325, 1326, 1327, 1328,
+	1329, 1330, 0, 0, 0, 0, 0, 147, 152, 149,
+	155, 156, 157, 158, 160, 161, 162, 163, 0, 0,
+	0, 0, 0, 164, 165, 166, 167, 1088, 0, 0,
+	0, 34, 35, 36, 70, 38, 39, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 169, 0,
+	0, 74, 0, 0, 0, 0, 40, 66, 67, 1179,
+	64, 68, 0, 0, 0, 0, 0, 65, 0, 0,
+	0, 0, 0, 111, 0, 133, 0, 0, 0, 0,
+	0, 1803, 0, 0, 153, 1202, 0, 1810, 0, 0,
+	1803, 0, 0, 0, 0, 614, 53, 1815, 0, 0,
+	0, 0, 0, 0, 0, 0, 69, 0, 0, 0,
+	0, 0, 0, 0, 0, 143, 0, 0, 0, 0,
+	132, 925, 925, 925, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 150, 0,
+	151, 0, 0, 0, 0, 1183, 1184, 142, 141, 168,
+	0, 0, 1465, 0, 0, 0, 0, 0, 0, 1469,
+	0, 1472, 0, 0, 0, 0, 0, 0, 0, 614,
+	1491, 0, 0, 0, 0, 0, 0, 0, 43, 46,
+	49, 48, 51, 0, 63, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 137, 1185, 144,
+	0, 1182, 0, 138, 139, 1208, 0, 154, 0, 52,
+	73, 72, 0, 0, 61, 62, 50, 159, 0, 0,
+	0, 0, 0, 0, 0, 0, 614, 0, 0, 1202,
+	0, 0, 1906, 1208, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 1558,
+	0, 54, 55, 0, 56, 57, 58, 59, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 1490, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 760, 0, 0, 1202, 146,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 1976, 1977, 1978, 0,
+	0, 0, 0, 71, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 1088, 0, 0, 0, 1612, 1613, 1614,
+	1615, 1616, 140, 0, 0, 0, 0, 1620, 1621, 1088,
+	1623, 0, 0, 0, 134, 0, 0, 135, 0, 0,
+	1628, 0, 0, 0, 0, 0, 0, 1631, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1202, 1635, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 1803, 2050,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 1803, 0, 0, 614, 0, 0, 0, 147, 152,
+	149, 155, 156, 157, 158, 160, 161, 162, 163, 0,
+	0, 0, 0, 0, 164, 165, 166, 167, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 1803,
+	1803, 1803, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 2092, 0, 2094, 0, 0, 0, 0,
+	0, 1803, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 1803, 0, 0, 0, 0, 1746,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 1657, 0, 0, 578, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 614, 614, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 1694, 0, 0, 1797, 1202, 0, 2163, 0, 0,
+	0, 1803, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 1084, 0, 0,
+	0, 0, 0, 0, 1721, 1722, 0, 0, 1084, 1084,
+	1084, 1084, 1084, 0, 0, 0, 0, 0, 0, 0,
+	0, 1827, 0, 0, 1490, 0, 0, 1084, 0, 0,
+	0, 1084, 0, 0, 0, 0, 0, 0, 0, 1842,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1891, 1816, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 1953, 0, 1954, 1955, 1956, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 1966, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 1903, 1979, 33, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 1084, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	2002, 0, 0, 0, 0, 0, 0, 2008, 2009, 2010,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 2104, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 2113,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 1903, 0, 33, 0, 1903, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 33, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 1903, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 738, 725, 33, 2139, 674, 741,
+	645, 663, 750, 665, 668, 708, 625, 687, 331, 660,
+	0, 649, 621, 656, 622, 647, 676, 241, 680, 644,
+	727, 690, 740, 289, 0, 627, 650, 345, 710, 382,
+	227, 298, 296, 410, 251, 244, 240, 226, 273, 304,
+	343, 400, 337, 747, 293, 697, 0, 391, 316, 0,
+	0, 0, 678, 730, 685, 721, 673, 709, 634, 696,
+	742, 661, 705, 743, 279, 225, 195, 328, 392, 255,
+	0, 0, 0, 177, 178, 179, 0, 2146, 2147, 0,
+	0, 0, 0, 0, 217, 0, 223, 702, 737, 658,
+	704, 237, 277, 243, 236, 407, 707, 753, 620, 699,
+	0, 623, 626, 749, 733, 653, 654, 0, 0, 0,
+	0, 0, 0, 0, 677, 686, 718, 671, 0, 0,
+	0, 0, 0, 0, 0, 0, 651, 0, 695, 0,
+	0, 0, 630, 624, 0, 0, 0, 0, 675, 0,
+	0, 0, 633, 0, 652, 719, 0, 618, 263, 628,
+	317, 723, 732, 672, 438, 736, 670, 669, 739, 714,
+	631, 729, 664, 288, 629, 285, 191, 205, 0, 662,
+	327, 366, 372, 728, 648, 657, 228, 655, 370, 341,
+	424, 213, 253, 363, 346, 368, 694, 712, 369, 294,
+	412, 358, 422, 439, 440, 235, 321, 430, 404, 436,
+	448, 206, 232, 335, 397, 427, 388, 314, 408, 409,
+	284, 387, 261, 194, 292, 198, 399, 420, 218, 380,
+	0, 0, 0, 200, 418, 396, 311, 281, 282, 199,
+	0, 362, 239, 259, 230, 330, 415, 416, 229, 450,
+	208, 435, 202, 209, 434, 323, 411, 419, 312, 303,
+	201, 417, 310, 302, 287, 249, 269, 356, 297, 357,
+	270, 319, 318, 320, 0, 196, 0, 393, 428, 451,
+	215, 643, 724, 406, 444, 447, 0, 359, 216, 260,
+	248, 355, 258, 290, 443, 445, 446, 214, 353, 266,
+	334, 423, 252, 431, 322, 210, 272, 389, 286, 295,
+	716, 752, 340, 371, 219, 426, 390, 638, 642, 636,
+	637, 688, 689, 639, 744, 745, 746, 720, 632, 0,
+	640, 641, 0, 726, 734, 735, 693, 190, 203, 291,
+	748, 360, 256, 449, 433, 429, 619, 635, 234, 646,
+	0, 0, 659, 666, 667, 679, 681, 682, 683, 684,
+	692, 700, 701, 703, 711, 713, 715, 717, 722, 731,
+	751, 192, 193, 204, 212, 221, 233, 246, 254, 264,
+	268, 271, 274, 275, 278, 283, 300, 305, 306, 307,
+	308, 324, 325, 326, 329, 332, 333, 336, 338, 339,
+	342, 348, 349, 350, 351, 352, 354, 361, 365, 373,
+	374, 375, 376, 377, 378, 379, 383, 384, 385, 386,
+	394, 398, 413, 414, 425, 437, 441, 265, 421, 442,
+	0, 299, 691, 698, 301, 250, 267, 276, 706, 432,
+	395, 207, 367, 257, 197, 224, 211, 231, 245, 247,
+	280, 309, 315, 344, 347, 262, 242, 222, 364, 220,
+	381, 401, 402, 403, 405, 313, 238, 738, 725, 0,
+	0, 674, 741, 645, 663, 750, 665, 668, 708, 625,
+	687, 331, 660, 0, 649, 621, 656, 622, 647, 676,
+	241, 680, 644, 727, 690, 740, 289, 0, 627, 650,
+	345, 710, 382, 227, 298, 296, 410, 251, 244, 240,
+	226, 273, 304, 343, 400, 337, 747, 293, 697, 0,
+	391, 316, 0, 0, 0, 678, 730, 685, 721, 673,
+	709, 634, 696, 742, 661, 705, 743, 279, 225, 195,
+	328, 392, 255, 0, 0, 0, 177, 178, 179, 0,
+	0, 0, 0, 0, 0, 0, 0, 217, 0, 223,
+	702, 737, 658, 704, 237, 277, 243, 236, 407, 707,
+	753, 620, 699, 0, 623, 626, 749, 733, 653, 654,
+	0, 0, 0, 0, 0, 0, 0, 677, 686, 718,
+	671, 0, 0, 0, 0, 0, 0, 1895, 0, 651,
+	0, 695, 0, 0, 0, 630, 624, 0, 0, 0,
+	0, 675, 0, 0, 0, 633, 0, 652, 719, 0,
+	618, 263, 628, 317, 723, 732, 672, 438, 736, 670,
+	669, 739, 714, 631, 729, 664, 288, 629, 285, 191,
+	205, 0, 662, 327, 366, 372, 728, 648, 657, 228,
+	655, 370, 341, 424, 213, 253, 363, 346, 368, 694,
+	712, 369, 294, 412, 358, 422, 439, 440, 235, 321,
+	430, 404, 436, 448, 206, 232, 335, 397, 427, 388,
+	314, 408, 409, 284, 387, 261, 194, 292, 198, 399,
+	420, 218, 380, 0, 0, 0, 200, 418, 396, 311,
+	281, 282, 199, 0, 362, 239, 259, 230, 330, 415,
+	416, 229, 450, 208, 435, 202, 209, 434, 323, 411,
+	419, 312, 303, 201, 417, 310, 302, 287, 249, 269,
+	356, 297, 357, 270, 319, 318, 320, 0, 196, 0,
+	393, 428, 451, 215, 643, 724, 406, 444, 447, 0,
+	359, 216, 260, 248, 355, 258, 290, 443, 445, 446,
+	214, 353, 266, 334, 423, 252, 431, 322, 210, 272,
+	389, 286, 295, 716, 752, 340, 371, 219, 426, 390,
+	638, 642, 636, 637, 688, 689, 639, 744, 745, 746,
+	720, 632, 0, 640, 641, 0, 726, 734, 735, 693,
+	190, 203, 291, 748, 360, 256, 449, 433, 429, 619,
+	635, 234, 646, 0, 0, 659, 666, 667, 679, 681,
+	682, 683, 684, 692, 700, 701, 703, 711, 713, 715,
+	717, 722, 731, 751, 192, 193, 204, 212, 221, 233,
+	246, 254, 264, 268, 271, 274, 275, 278, 283, 300,
+	305, 306, 307, 308, 324, 325, 326, 329, 332, 333,
+	336, 338, 339, 342, 348, 349, 350, 351, 352, 354,
+	361, 365, 373, 374, 375, 376, 377, 378, 379, 383,
+	384, 385, 386, 394, 398, 413, 414, 425, 437, 441,
+	265, 421, 442, 0, 299, 691, 698, 301, 250, 267,
+	276, 706, 432, 395, 207, 367, 257, 197, 224, 211,
+	231, 245, 247, 280, 309, 315, 344, 347, 262, 242,
+	222, 364, 220, 381, 401, 402, 403, 405, 313, 238,
+	738, 725, 0, 0, 674, 741, 645, 663, 750, 665,
+	668, 708, 625, 687, 331, 660, 0, 649, 621, 656,
+	622, 647, 676, 241, 680, 644, 727, 690, 740, 289,
+	0, 627, 650, 345, 710, 382, 227, 298, 296, 410,
+	251, 244, 240, 226, 273, 304, 343, 400, 337, 747,
+	293, 697, 0, 391, 316, 0, 0, 0, 678, 730,
+	685, 721, 673, 709, 634, 696, 742, 661, 705, 743,
+	279, 225, 195, 328, 392, 255, 0, 0, 0, 177,
+	178, 179, 0, 0, 0, 0, 0, 0, 0, 0,
+	217, 0, 223, 702, 737, 658, 704, 237, 277, 243,
+	236, 407, 707, 753, 620, 699, 0, 623, 626, 749,
+	733, 653, 654, 0, 0, 0, 0, 0, 0, 0,
+	677, 686, 718, 671, 0, 0, 0, 0, 0, 0,
+	1750, 0, 651, 0, 695, 0, 0, 0, 630, 624,
+	0, 0, 0, 0, 675, 0, 0, 0, 633, 0,
+	652, 719, 0, 618, 263, 628, 317, 723, 732, 672,
+	438, 736, 670, 669, 739, 714, 631, 729, 664, 288,
+	629, 285, 191, 205, 0, 662, 327, 366, 372, 728,
+	648, 657, 228, 655, 370, 341, 424, 213, 253, 363,
+	346, 368, 694, 712, 369, 294, 412, 358, 422, 439,
+	440, 235, 321, 430, 404, 436, 448, 206, 232, 335,
+	397, 427, 388, 314, 408, 409, 284, 387, 261, 194,
+	292, 198, 399, 420, 218, 380, 0, 0, 0, 200,
+	418, 396, 311, 281, 282, 199, 0, 362, 239, 259,
+	230, 330, 415, 416, 229, 450, 208, 435, 202, 209,
+	434, 323, 411, 419, 312, 303, 201, 417, 310, 302,
+	287, 249, 269, 356, 297, 357, 270, 319, 318, 320,
+	0, 196, 0, 393, 428, 451, 215, 643, 724, 406,
+	444, 447, 0, 359, 216, 260, 248, 355, 258, 290,
+	443, 445, 446, 214, 353, 266, 334, 423, 252, 431,
+	322, 210, 272, 389, 286, 295, 716, 752, 340, 371,
+	219, 426, 390, 638, 642, 636, 637, 688, 689, 639,
+	744, 745, 746, 720, 632, 0, 640, 641, 0, 726,
+	734, 735, 693, 190, 203, 291, 748, 360, 256, 449,
+	433, 429, 619, 635, 234, 646, 0, 0, 659, 666,
+	667, 679, 681, 682, 683, 684, 692, 700, 701, 703,
+	711, 713, 715, 717, 722, 731, 751, 192, 193, 204,
+	212, 221, 233, 246, 254, 264, 268, 271, 274, 275,
+	278, 283, 300, 305, 306, 307, 308, 324, 325, 326,
+	329, 332, 333, 336, 338, 339, 342, 348, 349, 350,
+	351, 352, 354, 361, 365, 373, 374, 375, 376, 377,
+	378, 379, 383, 384, 385, 386, 394, 398, 413, 414,
+	425, 437, 441, 265, 421, 442, 0, 299, 691, 698,
+	301, 250, 267, 276, 706, 432, 395, 207, 367, 257,
+	197, 224, 211, 231, 245, 247, 280, 309, 315, 344,
+	347, 262, 242, 222, 364, 220, 381, 401, 402, 403,
+	405, 313, 238, 738, 725, 0, 0, 674, 741, 645,
+	663, 750, 665, 668, 708, 625, 687, 331, 660, 0,
+	649, 621, 656, 622, 647, 676, 241, 680, 644, 727,
+	690, 740, 289, 0, 627, 650, 345, 710, 382, 227,
+	298, 296, 410, 251, 244, 240, 226, 273, 304, 343,
+	400, 337, 747, 293, 697, 0, 391, 316, 0, 0,
+	0, 678, 730, 685, 721, 673, 709, 634, 696, 742,
+	661, 705, 743, 279, 225, 195, 328, 392, 255, 0,
+	0, 0, 177, 178, 179, 0, 0, 0, 0, 0,
+	0, 0, 0, 217, 0, 223, 702, 737, 658, 704,
+	237, 277, 243, 236, 407, 707, 753, 620, 699, 0,
+	623, 626, 749, 733, 653, 654, 0, 0, 0, 0,
+	0, 0, 0, 677, 686, 718, 671, 0, 0, 0,
+	0, 0, 0, 1467, 0, 651, 0, 695, 0, 0,
+	0, 630, 624, 0, 0, 0, 0, 675, 0, 0,
+	0, 633, 0, 652, 719, 0, 618, 263, 628, 317,
+	723, 732, 672, 438, 736, 670, 669, 739, 714, 631,
+	729, 664, 288, 629, 285, 191, 205, 0, 662, 327,
+	366, 372, 728, 648, 657, 228, 655, 370, 341, 424,
+	213, 253, 363, 346, 368, 694, 712, 369, 294, 412,
+	358, 422, 439, 440, 235, 321, 430, 404, 436, 448,
+	206, 232, 335, 397, 427, 388, 314, 408, 409, 284,
+	387, 261, 194, 292, 198, 399, 420, 218, 380, 0,
+	0, 0, 200, 418, 396, 311, 281, 282, 199, 0,
+	362, 239, 259, 230, 330, 415, 416, 229, 450, 208,
+	435, 202, 209, 434, 323, 411, 419, 312, 303, 201,
+	417, 310, 302, 287, 249, 269, 356, 297, 357, 270,
+	319, 318, 320, 0, 196, 0, 393, 428, 451, 215,
+	643, 724, 406, 444, 447, 0, 359, 216, 260, 248,
+	355, 258, 290, 443, 445, 446, 214, 353, 266, 334,
+	423, 252, 431, 322, 210, 272, 389, 286, 295, 716,
+	752, 340, 371, 219, 426, 390, 638, 642, 636, 637,
+	688, 689, 639, 744, 745, 746, 720, 632, 0, 640,
+	641, 0, 726, 734, 735, 693, 190, 203, 291, 748,
+	360, 256, 449, 433, 429, 619, 635, 234, 646, 0,
+	0, 659, 666, 667, 679, 681, 682, 683, 684, 692,
+	700, 701, 703, 711, 713, 715, 717, 722, 731, 751,
+	192, 193, 204, 212, 221, 233, 246, 254, 264, 268,
+	271, 274, 275, 278, 283, 300, 305, 306, 307, 308,
+	324, 325, 326, 329, 332, 333, 336, 338, 339, 342,
+	348, 349, 350, 351, 352, 354, 361, 365, 373, 374,
+	375, 376, 377, 378, 379, 383, 384, 385, 386, 394,
+	398, 413, 414, 425, 437, 441, 265, 421, 442, 0,
+	299, 691, 698, 301, 250, 267, 276, 706, 432, 395,
+	207, 367, 257, 197, 224, 211, 231, 245, 247, 280,
+	309, 315, 344, 347, 262, 242, 222, 364, 220, 381,
+	401, 402, 403, 405, 313, 238, 738, 725, 0, 0,
+	674, 741, 645, 663, 750, 665, 668, 708, 625, 687,
+	331, 660, 0, 649, 621, 656, 622, 647, 676, 241,
+	680, 644, 727, 690, 740, 289, 0, 627, 650, 345,
+	710, 382, 227, 298, 296, 410, 251, 244, 240, 226,
+	273, 304, 343, 400, 337, 747, 293, 697, 0, 391,
+	316, 0, 0, 0, 678, 730, 685, 721, 673, 709,
+	634, 696, 742, 661, 705, 743, 279, 225, 195, 328,
+	392, 255, 69, 0, 0, 177, 178, 179, 0, 0,
+	0, 0, 0, 0, 0, 0, 217, 0, 223, 702,
+	737, 658, 704, 237, 277, 243, 236, 407, 707, 753,
+	620, 699, 0, 623, 626, 749, 733, 653, 654, 0,
+	0, 0, 0, 0, 0, 0, 677, 686, 718, 671,
+	0, 0, 0, 0, 0, 0, 0, 0, 651, 0,
+	695, 0, 0, 0, 630, 624, 0, 0, 0, 0,
+	675, 0, 0, 0, 633, 0, 652, 719, 0, 618,
+	263, 628, 317, 723, 732, 672, 438, 736, 670, 669,
+	739, 714, 631, 729, 664, 288, 629, 285, 191, 205,
+	0, 662, 327, 366, 372, 728, 648, 657, 228, 655,
+	370, 341, 424, 213, 253, 363, 346, 368, 694, 712,
+	369, 294, 412, 358, 422, 439, 440, 235, 321, 430,
+	404, 436, 448, 206, 232, 335, 397, 427, 388, 314,
+	408, 409, 284, 387, 261, 194, 292, 198, 399, 420,
+	218, 380, 0, 0, 0, 200, 418, 396, 311, 281,
+	282, 199, 0, 362, 239, 259, 230, 330, 415, 416,
+	229, 450, 208, 435, 202, 209, 434, 323, 411, 419,
+	312, 303, 201, 417, 310, 302, 287, 249, 269, 356,
+	297, 357, 270, 319, 318, 320, 0, 196, 0, 393,
+	428, 451, 215, 643, 724, 406, 444, 447, 0, 359,
+	216, 260, 248, 355, 258, 290, 443, 445, 446, 214,
+	353, 266, 334, 423, 252, 431, 322, 210, 272, 389,
+	286, 295, 716, 752, 340, 371, 219, 426, 390, 638,
+	642, 636, 637, 688, 689, 639, 744, 745, 746, 720,
+	632, 0, 640, 641, 0, 726, 734, 735, 693, 190,
+	203, 291, 748, 360, 256, 449, 433, 429, 619, 635,
+	234, 646, 0, 0, 659, 666, 667, 679, 681, 682,
+	683, 684, 692, 700, 701, 703, 711, 713, 715, 717,
+	722, 731, 751, 192, 193, 204, 212, 221, 233, 246,
+	254, 264, 268, 271, 274, 275, 278, 283, 300, 305,
+	306, 307, 308, 324, 325, 326, 329, 332, 333, 336,
+	338, 339, 342, 348, 349, 350, 351, 352, 354, 361,
+	365, 373, 374, 375, 376, 377, 378, 379, 383, 384,
+	385, 386, 394, 398, 413, 414, 425, 437, 441, 265,
+	421, 442, 0, 299, 691, 698, 301, 250, 267, 276,
+	706, 432, 395, 207, 367, 257, 197, 224, 211, 231,
+	245, 247, 280, 309, 315, 344, 347, 262, 242, 222,
+	364, 220, 381, 401, 402, 403, 405, 313, 238, 738,
+	725, 0, 0, 674, 741, 645, 663, 750, 665, 668,
+	708, 625, 687, 331, 660, 0, 649, 621, 656, 622,
+	647, 676, 241, 680, 644, 727, 690, 740, 289, 0,
+	627, 650, 345, 710, 382, 227, 298, 296, 410, 251,
+	244, 240, 226, 273, 304, 343, 400, 337, 747, 293,
+	697, 0, 391, 316, 0, 0, 0, 678, 730, 685,
+	721, 673, 709, 634, 696, 742, 661, 705, 743, 279,
+	225, 195, 328, 392, 255, 0, 0, 0, 177, 178,
+	179, 0, 0, 0, 0, 0, 0, 0, 0, 217,
+	0, 223, 702, 737, 658, 704, 237, 277, 243, 236,
+	407, 707, 753, 620, 699, 0, 623, 626, 749, 733,
+	653, 654, 0, 0, 0, 0, 0, 0, 0, 677,
+	686, 718, 671, 0, 0, 0, 0, 0, 0, 0,
+	0, 651, 0, 695, 0, 0, 0, 630, 624, 0,
+	0, 0, 0, 675, 0, 0, 0, 633, 0, 652,
+	719, 0, 618, 263, 628, 317, 723, 732, 672, 438,
+	736, 670, 669, 739, 714, 631, 729, 664, 288, 629,
+	285, 191, 205, 0, 662, 327, 366, 372, 728, 648,
+	657, 228, 655, 370, 341, 424, 213, 253, 363, 346,
+	368, 694, 712, 369, 294, 412, 358, 422, 439, 440,
+	235, 321, 430, 404, 436, 448, 206, 232, 335, 397,
+	427, 388, 314, 408, 409, 284, 387, 261, 194, 292,
+	198, 399, 420, 218, 380, 0, 0, 0, 200, 418,
+	396, 311, 281, 282, 199, 0, 362, 239, 259, 230,
+	330, 415, 416, 229, 450, 208, 435, 202, 209, 434,
+	323, 411, 419, 312, 303, 201, 417, 310, 302, 287,
+	249, 269, 356, 297, 357, 270, 319, 318, 320, 0,
+	196, 0, 393, 428, 451, 215, 643, 724, 406, 444,
+	447, 0, 359, 216, 260, 248, 355, 258, 290, 443,
+	445, 446, 214, 353, 266, 334, 423, 252, 431, 322,
+	210, 272, 389, 286, 295, 716, 752, 340, 371, 219,
+	426, 390, 638, 642, 636, 637, 688, 689, 639, 744,
+	745, 746, 720, 632, 0, 640, 641, 0, 726, 734,
+	735, 693, 190, 203, 291, 748, 360, 256, 449, 433,
+	429, 619, 635, 234, 646, 0, 0, 659, 666, 667,
+	679, 681, 682, 683, 684, 692, 700, 701, 703, 711,
+	713, 715, 717, 722, 731, 751, 192, 193, 204, 212,
+	221, 233, 246, 254, 264, 268, 271, 274, 275, 278,
+	283, 300, 305, 306, 307, 308, 324, 325, 326, 329,
+	332, 333, 336, 338, 339, 342, 348, 349, 350, 351,
+	352, 354, 361, 365, 373, 374, 375, 376, 377, 378,
+	379, 383, 384, 385, 386, 394, 398, 413, 414, 425,
+	437, 441, 265, 421, 442, 0, 299, 691, 698, 301,
+	250, 267, 276, 706, 432, 395, 207, 367, 257, 197,
+	224, 211, 231, 245, 247, 280, 309, 315, 344, 347,
+	262, 242, 222, 364, 220, 381, 401, 402, 403, 405,
+	313, 238, 738, 725, 0, 0, 674, 741, 645, 663,
+	750, 665, 668, 708, 625, 687, 331, 660, 0, 649,
+	621, 656, 622, 647, 676, 241, 680, 644, 727, 690,
+	740, 289, 0, 627, 650, 345, 710, 382, 227, 298,
+	296, 410, 251, 244, 240, 226, 273, 304, 343, 400,
+	337, 747, 293, 697, 0, 391, 316, 0, 0, 0,
+	678, 730, 685, 721, 673, 709, 634, 696, 742, 661,
+	705, 743, 279, 225, 195, 328, 392, 255, 0, 0,
+	0, 177, 178, 179, 0, 0, 0, 0, 0, 0,
+	0, 0, 217, 0, 223, 702, 737, 658, 704, 237,
+	277, 243, 236, 407, 707, 753, 620, 699, 0, 623,
+	626, 749, 733, 653, 654, 0, 0, 0, 0, 0,
+	0, 0, 677, 686, 718, 671, 0, 0, 0, 0,
+	0, 0, 0, 0, 651, 0, 695, 0, 0, 0,
+	630, 624, 0, 0, 0, 0, 675, 0, 0, 0,
+	633, 0, 652, 719, 0, 618, 263, 628, 317, 723,
+	732, 672, 438, 736, 670, 669, 739, 714, 631, 729,
+	664, 288, 629, 285, 191, 205, 0, 662, 327, 366,
+	372, 728, 648, 657, 228, 655, 370, 341, 424, 213,
+	253, 363, 346, 368, 694, 712, 369, 294, 412, 358,
+	422, 439, 440, 235, 321, 430, 404, 436, 448, 206,
+	232, 335, 397, 427, 388, 314, 408, 409, 284, 387,
+	261, 194, 292, 198, 399, 420, 218, 380, 0, 0,
+	0, 200, 418, 396, 311, 281, 282, 199, 0, 362,
+	239, 259, 230, 330, 415, 416, 229, 450, 208, 435,
+	202, 755, 434, 323, 411, 419, 312, 303, 201, 417,
+	310, 302, 287, 249, 269, 356, 297, 357, 270, 319,
+	318, 320, 0, 196, 0, 393, 428, 451, 215, 643,
+	724, 406, 444, 447, 0, 359, 216, 260, 248, 355,
+	258, 290, 443, 445, 446, 214, 353, 266, 334, 423,
+	252, 431, 617, 754, 611, 610, 286, 295, 716, 752,
+	340, 371, 219, 426, 390, 638, 642, 636, 637, 688,
+	689, 639, 744, 745, 746, 720, 632, 0, 640, 641,
+	0, 726, 734, 735, 693, 190, 203, 291, 748, 360,
+	256, 449, 433, 429, 619, 635, 234, 646, 0, 0,
+	659, 666, 667, 679, 681, 682, 683, 684, 692, 700,
+	701, 703, 711, 713, 715, 717, 722, 731, 751, 192,
+	193, 204, 212, 221, 233, 246, 254, 264, 268, 271,
+	274, 275, 278, 283, 300, 305, 306, 307, 308, 324,
+	325, 326, 329, 332, 333, 336, 338, 339, 342, 348,
+	349, 350, 351, 352, 354, 361, 365, 373, 374, 375,
+	376, 377, 378, 379, 383, 384, 385, 386, 394, 398,
+	413, 414, 425, 437, 441, 265, 421, 442, 0, 299,
+	691, 698, 301, 250, 267, 276, 706, 432, 395, 207,
+	367, 257, 197, 224, 211, 231, 245, 247, 280, 309,
+	315, 344, 347, 262, 242, 222, 364, 220, 381, 401,
+	402, 403, 405, 313, 238, 738, 725, 0, 0, 674,
+	741, 645, 663, 750, 665, 668, 708, 625, 687, 331,
+	660, 0, 649, 621, 656, 622, 647, 676, 241, 680,
+	644, 727, 690, 740, 289, 0, 627, 650, 345, 710,
+	382, 227, 298, 296, 410, 251, 244, 240, 226, 273,
+	304, 343, 400, 337, 747, 293, 697, 0, 391, 316,
+	0, 0, 0, 678, 730, 685, 721, 673, 709, 634,
+	696, 742, 661, 705, 743, 279, 225, 195, 328, 392,
+	255, 0, 0, 0, 177, 178, 179, 0, 0, 0,
+	0, 0, 0, 0, 0, 217, 0, 223, 702, 737,
+	658, 704, 237, 277, 243, 236, 407, 707, 753, 620,
+	699, 0, 623, 626, 749, 733, 653, 654, 0, 0,
+	0, 0, 0, 0, 0, 677, 686, 718, 671, 0,
+	0, 0, 0, 0, 0, 0, 0, 651, 0, 695,
+	0, 0, 0, 630, 624, 0, 0, 0, 0, 675,
+	0, 0, 0, 633, 0, 652, 719, 0, 618, 263,
+	628, 317, 723, 732, 672, 438, 736, 670, 669, 739,
+	714, 631, 729, 664, 288, 629, 285, 191, 205, 0,
+	662, 327, 366, 372, 728, 648, 657, 228, 655, 370,
+	341, 424, 213, 253, 363, 346, 368, 694, 712, 369,
+	294, 412, 358, 422, 439, 440, 235, 321, 430, 404,
+	436, 448, 206, 232, 335, 397, 427, 388, 314, 408,
+	409, 284, 387, 261, 194, 292, 198, 399, 1092, 218,
+	380, 0, 0, 0, 200, 418, 396, 311, 281, 282,
+	199, 0, 362, 239, 259, 230, 330, 415, 416, 229,
+	450, 208, 435, 202, 755, 434, 323, 411, 419, 312,
+	303, 201, 417, 310, 302, 287, 249, 269, 356, 297,
+	357, 270, 319, 318, 320, 0, 196, 0, 393, 428,
+	451, 215, 643, 724, 406, 444, 447, 0, 359, 216,
+	260, 248, 355, 258, 290, 443, 445, 446, 214, 353,
+	266, 334, 423, 252, 431, 617, 754, 611, 610, 286,
+	295, 716, 752, 340, 371, 219, 426, 390, 638, 642,
+	636, 637, 688, 689, 639, 744, 745, 746, 720, 632,
+	0, 640, 641, 0, 726, 734, 735, 693, 190, 203,
+	291, 748, 360, 256, 449, 433, 429, 619, 635, 234,
+	646, 0, 0, 659, 666, 667, 679, 681, 682, 683,
+	684, 692, 700, 701, 703, 711, 713, 715, 717, 722,
+	731, 751, 192, 193, 204, 212, 221, 233, 246, 254,
+	264, 268, 271, 274, 275, 278, 283, 300, 305, 306,
+	307, 308, 324, 325, 326, 329, 332, 333, 336, 338,
+	339, 342, 348, 349, 350, 351, 352, 354, 361, 365,
+	373, 374, 375, 376, 377, 378, 379, 383, 384, 385,
+	386, 394, 398, 413, 414, 425, 437, 441, 265, 421,
+	442, 0, 299, 691, 698, 301, 250, 267, 276, 706,
+	432, 395, 207, 367, 257, 197, 224, 211, 231, 245,
+	247, 280, 309, 315, 344, 347, 262, 242, 222, 364,
+	220, 381, 401, 402, 403, 405, 313, 238, 738, 725,
+	0, 0, 674, 741, 645, 663, 750, 665, 668, 708,
+	625, 687, 331, 660, 0, 649, 621, 656, 622, 647,
+	676, 241, 680, 644, 727, 690, 740, 289, 0, 627,
+	650, 345, 710, 382, 227, 298, 296, 410, 251, 244,
+	240, 226, 273, 304, 343, 400, 337, 747, 293, 697,
+	0, 391, 316, 0, 0, 0, 678, 730, 685, 721,
+	673, 709, 634, 696, 742, 661, 705, 743, 279, 225,
+	195, 328, 392, 255, 0, 0, 0, 177, 178, 179,
+	0, 0, 0, 0, 0, 0, 0, 0, 217, 0,
+	223, 702, 737, 658, 704, 237, 277, 243, 236, 407,
+	707, 753, 620, 699, 0, 623, 626, 749, 733, 653,
+	654, 0, 0, 0, 0, 0, 0, 0, 677, 686,
+	718, 671, 0, 0, 0, 0, 0, 0, 0, 0,
+	651, 0, 695, 0, 0, 0, 630, 624, 0, 0,
+	0, 0, 675, 0, 0, 0, 633, 0, 652, 719,
+	0, 618, 263, 628, 317, 723, 732, 672, 438, 736,
+	670, 669, 739, 714, 631, 729, 664, 288, 629, 285,
+	191, 205, 0, 662, 327, 366, 372, 728, 648, 657,
+	228, 655, 370, 341, 424, 213, 253, 363, 346, 368,
+	694, 712, 369, 294, 412, 358, 422, 439, 440, 235,
+	321, 430, 404, 436, 448, 206, 232, 335, 397, 427,
+	388, 314, 408, 409, 284, 387, 261, 194, 292, 198,
+	399, 608, 218, 380, 0, 0, 0, 200, 418, 396,
+	311, 281, 282, 199, 0, 362, 239, 259, 230, 330,
+	415, 416, 229, 450, 208, 435, 202, 755, 434, 323,
+	411, 419, 312, 303, 201, 417, 310, 302, 287, 249,
+	269, 356, 297, 357, 270, 319, 318, 320, 0, 196,
+	0, 393, 428, 451, 215, 643, 724, 406, 444, 447,
+	0, 359, 216, 260, 248, 355, 258, 290, 443, 445,
+	446, 214, 353, 266, 334, 423, 252, 431, 617, 754,
+	611, 610, 286, 295, 716, 752, 340, 371, 219, 426,
+	390, 638, 642, 636, 637, 688, 689, 639, 744, 745,
+	746, 720, 632, 0, 640, 641, 0, 726, 734, 735,
+	693, 190, 203, 291, 748, 360, 256, 449, 433, 429,
+	619, 635, 234, 646, 0, 0, 659, 666, 667, 679,
+	681, 682, 683, 684, 692, 700, 701, 703, 711, 713,
+	715, 717, 722, 731, 751, 192, 193, 204, 212, 221,
+	233, 246, 254, 264, 268, 271, 274, 275, 278, 283,
+	300, 305, 306, 307, 308, 324, 325, 326, 329, 332,
+	333, 336, 338, 339, 342, 348, 349, 350, 351, 352,
+	354, 361, 365, 373, 374, 375, 376, 377, 378, 379,
+	383, 384, 385, 386, 394, 398, 413, 414, 425, 437,
+	441, 265, 421, 442, 0, 299, 691, 698, 301, 250,
+	267, 276, 706, 432, 395, 207, 367, 257, 197, 224,
+	211, 231, 245, 247, 280, 309, 315, 344, 347, 262,
+	242, 222, 364, 220, 381, 401, 402, 403, 405, 313,
+	238, 331, 0, 0, 1394, 0, 511, 0, 0, 0,
+	241, 0, 510, 0, 0, 0, 289, 0, 0, 1395,
+	345, 0, 382, 227, 298, 296, 410, 251, 244, 240,
+	226, 273, 304, 343, 400, 337, 554, 293, 0, 0,
+	391, 316, 0, 0, 0, 0, 0, 545, 546, 0,
+	0, 0, 0, 0, 0, 0, 0, 279, 225, 195,
+	328, 392, 255, 69, 0, 0, 177, 178, 179, 532,
+	531, 534, 535, 536, 537, 0, 0, 217, 533, 223,
+	538, 539, 540, 0, 237, 277, 243, 236, 407, 0,
+	0, 0, 508, 525, 0, 553, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 522, 523, 598, 0, 0,
+	0, 568, 0, 524, 0, 0, 517, 518, 520, 519,
+	521, 526, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 263, 0, 317, 567, 0, 0, 438, 0, 0,
+	565, 0, 0, 0, 0, 0, 288, 0, 285, 191,
+	205, 0, 0, 327, 366, 372, 0, 0, 0, 228,
+	0, 370, 341, 424, 213, 253, 363, 346, 368, 0,
+	0, 369, 294, 412, 358, 422, 439, 440, 235, 321,
+	430, 404, 436, 448, 206, 232, 335, 397, 427, 388,
+	314, 408, 409, 284, 387, 261, 194, 292, 198, 399,
+	420, 218, 380, 0, 0, 0, 200, 418, 396, 311,
+	281, 282, 199, 0, 362, 239, 259, 230, 330, 415,
+	416, 229, 450, 208, 435, 202, 209, 434, 323, 411,
+	419, 312, 303, 201, 417, 310, 302, 287, 249, 269,
+	356, 297, 357, 270, 319, 318, 320, 0, 196, 0,
+	393, 428, 451, 215, 0, 0, 406, 444, 447, 0,
+	359, 216, 260, 248, 355, 258, 290, 443, 445, 446,
+	214, 353, 266, 334, 423, 252, 431, 322, 210, 272,
+	389, 286, 295, 0, 0, 340, 371, 219, 426, 390,
+	555, 566, 561, 562, 559, 560, 0, 558, 557, 556,
+	569, 547, 548, 549, 550, 552, 0, 563, 564, 551,
+	190, 203, 291, 0, 360, 256, 449, 433, 429, 0,
+	0, 234, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 192, 193, 204, 212, 221, 233,
+	246, 254, 264, 268, 271, 274, 275, 278, 283, 300,
+	305, 306, 307, 308, 324, 325, 326, 329, 332, 333,
+	336, 338, 339, 342, 348, 349, 350, 351, 352, 354,
+	361, 365, 373, 374, 375, 376, 377, 378, 379, 383,
+	384, 385, 386, 394, 398, 413, 414, 425, 437, 441,
+	265, 421, 442, 0, 299, 0, 0, 301, 250, 267,
+	276, 0, 432, 395, 207, 367, 257, 197, 224, 211,
+	231, 245, 247, 280, 309, 315, 344, 347, 262, 242,
+	222, 364, 220, 381, 401, 402, 403, 405, 313, 238,
+	331, 0, 0, 0, 0, 511, 0, 0, 0, 241,
+	0, 510, 0, 0, 0, 289, 0, 0, 0, 345,
+	0, 382, 227, 298, 296, 410, 251, 244, 240, 226,
+	273, 304, 343, 400, 337, 554, 293, 0, 0, 391,
+	316, 0, 0, 0, 0, 0, 545, 546, 0, 0,
+	0, 0, 0, 0, 1506, 0, 279, 225, 195, 328,
+	392, 255, 69, 0, 0, 177, 178, 179, 532, 531,
+	534, 535, 536, 537, 0, 0, 217, 533, 223, 538,
+	539, 540, 1507, 237, 277, 243, 236, 407, 0, 0,
+	0, 508, 525, 0, 553, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 522, 523, 0, 0, 0, 0,
+	568, 0, 524, 0, 0, 517, 518, 520, 519, 521,
+	526, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	263, 0, 317, 567, 0, 0, 438, 0, 0, 565,
+	0, 0, 0, 0, 0, 288, 0, 285, 191, 205,
+	0, 0, 327, 366, 372, 0, 0, 0, 228, 0,
+	370, 341, 424, 213, 253, 363, 346, 368, 0, 0,
+	369, 294, 412, 358, 422, 439, 440, 235, 321, 430,
+	404, 436, 448, 206, 232, 335, 397, 427, 388, 314,
+	408, 409, 284, 387, 261, 194, 292, 198, 399, 420,
+	218, 380, 0, 0, 0, 200, 418, 396, 311, 281,
+	282, 199, 0, 362, 239, 259, 230, 330, 415, 416,
+	229, 450, 208, 435, 202, 209, 434, 323, 411, 419,
+	312, 303, 201, 417, 310, 302, 287, 249, 269, 356,
+	297, 357, 270, 319, 318, 320, 0, 196, 0, 393,
+	428, 451, 215, 0, 0, 406, 444, 447, 0, 359,
+	216, 260, 248, 355, 258, 290, 443, 445, 446, 214,
+	353, 266, 334, 423, 252, 431, 322, 210, 272, 389,
+	286, 295, 0, 0, 340, 371, 219, 426, 390, 555,
+	566, 561, 562, 559, 560, 0, 558, 557, 556, 569,
+	547, 548, 549, 550, 552, 0, 563, 564, 551, 190,
+	203, 291, 0, 360, 256, 449, 433, 429, 0, 0,
+	234, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 192, 193, 204, 212, 221, 233, 246,
+	254, 264, 268, 271, 274, 275, 278, 283, 300, 305,
+	306, 307, 308, 324, 325, 326, 329, 332, 333, 336,
+	338, 339, 342, 348, 349, 350, 351, 352, 354, 361,
+	365, 373, 374, 375, 376, 377, 378, 379, 383, 384,
+	385, 386, 394, 398, 413, 414, 425, 437, 441, 265,
+	421, 442, 0, 299, 0, 0, 301, 250, 267, 276,
+	0, 432, 395, 207, 367, 257, 197, 224, 211, 231,
+	245, 247, 280, 309, 315, 344, 347, 262, 242, 222,
+	364, 220, 381, 401, 402, 403, 405, 313, 238, 331,
+	0, 0, 0, 0, 511, 0, 0, 0, 241, 0,
+	510, 0, 0, 0, 289, 0, 0, 0, 345, 0,
+	382, 227, 298, 296, 410, 251, 244, 240, 226, 273,
+	304, 343, 400, 337, 554, 293, 0, 0, 391, 316,
+	0, 0, 0, 0, 0, 545, 546, 0, 0, 0,
+	0, 0, 0, 0, 0, 279, 225, 195, 328, 392,
+	255, 69, 0, 586, 177, 178, 179, 532, 531, 534,
+	535, 536, 537, 0, 0, 217, 533, 223, 538, 539,
+	540, 0, 237, 277, 243, 236, 407, 0, 0, 0,
+	508, 525, 0, 553, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 522, 523, 0, 0, 0, 0, 568,
+	0, 524, 0, 0, 517, 518, 520, 519, 521, 526,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 263,
+	0, 317, 567, 0, 0, 438, 0, 0, 565, 0,
+	0, 0, 0, 0, 288, 0, 285, 191, 205, 0,
+	0, 327, 366, 372, 0, 0, 0, 228, 0, 370,
+	341, 424, 213, 253, 363, 346, 368, 0, 0, 369,
+	294, 412, 358, 422, 439, 440, 235, 321, 430, 404,
+	436, 448, 206, 232, 335, 397, 427, 388, 314, 408,
+	409, 284, 387, 261, 194, 292, 198, 399, 420, 218,
+	380, 0, 0, 0, 200, 418, 396, 311, 281, 282,
+	199, 0, 362, 239, 259, 230, 330, 415, 416, 229,
+	450, 208, 435, 202, 209, 434, 323, 411, 419, 312,
+	303, 201, 417, 310, 302, 287, 249, 269, 356, 297,
+	357, 270, 319, 318, 320, 0, 196, 0, 393, 428,
+	451, 215, 0, 0, 406, 444, 447, 0, 359, 216,
+	260, 248, 355, 258, 290, 443, 445, 446, 214, 353,
+	266, 334, 423, 252, 431, 322, 210, 272, 389, 286,
+	295, 0, 0, 340, 371, 219, 426, 390, 555, 566,
+	561, 562, 559, 560, 0, 558, 557, 556, 569, 547,
+	548, 549, 550, 552, 0, 563, 564, 551, 190, 203,
+	291, 0, 360, 256, 449, 433, 429, 0, 0, 234,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 192, 193, 204, 212, 221, 233, 246, 254,
+	264, 268, 271, 274, 275, 278, 283, 300, 305, 306,
+	307, 308, 324, 325, 326, 329, 332, 333, 336, 338,
+	339, 342, 348, 349, 350, 351, 352, 354, 361, 365,
+	373, 374, 375, 376, 377, 378, 379, 383, 384, 385,
+	386, 394, 398, 413, 414, 425, 437, 441, 265, 421,
+	442, 0, 299, 0, 0, 301, 250, 267, 276, 0,
+	432, 395, 207, 367, 257, 197, 224, 211, 231, 245,
+	247, 280, 309, 315, 344, 347, 262, 242, 222, 364,
+	220, 381, 401, 402, 403, 405, 313, 238, 331, 0,
+	0, 0, 0, 511, 0, 0, 0, 241, 0, 510,
+	0, 0, 0, 289, 0, 0, 0, 345, 0, 382,
+	227, 298, 296, 410, 251, 244, 240, 226, 273, 304,
+	343, 400, 337, 554, 293, 0, 0, 391, 316, 0,
+	0, 0, 0, 0, 545, 546, 0, 0, 0, 0,
+	0, 0, 0, 0, 279, 225, 195, 328, 392, 255,
+	69, 0, 0, 177, 178, 179, 532, 531, 534, 535,
+	536, 537, 0, 0, 217, 533, 223, 538, 539, 540,
+	0, 237, 277, 243, 236, 407, 0, 0, 0, 508,
+	525, 0, 553, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 522, 523, 598, 0, 0, 0, 568, 0,
+	524, 0, 0, 517, 518, 520, 519, 521, 526, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 263, 0,
+	317, 567, 0, 0, 438, 0, 0, 565, 0, 0,
+	0, 0, 0, 288, 0, 285, 191, 205, 0, 0,
+	327, 366, 372, 0, 0, 0, 228, 0, 370, 341,
+	424, 213, 253, 363, 346, 368, 0, 0, 369, 294,
+	412, 358, 422, 439, 440, 235, 321, 430, 404, 436,
+	448, 206, 232, 335, 397, 427, 388, 314, 408, 409,
+	284, 387, 261, 194, 292, 198, 399, 420, 218, 380,
+	0, 0, 0, 200, 418, 396, 311, 281, 282, 199,
+	0, 362, 239, 259, 230, 330, 415, 416, 229, 450,
+	208, 435, 202, 209, 434, 323, 411, 419, 312, 303,
+	201, 417, 310, 302, 287, 249, 269, 356, 297, 357,
+	270, 319, 318, 320, 0, 196, 0, 393, 428, 451,
+	215, 0, 0, 406, 444, 447, 0, 359, 216, 260,
+	248, 355, 258, 290, 443, 445, 446, 214, 353, 266,
+	334, 423, 252, 431, 322, 210, 272, 389, 286, 295,
+	0, 0, 340, 371, 219, 426, 390, 555, 566, 561,
+	562, 559, 560, 0, 558, 557, 556, 569, 547, 548,
+	549, 550, 552, 0, 563, 564, 551, 190, 203, 291,
+	0, 360, 256, 449, 433, 429, 0, 0, 234, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 192, 193, 204, 212, 221, 233, 246, 254, 264,
+	268, 271, 274, 275, 278, 283, 300, 305, 306, 307,
+	308, 324, 325, 326, 329, 332, 333, 336, 338, 339,
+	342, 348, 349, 350, 351, 352, 354, 361, 365, 373,
+	374, 375, 376, 377, 378, 379, 383, 384, 385, 386,
+	394, 398, 413, 414, 425, 437, 441, 265, 421, 442,
+	0, 299, 0, 0, 301, 250, 267, 276, 0, 432,
+	395, 207, 367, 257, 197, 224, 211, 231, 245, 247,
+	280, 309, 315, 344, 347, 262, 242, 222, 364, 220,
+	381, 401, 402, 403, 405, 313, 238, 331, 0, 0,
+	0, 0, 511, 0, 0, 0, 241, 0, 510, 0,
+	0, 0, 289, 0, 0, 0, 345, 0, 382, 227,
+	298, 296, 410, 251, 244, 240, 226, 273, 304, 343,
+	400, 337, 554, 293, 0, 0, 391, 316, 0, 0,
+	0, 0, 0, 545, 546, 0, 0, 0, 0, 0,
+	0, 0, 0, 279, 225, 195, 328, 392, 255, 69,
+	0, 0, 177, 178, 179, 532, 1412, 534, 535, 536,
+	537, 0, 0, 217, 533, 223, 538, 539, 540, 0,
+	237, 277, 243, 236, 407, 0, 0, 0, 508, 525,
+	0, 553, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 522, 523, 598, 0, 0, 0, 568, 0, 524,
+	0, 0, 517, 518, 520, 519, 521, 526, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 263, 0, 317,
+	567, 0, 0, 438, 0, 0, 565, 0, 0, 0,
+	0, 0, 288, 0, 285, 191, 205, 0, 0, 327,
+	366, 372, 0, 0, 0, 228, 0, 370, 341, 424,
+	213, 253, 363, 346, 368, 0, 0, 369, 294, 412,
+	358, 422, 439, 440, 235, 321, 430, 404, 436, 448,
+	206, 232, 335, 397, 427, 388, 314, 408, 409, 284,
+	387, 261, 194, 292, 198, 399, 420, 218, 380, 0,
+	0, 0, 200, 418, 396, 311, 281, 282, 199, 0,
+	362, 239, 259, 230, 330, 415, 416, 229, 450, 208,
+	435, 202, 209, 434, 323, 411, 419, 312, 303, 201,
+	417, 310, 302, 287, 249, 269, 356, 297, 357, 270,
+	319, 318, 320, 0, 196, 0, 393, 428, 451, 215,
+	0, 0, 406, 444, 447, 0, 359, 216, 260, 248,
+	355, 258, 290, 443, 445, 446, 214, 353, 266, 334,
+	423, 252, 431, 322, 210, 272, 389, 286, 295, 0,
+	0, 340, 371, 219, 426, 390, 555, 566, 561, 562,
+	559, 560, 0, 558, 557, 556, 569, 547, 548, 549,
+	550, 552, 0, 563, 564, 551, 190, 203, 291, 0,
+	360, 256, 449, 433, 429, 0, 0, 234, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	192, 193, 204, 212, 221, 233, 246, 254, 264, 268,
+	271, 274, 275, 278, 283, 300, 305, 306, 307, 308,
+	324, 325, 326, 329, 332, 333, 336, 338, 339, 342,
+	348, 349, 350, 351, 352, 354, 361, 365, 373, 374,
+	375, 376, 377, 378, 379, 383, 384, 385, 386, 394,
+	398, 413, 414, 425, 437, 441, 265, 421, 442, 0,
+	299, 0, 0, 301, 250, 267, 276, 0, 432, 395,
+	207, 367, 257, 197, 224, 211, 231, 245, 247, 280,
+	309, 315, 344, 347, 262, 242, 222, 364, 220, 381,
+	401, 402, 403, 405, 313, 238, 331, 0, 0, 0,
+	0, 511, 0, 0, 0, 241, 0, 510, 0, 0,
+	0, 289, 0, 0, 0, 345, 0, 382, 227, 298,
+	296, 410, 251, 244, 240, 226, 273, 304, 343, 400,
+	337, 554, 293, 0, 0, 391, 316, 0, 0, 0,
+	0, 0, 545, 546, 0, 0, 0, 0, 0, 0,
+	0, 0, 279, 225, 195, 328, 392, 255, 69, 0,
+	0, 177, 178, 179, 532, 1409, 534, 535, 536, 537,
+	0, 0, 217, 533, 223, 538, 539, 540, 0, 237,
+	277, 243, 236, 407, 0, 0, 0, 508, 525, 0,
+	553, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	522, 523, 598, 0, 0, 0, 568, 0, 524, 0,
+	0, 517, 518, 520, 519, 521, 526, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 263, 0, 317, 567,
+	0, 0, 438, 0, 0, 565, 0, 0, 0, 0,
+	0, 288, 0, 285, 191, 205, 0, 0, 327, 366,
+	372, 0, 0, 0, 228, 0, 370, 341, 424, 213,
+	253, 363, 346, 368, 0, 0, 369, 294, 412, 358,
+	422, 439, 440, 235, 321, 430, 404, 436, 448, 206,
+	232, 335, 397, 427, 388, 314, 408, 409, 284, 387,
+	261, 194, 292, 198, 399, 420, 218, 380, 0, 0,
+	0, 200, 418, 396, 311, 281, 282, 199, 0, 362,
+	239, 259, 230, 330, 415, 416, 229, 450, 208, 435,
+	202, 209, 434, 323, 411, 419, 312, 303, 201, 417,
+	310, 302, 287, 249, 269, 356, 297, 357, 270, 319,
+	318, 320, 0, 196, 0, 393, 428, 451, 215, 0,
+	0, 406, 444, 447, 0, 359, 216, 260, 248, 355,
+	258, 290, 443, 445, 446, 214, 353, 266, 334, 423,
+	252, 431, 322, 210, 272, 389, 286, 295, 0, 0,
+	340, 371, 219, 426, 390, 555, 566, 561, 562, 559,
+	560, 0, 558, 557, 556, 569, 547, 548, 549, 550,
+	552, 0, 563, 564, 551, 190, 203, 291, 0, 360,
+	256, 449, 433, 429, 0, 0, 234, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 192,
+	193, 204, 212, 221, 233, 246, 254, 264, 268, 271,
+	274, 275, 278, 283, 300, 305, 306, 307, 308, 324,
+	325, 326, 329, 332, 333, 336, 338, 339, 342, 348,
+	349, 350, 351, 352, 354, 361, 365, 373, 374, 375,
+	376, 377, 378, 379, 383, 384, 385, 386, 394, 398,
+	413, 414, 425, 437, 441, 265, 421, 442, 0, 299,
+	0, 0, 301, 250, 267, 276, 0, 432, 395, 207,
+	367, 257, 197, 224, 211, 231, 245, 247, 280, 309,
+	315, 344, 347, 262, 242, 222, 364, 220, 381, 401,
+	402, 403, 405, 313, 238, 579, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 331, 0,
+	0, 0, 0, 511, 0, 0, 0, 241, 0, 510,
+	0, 0, 0, 289, 0, 0, 0, 345, 0, 382,
+	227, 298, 296, 410, 251, 244, 240, 226, 273, 304,
+	343, 400, 337, 554, 293, 0, 0, 391, 316, 0,
+	0, 0, 0, 0, 545, 546, 0, 0, 0, 0,
+	0, 0, 0, 0, 279, 225, 195, 328, 392, 255,
+	69, 0, 0, 177, 178, 179, 532, 531, 534, 535,
+	536, 537, 0, 0, 217, 533, 223, 538, 539, 540,
+	0, 237, 277, 243, 236, 407, 0, 0, 0, 508,
+	525, 0, 553, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 522, 523, 0, 0, 0, 0, 568, 0,
+	524, 0, 0, 517, 518, 520, 519, 521, 526, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 263, 0,
+	317, 567, 0, 0, 438, 0, 0, 565, 0, 0,
+	0, 0, 0, 288, 0, 285, 191, 205, 0, 0,
+	327, 366, 372, 0, 0, 0, 228, 0, 370, 341,
+	424, 213, 253, 363, 346, 368, 0, 0, 369, 294,
+	412, 358, 422, 439, 440, 235, 321, 430, 404, 436,
+	448, 206, 232, 335, 397, 427, 388, 314, 408, 409,
+	284, 387, 261, 194, 292, 198, 399, 420, 218, 380,
+	0, 0, 0, 200, 418, 396, 311, 281, 282, 199,
+	0, 362, 239, 259, 230, 330, 415, 416, 229, 450,
+	208, 435, 202, 209, 434, 323, 411, 419, 312, 303,
+	201, 417, 310, 302, 287, 249, 269, 356, 297, 357,
+	270, 319, 318, 320, 0, 196, 0, 393, 428, 451,
+	215, 0, 0, 406, 444, 447, 0, 359, 216, 260,
+	248, 355, 258, 290, 443, 445, 446, 214, 353, 266,
+	334, 423, 252, 431, 322, 210, 272, 389, 286, 295,
+	0, 0, 340, 371, 219, 426, 390, 555, 566, 561,
+	562, 559, 560, 0, 558, 557, 556, 569, 547, 548,
+	549, 550, 552, 0, 563, 564, 551, 190, 203, 291,
+	0, 360, 256, 449, 433, 429, 0, 0, 234, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 192, 193, 204, 212, 221, 233, 246, 254, 264,
+	268, 271, 274, 275, 278, 283, 300, 305, 306, 307,
+	308, 324, 325, 326, 329, 332, 333, 336, 338, 339,
+	342, 348, 349, 350, 351, 352, 354, 361, 365, 373,
+	374, 375, 376, 377, 378, 379, 383, 384, 385, 386,
+	394, 398, 413, 414, 425, 437, 441, 265, 421, 442,
+	0, 299, 0, 0, 301, 250, 267, 276, 0, 432,
+	395, 207, 367, 257, 197, 224, 211, 231, 245, 247,
+	280, 309, 315, 344, 347, 262, 242, 222, 364, 220,
+	381, 401, 402, 403, 405, 313, 238, 331, 0, 0,
+	0, 0, 511, 0, 0, 0, 241, 0, 510, 0,
+	0, 0, 289, 0, 0, 0, 345, 0, 382, 227,
+	298, 296, 410, 251, 244, 240, 226, 273, 304, 343,
+	400, 337, 554, 293, 0, 0, 391, 316, 0, 0,
+	0, 0, 0, 545, 546, 0, 0, 0, 0, 0,
+	0, 0, 0, 279, 225, 195, 328, 392, 255, 69,
+	0, 0, 177, 178, 179, 532, 531, 534, 535, 536,
+	537, 0, 0, 217, 533, 223, 538, 539, 540, 0,
+	237, 277, 243, 236, 407, 0, 0, 0, 508, 525,
+	0, 553, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 522, 523, 0, 0, 0, 0, 568, 0, 524,
+	0, 0, 517, 518, 520, 519, 521, 526, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 263, 0, 317,
+	567, 0, 0, 438, 0, 0, 565, 0, 0, 0,
+	0, 0, 288, 0, 285, 191, 205, 0, 0, 327,
+	366, 372, 0, 0, 0, 228, 0, 370, 341, 424,
+	213, 253, 363, 346, 368, 0, 0, 369, 294, 412,
+	358, 422, 439, 440, 235, 321, 430, 404, 436, 448,
+	206, 232, 335, 397, 427, 388, 314, 408, 409, 284,
+	387, 261, 194, 292, 198, 399, 420, 218, 380, 0,
+	0, 0, 200, 418, 396, 311, 281, 282, 199, 0,
+	362, 239, 259, 230, 330, 415, 416, 229, 450, 208,
+	435, 202, 209, 434, 323, 411, 419, 312, 303, 201,
+	417, 310, 302, 287, 249, 269, 356, 297, 357, 270,
+	319, 318, 320, 0, 196, 0, 393, 428, 451, 215,
+	0, 0, 406, 444, 447, 0, 359, 216, 260, 248,
+	355, 258, 290, 443, 445, 446, 214, 353, 266, 334,
+	423, 252, 431, 322, 210, 272, 389, 286, 295, 0,
+	0, 340, 371, 219, 426, 390, 555, 566, 561, 562,
+	559, 560, 0, 558, 557, 556, 569, 547, 548, 549,
+	550, 552, 0, 563, 564, 551, 190, 203, 291, 0,
+	360, 256, 449, 433, 429, 0, 0, 234, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	192, 193, 204, 212, 221, 233, 246, 254, 264, 268,
+	271, 274, 275, 278, 283, 300, 305, 306, 307, 308,
+	324, 325, 326, 329, 332, 333, 336, 338, 339, 342,
+	348, 349, 350, 351, 352, 354, 361, 365, 373, 374,
+	375, 376, 377, 378, 379, 383, 384, 385, 386, 394,
+	398, 413, 414, 425, 437, 441, 265, 421, 442, 0,
+	299, 0, 0, 301, 250, 267, 276, 0, 432, 395,
+	207, 367, 257, 197, 224, 211, 231, 245, 247, 280,
+	309, 315, 344, 347, 262, 242, 222, 364, 220, 381,
+	401, 402, 403, 405, 313, 238, 331, 0, 0, 0,
+	0, 0, 0, 0, 0, 241, 0, 0, 0, 0,
+	0, 289, 0, 0, 0, 345, 0, 382, 227, 298,
+	296, 410, 251, 244, 240, 226, 273, 304, 343, 400,
+	337, 554, 293, 0, 0, 391, 316, 0, 0, 0,
+	0, 0, 545, 546, 0, 0, 0, 0, 0, 0,
+	0, 0, 279, 225, 195, 328, 392, 255, 69, 0,
+	0, 177, 178, 179, 532, 531, 534, 535, 536, 537,
+	0, 0, 217, 533, 223, 538, 539, 540, 0, 237,
+	277, 243, 236, 407, 0, 0, 0, 0, 525, 0,
+	553, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	522, 523, 0, 0, 0, 0, 568, 0, 524, 0,
+	0, 517, 518, 520, 519, 521, 526, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 263, 0, 317, 567,
+	0, 0, 438, 0, 0, 565, 0, 0, 0, 0,
+	0, 288, 0, 285, 191, 205, 0, 0, 327, 366,
+	372, 0, 0, 0, 228, 0, 370, 341, 424, 213,
+	253, 363, 346, 368, 2166, 0, 369, 294, 412, 358,
+	422, 439, 440, 235, 321, 430, 404, 436, 448, 206,
+	232, 335, 397, 427, 388, 314, 408, 409, 284, 387,
+	261, 194, 292, 198, 399, 420, 218, 380, 0, 0,
+	0, 200, 418, 396, 311, 281, 282, 199, 0, 362,
+	239, 259, 230, 330, 415, 416, 229, 450, 208, 435,
+	202, 209, 434, 323, 411, 419, 312, 303, 201, 417,
+	310, 302, 287, 249, 269, 356, 297, 357, 270, 319,
+	318, 320, 0, 196, 0, 393, 428, 451, 215, 0,
+	0, 406, 444, 447, 0, 359, 216, 260, 248, 355,
+	258, 290, 443, 445, 446, 214, 353, 266, 334, 423,
+	252, 431, 322, 210, 272, 389, 286, 295, 0, 0,
+	340, 371, 219, 426, 390, 555, 566, 561, 562, 559,
+	560, 0, 558, 557, 556, 569, 547, 548, 549, 550,
+	552, 0, 563, 564, 551, 190, 203, 291, 0, 360,
+	256, 449, 433, 429, 0, 0, 234, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 192,
+	193, 204, 212, 221, 233, 246, 254, 264, 268, 271,
+	274, 275, 278, 283, 300, 305, 306, 307, 308, 324,
+	325, 326, 329, 332, 333, 336, 338, 339, 342, 348,
+	349, 350, 351, 352, 354, 361, 365, 373, 374, 375,
+	376, 377, 378, 379, 383, 384, 385, 386, 394, 398,
+	413, 414, 425, 437, 441, 265, 421, 442, 0, 299,
+	0, 0, 301, 250, 267, 276, 0, 432, 395, 207,
+	367, 257, 197, 224, 211, 231, 245, 247, 280, 309,
+	315, 344, 347, 262, 242, 222, 364, 220, 381, 401,
+	402, 403, 405, 313, 238, 331, 0, 0, 0, 0,
+	0, 0, 0, 0, 241, 0, 0, 0, 0, 0,
+	289, 0, 0, 0, 345, 0, 382, 227, 298, 296,
+	410, 251, 244, 240, 226, 273, 304, 343, 400, 337,
+	554, 293, 0, 0, 391, 316, 0, 0, 0, 0,
+	0, 545, 546, 0, 0, 0, 0, 0, 0, 0,
+	0, 279, 225, 195, 328, 392, 255, 69, 0, 586,
+	177, 178, 179, 532, 531, 534, 535, 536, 537, 0,
+	0, 217, 533, 223, 538, 539, 540, 0, 237, 277,
+	243, 236, 407, 0, 0, 0, 0, 525, 0, 553,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 522,
+	523, 0, 0, 0, 0, 568, 0, 524, 0, 0,
+	517, 518, 520, 519, 521, 526, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 263, 0, 317, 567, 0,
+	0, 438, 0, 0, 565, 0, 0, 0, 0, 0,
+	288, 0, 285, 191, 205, 0, 0, 327, 366, 372,
+	0, 0, 0, 228, 0, 370, 341, 424, 213, 253,
+	363, 346, 368, 0, 0, 369, 294, 412, 358, 422,
+	439, 440, 235, 321, 430, 404, 436, 448, 206, 232,
+	335, 397, 427, 388, 314, 408, 409, 284, 387, 261,
+	194, 292, 198, 399, 420, 218, 380, 0, 0, 0,
+	200, 418, 396, 311, 281, 282, 199, 0, 362, 239,
+	259, 230, 330, 415, 416, 229, 450, 208, 435, 202,
+	209, 434, 323, 411, 419, 312, 303, 201, 417, 310,
+	302, 287, 249, 269, 356, 297, 357, 270, 319, 318,
+	320, 0, 196, 0, 393, 428, 451, 215, 0, 0,
+	406, 444, 447, 0, 359, 216, 260, 248, 355, 258,
+	290, 443, 445, 446, 214, 353, 266, 334, 423, 252,
+	431, 322, 210, 272, 389, 286, 295, 0, 0, 340,
+	371, 219, 426, 390, 555, 566, 561, 562, 559, 560,
+	0, 558, 557, 556, 569, 547, 548, 549, 550, 552,
+	0, 563, 564, 551, 190, 203, 291, 0, 360, 256,
+	449, 433, 429, 0, 0, 234, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 192, 193,
+	204, 212, 221, 233, 246, 254, 264, 268, 271, 274,
+	275, 278, 283, 300, 305, 306, 307, 308, 324, 325,
+	326, 329, 332, 333, 336, 338, 339, 342, 348, 349,
+	350, 351, 352, 354, 361, 365, 373, 374, 375, 376,
+	377, 378, 379, 383, 384, 385, 386, 394, 398, 413,
+	414, 425, 437, 441, 265, 421, 442, 0, 299, 0,
+	0, 301, 250, 267, 276, 0, 432, 395, 207, 367,
+	257, 197, 224, 211, 231, 245, 247, 280, 309, 315,
+	344, 347, 262, 242, 222, 364, 220, 381, 401, 402,
+	403, 405, 313, 238, 331, 0, 0, 0, 0, 0,
+	0, 0, 0, 241, 0, 0, 0, 0, 0, 289,
+	0, 0, 0, 345, 0, 382, 227, 298, 296, 410,
+	251, 244, 240, 226, 273, 304, 343, 400, 337, 554,
+	293, 0, 0, 391, 316, 0, 0, 0, 0, 0,
+	545, 546, 0, 0, 0, 0, 0, 0, 0, 0,
+	279, 225, 195, 328, 392, 255, 69, 0, 0, 177,
+	178, 179, 532, 531, 534, 535, 536, 537, 0, 0,
+	217, 533, 223, 538, 539, 540, 0, 237, 277, 243,
+	236, 407, 0, 0, 0, 0, 525, 0, 553, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 522, 523,
+	0, 0, 0, 0, 568, 0, 524, 0, 0, 517,
+	518, 520, 519, 521, 526, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 263, 0, 317, 567, 0, 0,
+	438, 0, 0, 565, 0, 0, 0, 0, 0, 288,
+	0, 285, 191, 205, 0, 0, 327, 366, 372, 0,
+	0, 0, 228, 0, 370, 341, 424, 213, 253, 363,
+	346, 368, 0, 0, 369, 294, 412, 358, 422, 439,
+	440, 235, 321, 430, 404, 436, 448, 206, 232, 335,
+	397, 427, 388, 314, 408, 409, 284, 387, 261, 194,
+	292, 198, 399, 420, 218, 380, 0, 0, 0, 200,
+	418, 396, 311, 281, 282, 199, 0, 362, 239, 259,
+	230, 330, 415, 416, 229, 450, 208, 435, 202, 209,
+	434, 323, 411, 419, 312, 303, 201, 417, 310, 302,
+	287, 249, 269, 356, 297, 357, 270, 319, 318, 320,
+	0, 196, 0, 393, 428, 451, 215, 0, 0, 406,
+	444, 447, 0, 359, 216, 260, 248, 355, 258, 290,
+	443, 445, 446, 214, 353, 266, 334, 423, 252, 431,
+	322, 210, 272, 389, 286, 295, 0, 0, 340, 371,
+	219, 426, 390, 555, 566, 561, 562, 559, 560, 0,
+	558, 557, 556, 569, 547, 548, 549, 550, 552, 0,
+	563, 564, 551, 190, 203, 291, 0, 360, 256, 449,
+	433, 429, 0, 0, 234, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 192, 193, 204,
+	212, 221, 233, 246, 254, 264, 268, 271, 274, 275,
+	278, 283, 300, 305, 306, 307, 308, 324, 325, 326,
+	329, 332, 333, 336, 338, 339, 342, 348, 349, 350,
+	351, 352, 354, 361, 365, 373, 374, 375, 376, 377,
+	378, 379, 383, 384, 385, 386, 394, 398, 413, 414,
+	425, 437, 441, 265, 421, 442, 0, 299, 0, 0,
+	301, 250, 267, 276, 0, 432, 395, 207, 367, 257,
+	197, 224, 211, 231, 245, 247, 280, 309, 315, 344,
+	347, 262, 242, 222, 364, 220, 381, 401, 402, 403,
+	405, 313, 238, 331, 0, 0, 0, 0, 0, 0,
+	0, 0, 241, 0, 0, 0, 0, 0, 289, 0,
+	0, 0, 345, 0, 382, 227, 298, 296, 410, 251,
+	244, 240, 226, 273, 304, 343, 400, 337, 0, 293,
+	0, 0, 391, 316, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 279,
+	225, 195, 328, 392, 255, 0, 0, 0, 177, 178,
+	179, 0, 0, 0, 0, 0, 0, 0, 0, 217,
+	0, 223, 0, 0, 0, 0, 237, 277, 243, 236,
+	407, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 969, 968, 978, 979, 971, 972, 973,
+	974, 975, 976, 977, 970, 0, 0, 980, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 263, 0, 317, 0, 0, 0, 438,
+	0, 0, 0, 0, 0, 0, 0, 0, 288, 0,
+	285, 191, 205, 0, 0, 327, 366, 372, 0, 0,
+	0, 228, 0, 370, 341, 424, 213, 253, 363, 346,
+	368, 0, 0, 369, 294, 412, 358, 422, 439, 440,
+	235, 321, 430, 404, 436, 448, 206, 232, 335, 397,
+	427, 388, 314, 408, 409, 284, 387, 261, 194, 292,
+	198, 399, 420, 218, 380, 0, 0, 0, 200, 418,
+	396, 311, 281, 282, 199, 0, 362, 239, 259, 230,
+	330, 415, 416, 229, 450, 208, 435, 202, 209, 434,
+	323, 411, 419, 312, 303, 201, 417, 310, 302, 287,
+	249, 269, 356, 297, 357, 270, 319, 318, 320, 0,
+	196, 0, 393, 428, 451, 215, 0, 0, 406, 444,
+	447, 0, 359, 216, 260, 248, 355, 258, 290, 443,
+	445, 446, 214, 353, 266, 334, 423, 252, 431, 322,
+	210, 272, 389, 286, 295, 0, 0, 340, 371, 219,
+	426, 390, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 190, 203, 291, 0, 360, 256, 449, 433,
+	429, 0, 0, 234, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 192, 193, 204, 212,
+	221, 233, 246, 254, 264, 268, 271, 274, 275, 278,
+	283, 300, 305, 306, 307, 308, 324, 325, 326, 329,
+	332, 333, 336, 338, 339, 342, 348, 349, 350, 351,
+	352, 354, 361, 365, 373, 374, 375, 376, 377, 378,
+	379, 383, 384, 385, 386, 394, 398, 413, 414, 425,
+	437, 441, 265, 421, 442, 0, 299, 0, 0, 301,
+	250, 267, 276, 0, 432, 395, 207, 367, 257, 197,
+	224, 211, 231, 245, 247, 280, 309, 315, 344, 347,
+	262, 242, 222, 364, 220, 381, 401, 402, 403, 405,
+	313, 238, 331, 0, 0, 0, 0, 0, 0, 0,
+	0, 241, 799, 0, 0, 0, 0, 289, 0, 0,
+	0, 345, 0, 382, 227, 298, 296, 410, 251, 244,
+	240, 226, 273, 304, 343, 400, 337, 0, 293, 0,
+	0, 391, 316, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 279, 225,
+	195, 328, 392, 255, 0, 0, 0, 177, 178, 179,
+	0, 0, 0, 0, 0, 0, 0, 0, 217, 0,
+	223, 0, 0, 0, 0, 237, 277, 243, 236, 407,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 263, 0, 317, 0, 0, 798, 438, 0,
+	0, 0, 0, 0, 0, 795, 796, 288, 763, 285,
+	191, 205, 789, 793, 327, 366, 372, 0, 0, 0,
+	228, 0, 370, 341, 424, 213, 253, 363, 346, 368,
+	0, 0, 369, 294, 412, 358, 422, 439, 440, 235,
+	321, 430, 404, 436, 448, 206, 232, 335, 397, 427,
+	388, 314, 408, 409, 284, 387, 261, 194, 292, 198,
+	399, 420, 218, 380, 0, 0, 0, 200, 418, 396,
+	311, 281, 282, 199, 0, 362, 239, 259, 230, 330,
+	415, 416, 229, 450, 208, 435, 202, 209, 434, 323,
+	411, 419, 312, 303, 201, 417, 310, 302, 287, 249,
+	269, 356, 297, 357, 270, 319, 318, 320, 0, 196,
+	0, 393, 428, 451, 215, 0, 0, 406, 444, 447,
+	0, 359, 216, 260, 248, 355, 258, 290, 443, 445,
+	446, 214, 353, 266, 334, 423, 252, 431, 322, 210,
+	272, 389, 286, 295, 0, 0, 340, 371, 219, 426,
+	390, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 190, 203, 291, 0, 360, 256, 449, 433, 429,
+	0, 0, 234, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 192, 193, 204, 212, 221,
+	233, 246, 254, 264, 268, 271, 274, 275, 278, 283,
+	300, 305, 306, 307, 308, 324, 325, 326, 329, 332,
+	333, 336, 338, 339, 342, 348, 349, 350, 351, 352,
+	354, 361, 365, 373, 374, 375, 376, 377, 378, 379,
+	383, 384, 385, 386, 394, 398, 413, 414, 425, 437,
+	441, 265, 421, 442, 0, 299, 0, 0, 301, 250,
+	267, 276, 0, 432, 395, 207, 367, 257, 197, 224,
+	211, 231, 245, 247, 280, 309, 315, 344, 347, 262,
+	242, 222, 364, 220, 381, 401, 402, 403, 405, 313,
+	238, 331, 0, 0, 0, 1070, 0, 0, 0, 0,
+	241, 0, 0, 0, 0, 0, 289, 0, 0, 0,
+	345, 0, 382, 227, 298, 296, 410, 251, 244, 240,
+	226, 273, 304, 343, 400, 337, 0, 293, 0, 0,
+	391, 316, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 279, 225, 195,
+	328, 392, 255, 0, 0, 0, 177, 178, 179, 0,
+	1072, 0, 0, 0, 0, 0, 0, 217, 0, 223,
+	0, 0, 0, 0, 237, 277, 243, 236, 407, 958,
+	959, 957, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 960, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 263, 0, 317, 0, 0, 0, 438, 0, 0,
+	0, 0, 0, 0, 0, 0, 288, 0, 285, 191,
+	205, 0, 0, 327, 366, 372, 0, 0, 0, 228,
+	0, 370, 341, 424, 213, 253, 363, 346, 368, 0,
+	0, 369, 294, 412, 358, 422, 439, 440, 235, 321,
+	430, 404, 436, 448, 206, 232, 335, 397, 427, 388,
+	314, 408, 409, 284, 387, 261, 194, 292, 198, 399,
+	420, 218, 380, 0, 0, 0, 200, 418, 396, 311,
+	281, 282, 199, 0, 362, 239, 259, 230, 330, 415,
+	416, 229, 450, 208, 435, 202, 209, 434, 323, 411,
+	419, 312, 303, 201, 417, 310, 302, 287, 249, 269,
+	356, 297, 357, 270, 319, 318, 320, 0, 196, 0,
+	393, 428, 451, 215, 0, 0, 406, 444, 447, 0,
+	359, 216, 260, 248, 355, 258, 290, 443, 445, 446,
+	214, 353, 266, 334, 423, 252, 431, 322, 210, 272,
+	389, 286, 295, 0, 0, 340, 371, 219, 426, 390,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	190, 203, 291, 0, 360, 256, 449, 433, 429, 0,
+	0, 234, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 192, 193, 204, 212, 221, 233,
+	246, 254, 264, 268, 271, 274, 275, 278, 283, 300,
+	305, 306, 307, 308, 324, 325, 326, 329, 332, 333,
+	336, 338, 339, 342, 348, 349, 350, 351, 352, 354,
+	361, 365, 373, 374, 375, 376, 377, 378, 379, 383,
+	384, 385, 386, 394, 398, 413, 414, 425, 437, 441,
+	265, 421, 442, 0, 299, 0, 0, 301, 250, 267,
+	276, 0, 432, 395, 207, 367, 257, 197, 224, 211,
+	231, 245, 247, 280, 309, 315, 344, 347, 262, 242,
+	222, 364, 220, 381, 401, 402, 403, 405, 313, 238,
+	34, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 331, 0, 0, 0, 0, 0, 0,
+	0, 0, 241, 0, 0, 0, 0, 0, 289, 0,
+	0, 0, 345, 0, 382, 227, 298, 296, 410, 251,
+	244, 240, 226, 273, 304, 343, 400, 337, 0, 293,
+	0, 0, 391, 316, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 279,
+	225, 195, 328, 392, 255, 69, 0, 586, 177, 178,
+	179, 0, 0, 0, 0, 0, 0, 0, 0, 217,
+	0, 223, 0, 0, 0, 0, 237, 277, 243, 236,
+	407, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 263, 0, 317, 0, 0, 0, 438,
+	0, 0, 0, 0, 0, 0, 0, 0, 288, 0,
+	285, 191, 205, 0, 0, 327, 366, 372, 0, 0,
+	0, 228, 0, 370, 341, 424, 213, 253, 363, 346,
+	368, 0, 0, 369, 294, 412, 358, 422, 439, 440,
+	235, 321, 430, 404, 436, 448, 206, 232, 335, 397,
+	427, 388, 314, 408, 409, 284, 387, 261, 194, 292,
+	198, 399, 420, 218, 380, 0, 0, 0, 200, 418,
+	396, 311, 281, 282, 199, 0, 362, 239, 259, 230,
+	330, 415, 416, 229, 450, 208, 435, 202, 209, 434,
+	323, 411, 419, 312, 303, 201, 417, 310, 302, 287,
+	249, 269, 356, 297, 357, 270, 319, 318, 320, 0,
+	196, 0, 393, 428, 451, 215, 0, 0, 406, 444,
+	447, 0, 359, 216, 260, 248, 355, 258, 290, 443,
+	445, 446, 214, 353, 266, 334, 423, 252, 431, 322,
+	210, 272, 389, 286, 295, 0, 0, 340, 371, 219,
+	426, 390, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 190, 203, 291, 0, 360, 256, 449, 433,
+	429, 0, 0, 234, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 192, 193, 204, 212,
+	221, 233, 246, 254, 264, 268, 271, 274, 275, 278,
+	283, 300, 305, 306, 307, 308, 324, 325, 326, 329,
+	332, 333, 336, 338, 339, 342, 348, 349, 350, 351,
+	352, 354, 361, 365, 373, 374, 375, 376, 377, 378,
+	379, 383, 384, 385, 386, 394, 398, 413, 414, 425,
+	437, 441, 265, 421, 442, 0, 299, 0, 0, 301,
+	250, 267, 276, 0, 432, 395, 207, 367, 257, 197,
+	224, 211, 231, 245, 247, 280, 309, 315, 344, 347,
+	262, 242, 222, 364, 220, 381, 401, 402, 403, 405,
+	313, 238, 331, 0, 0, 0, 1439, 0, 0, 0,
+	0, 241, 0, 0, 0, 0, 0, 289, 0, 0,
+	0, 345, 0, 382, 227, 298, 296, 410, 251, 244,
+	240, 226, 273, 304, 343, 400, 337, 0, 293, 0,
+	0, 391, 316, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 279, 225,
+	195, 328, 392, 255, 0, 0, 0, 177, 178, 179,
+	0, 1441, 0, 0, 0, 0, 0, 0, 217, 0,
+	223, 0, 0, 0, 0, 237, 277, 243, 236, 407,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 263, 0, 317, 0, 0, 0, 438, 0,
+	0, 0, 0, 0, 0, 0, 0, 288, 0, 285,
+	191, 205, 0, 0, 327, 366, 372, 0, 0, 0,
+	228, 0, 370, 341, 424, 213, 253, 363, 346, 368,
+	0, 1437, 369, 294, 412, 358, 422, 439, 440, 235,
+	321, 430, 404, 436, 448, 206, 232, 335, 397, 427,
+	388, 314, 408, 409, 284, 387, 261, 194, 292, 198,
+	399, 420, 218, 380, 0, 0, 0, 200, 418, 396,
+	311, 281, 282, 199, 0, 362, 239, 259, 230, 330,
+	415, 416, 229, 450, 208, 435, 202, 209, 434, 323,
+	411, 419, 312, 303, 201, 417, 310, 302, 287, 249,
+	269, 356, 297, 357, 270, 319, 318, 320, 0, 196,
+	0, 393, 428, 451, 215, 0, 0, 406, 444, 447,
+	0, 359, 216, 260, 248, 355, 258, 290, 443, 445,
+	446, 214, 353, 266, 334, 423, 252, 431, 322, 210,
+	272, 389, 286, 295, 0, 0, 340, 371, 219, 426,
+	390, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 190, 203, 291, 0, 360, 256, 449, 433, 429,
+	0, 0, 234, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 192, 193, 204, 212, 221,
+	233, 246, 254, 264, 268, 271, 274, 275, 278, 283,
+	300, 305, 306, 307, 308, 324, 325, 326, 329, 332,
+	333, 336, 338, 339, 342, 348, 349, 350, 351, 352,
+	354, 361, 365, 373, 374, 375, 376, 377, 378, 379,
+	383, 384, 385, 386, 394, 398, 413, 414, 425, 437,
+	441, 265, 421, 442, 0, 299, 0, 0, 301, 250,
+	267, 276, 0, 432, 395, 207, 367, 257, 197, 224,
+	211, 231, 245, 247, 280, 309, 315, 344, 347, 262,
+	242, 222, 364, 220, 381, 401, 402, 403, 405, 313,
+	238, 331, 0, 0, 0, 0, 0, 0, 0, 0,
+	241, 0, 0, 0, 0, 0, 289, 0, 0, 0,
+	345, 0, 382, 227, 298, 296, 410, 251, 244, 240,
+	226, 273, 304, 343, 400, 337, 0, 293, 0, 0,
+	391, 316, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 279, 225, 195,
+	328, 392, 255, 0, 0, 0, 177, 178, 179, 0,
+	0, 0, 0, 0, 0, 0, 0, 217, 0, 223,
+	0, 0, 0, 0, 237, 277, 243, 236, 407, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 757, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 263, 0, 317, 0, 0, 0, 438, 0, 0,
+	0, 0, 0, 0, 0, 0, 288, 763, 285, 191,
+	205, 761, 0, 327, 366, 372, 0, 0, 0, 228,
+	0, 370, 341, 424, 213, 253, 363, 346, 368, 0,
+	0, 369, 294, 412, 358, 422, 439, 440, 235, 321,
+	430, 404, 436, 448, 206, 232, 335, 397, 427, 388,
+	314, 408, 409, 284, 387, 261, 194, 292, 198, 399,
+	420, 218, 380, 0, 0, 0, 200, 418, 396, 311,
+	281, 282, 199, 0, 362, 239, 259, 230, 330, 415,
+	416, 229, 450, 208, 435, 202, 209, 434, 323, 411,
+	419, 312, 303, 201, 417, 310, 302, 287, 249, 269,
+	356, 297, 357, 270, 319, 318, 320, 0, 196, 0,
+	393, 428, 451, 215, 0, 0, 406, 444, 447, 0,
+	359, 216, 260, 248, 355, 258, 290, 443, 445, 446,
+	214, 353, 266, 334, 423, 252, 431, 322, 210, 272,
+	389, 286, 295, 0, 0, 340, 371, 219, 426, 390,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	190, 203, 291, 0, 360, 256, 449, 433, 429, 0,
+	0, 234, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 192, 193, 204, 212, 221, 233,
+	246, 254, 264, 268, 271, 274, 275, 278, 283, 300,
+	305, 306, 307, 308, 324, 325, 326, 329, 332, 333,
+	336, 338, 339, 342, 348, 349, 350, 351, 352, 354,
+	361, 365, 373, 374, 375, 376, 377, 378, 379, 383,
+	384, 385, 386, 394, 398, 413, 414, 425, 437, 441,
+	265, 421, 442, 0, 299, 0, 0, 301, 250, 267,
+	276, 0, 432, 395, 207, 367, 257, 197, 224, 211,
+	231, 245, 247, 280, 309, 315, 344, 347, 262, 242,
+	222, 364, 220, 381, 401, 402, 403, 405, 313, 238,
+	331, 0, 0, 0, 1439, 0, 0, 0, 0, 241,
+	0, 0, 0, 0, 0, 289, 0, 0, 0, 345,
+	0, 382, 227, 298, 296, 410, 251, 244, 240, 226,
+	273, 304, 343, 400, 337, 0, 293, 0, 0, 391,
+	316, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 279, 225, 195, 328,
+	392, 255, 0, 0, 0, 177, 178, 179, 0, 1441,
+	0, 0, 0, 0, 0, 0, 217, 0, 223, 0,
+	0, 0, 0, 237, 277, 243, 236, 407, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	263, 0, 317, 0, 0, 0, 438, 0, 0, 0,
+	0, 0, 0, 0, 0, 288, 0, 285, 191, 205,
+	0, 0, 327, 366, 372, 0, 0, 0, 228, 0,
+	370, 341, 424, 213, 253, 363, 346, 368, 0, 0,
+	369, 294, 412, 358, 422, 439, 440, 235, 321, 430,
+	404, 436, 448, 206, 232, 335, 397, 427, 388, 314,
+	408, 409, 284, 387, 261, 194, 292, 198, 399, 420,
+	218, 380, 0, 0, 0, 200, 418, 396, 311, 281,
+	282, 199, 0, 362, 239, 259, 230, 330, 415, 416,
+	229, 450, 208, 435, 202, 209, 434, 323, 411, 419,
+	312, 303, 201, 417, 310, 302, 287, 249, 269, 356,
+	297, 357, 270, 319, 318, 320, 0, 196, 0, 393,
+	428, 451, 215, 0, 0, 406, 444, 447, 0, 359,
+	216, 260, 248, 355, 258, 290, 443, 445, 446, 214,
+	353, 266, 334, 423, 252, 431, 322, 210, 272, 389,
+	286, 295, 0, 0, 340, 371, 219, 426, 390, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 190,
+	203, 291, 0, 360, 256, 449, 433, 429, 0, 0,
+	234, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 192, 193, 204, 212, 221, 233, 246,
+	254, 264, 268, 271, 274, 275, 278, 283, 300, 305,
+	306, 307, 308, 324, 325, 326, 329, 332, 333, 336,
+	338, 339, 342, 348, 349, 350, 351, 352, 354, 361,
+	365, 373, 374, 375, 376, 377, 378, 379, 383, 384,
+	385, 386, 394, 398, 413, 414, 425, 437, 441, 265,
+	421, 442, 0, 299, 0, 0, 301, 250, 267, 276,
+	0, 432, 395, 207, 367, 257, 197, 224, 211, 231,
+	245, 247, 280, 309, 315, 344, 347, 262, 242, 222,
+	364, 220, 381, 401, 402, 403, 405, 313, 238, 34,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 331, 0, 0, 0, 0, 0, 0, 0,
+	0, 241, 0, 0, 0, 0, 0, 289, 0, 0,
+	0, 345, 0, 382, 227, 298, 296, 410, 251, 244,
+	240, 226, 273, 304, 343, 400, 337, 0, 293, 0,
+	0, 391, 316, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 279, 225,
+	195, 328, 392, 255, 69, 0, 0, 177, 178, 179,
+	0, 0, 0, 0, 0, 0, 0, 0, 217, 0,
+	223, 0, 0, 0, 0, 237, 277, 243, 236, 407,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 263, 0, 317, 0, 0, 0, 438, 0,
+	0, 0, 0, 0, 0, 0, 0, 288, 0, 285,
+	191, 205, 0, 0, 327, 366, 372, 0, 0, 0,
+	228, 0, 370, 341, 424, 213, 253, 363, 346, 368,
+	0, 0, 369, 294, 412, 358, 422, 439, 440, 235,
+	321, 430, 404, 436, 448, 206, 232, 335, 397, 427,
+	388, 314, 408, 409, 284, 387, 261, 194, 292, 198,
+	399, 420, 218, 380, 0, 0, 0, 200, 418, 396,
+	311, 281, 282, 199, 0, 362, 239, 259, 230, 330,
+	415, 416, 229, 450, 208, 435, 202, 209, 434, 323,
+	411, 419, 312, 303, 201, 417, 310, 302, 287, 249,
+	269, 356, 297, 357, 270, 319, 318, 320, 0, 196,
+	0, 393, 428, 451, 215, 0, 0, 406, 444, 447,
+	0, 359, 216, 260, 248, 355, 258, 290, 443, 445,
+	446, 214, 353, 266, 334, 423, 252, 431, 322, 210,
+	272, 389, 286, 295, 0, 0, 340, 371, 219, 426,
+	390, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 190, 203, 291, 0, 360, 256, 449, 433, 429,
+	0, 0, 234, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 192, 193, 204, 212, 221,
+	233, 246, 254, 264, 268, 271, 274, 275, 278, 283,
+	300, 305, 306, 307, 308, 324, 325, 326, 329, 332,
+	333, 336, 338, 339, 342, 348, 349, 350, 351, 352,
+	354, 361, 365, 373, 374, 375, 376, 377, 378, 379,
+	383, 384, 385, 386, 394, 398, 413, 414, 425, 437,
+	441, 265, 421, 442, 0, 299, 0, 0, 301, 250,
+	267, 276, 0, 432, 395, 207, 367, 257, 197, 224,
+	211, 231, 245, 247, 280, 309, 315, 344, 347, 262,
+	242, 222, 364, 220, 381, 401, 402, 403, 405, 313,
+	238, 331, 0, 0, 0, 0, 0, 0, 0, 0,
+	241, 0, 0, 0, 0, 0, 289, 0, 0, 0,
+	345, 0, 382, 227, 298, 296, 410, 251, 244, 240,
+	226, 273, 304, 343, 400, 337, 0, 293, 0, 0,
+	391, 316, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 279, 225, 195,
+	328, 392, 255, 0, 0, 0, 177, 178, 179, 0,
+	0, 1459, 0, 0, 1460, 0, 0, 217, 0, 223,
+	0, 0, 0, 0, 237, 277, 243, 236, 407, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 263, 0, 317, 0, 0, 0, 438, 0, 0,
+	0, 0, 0, 0, 0, 0, 288, 0, 285, 191,
+	205, 0, 0, 327, 366, 372, 0, 0, 0, 228,
+	0, 370, 341, 424, 213, 253, 363, 346, 368, 0,
+	0, 369, 294, 412, 358, 422, 439, 440, 235, 321,
+	430, 404, 436, 448, 206, 232, 335, 397, 427, 388,
+	314, 408, 409, 284, 387, 261, 194, 292, 198, 399,
+	420, 218, 380, 0, 0, 0, 200, 418, 396, 311,
+	281, 282, 199, 0, 362, 239, 259, 230, 330, 415,
+	416, 229, 450, 208, 435, 202, 209, 434, 323, 411,
+	419, 312, 303, 201, 417, 310, 302, 287, 249, 269,
+	356, 297, 357, 270, 319, 318, 320, 0, 196, 0,
+	393, 428, 451, 215, 0, 0, 406, 444, 447, 0,
+	359, 216, 260, 248, 355, 258, 290, 443, 445, 446,
+	214, 353, 266, 334, 423, 252, 431, 322, 210, 272,
+	389, 286, 295, 0, 0, 340, 371, 219, 426, 390,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	190, 203, 291, 0, 360, 256, 449, 433, 429, 0,
+	0, 234, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 192, 193, 204, 212, 221, 233,
+	246, 254, 264, 268, 271, 274, 275, 278, 283, 300,
+	305, 306, 307, 308, 324, 325, 326, 329, 332, 333,
+	336, 338, 339, 342, 348, 349, 350, 351, 352, 354,
+	361, 365, 373, 374, 375, 376, 377, 378, 379, 383,
+	384, 385, 386, 394, 398, 413, 414, 425, 437, 441,
+	265, 421, 442, 0, 299, 0, 0, 301, 250, 267,
+	276, 0, 432, 395, 207, 367, 257, 197, 224, 211,
+	231, 245, 247, 280, 309, 315, 344, 347, 262, 242,
+	222, 364, 220, 381, 401, 402, 403, 405, 313, 238,
+	331, 0, 0, 0, 0, 0, 0, 0, 0, 241,
+	0, 1103, 0, 0, 0, 289, 0, 0, 0, 345,
+	0, 382, 227, 298, 296, 410, 251, 244, 240, 226,
+	273, 304, 343, 400, 337, 0, 293, 0, 0, 391,
+	316, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 279, 225, 195, 328,
+	392, 255, 0, 0, 0, 177, 178, 179, 0, 1102,
+	0, 0, 0, 0, 0, 0, 217, 0, 223, 0,
+	0, 0, 0, 237, 277, 243, 236, 407, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	263, 0, 317, 0, 0, 0, 438, 0, 0, 0,
+	0, 0, 0, 0, 0, 288, 0, 285, 191, 205,
+	0, 0, 327, 366, 372, 0, 0, 0, 228, 0,
+	370, 341, 424, 213, 253, 363, 346, 368, 0, 0,
+	369, 294, 412, 358, 422, 439, 440, 235, 321, 430,
+	404, 436, 448, 206, 232, 335, 397, 427, 388, 314,
+	408, 409, 284, 387, 261, 194, 292, 198, 399, 420,
+	218, 380, 0, 0, 0, 200, 418, 396, 311, 281,
+	282, 199, 0, 362, 239, 259, 230, 330, 415, 416,
+	229, 450, 208, 435, 202, 209, 434, 323, 411, 419,
+	312, 303, 201, 417, 310, 302, 287, 249, 269, 356,
+	297, 357, 270, 319, 318, 320, 0, 196, 0, 393,
+	428, 451, 215, 0, 0, 406, 444, 447, 0, 359,
+	216, 260, 248, 355, 258, 290, 443, 445, 446, 214,
+	353, 266, 334, 423, 252, 431, 322, 210, 272, 389,
+	286, 295, 0, 0, 340, 371, 219, 426, 390, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 190,
+	203, 291, 0, 360, 256, 449, 433, 429, 0, 0,
+	234, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 192, 193, 204, 212, 221, 233, 246,
+	254, 264, 268, 271, 274, 275, 278, 283, 300, 305,
+	306, 307, 308, 324, 325, 326, 329, 332, 333, 336,
+	338, 339, 342, 348, 349, 350, 351, 352, 354, 361,
+	365, 373, 374, 375, 376, 377, 378, 379, 383, 384,
+	385, 386, 394, 398, 413, 414, 425, 437, 441, 265,
+	421, 442, 0, 299, 0, 0, 301, 250, 267, 276,
+	0, 432, 395, 207, 367, 257, 197, 224, 211, 231,
+	245, 247, 280, 309, 315, 344, 347, 262, 242, 222,
+	364, 220, 381, 401, 402, 403, 405, 313, 238, 331,
+	0, 0, 0, 0, 0, 0, 0, 0, 241, 0,
+	0, 0, 0, 0, 289, 0, 0, 0, 345, 0,
+	382, 227, 298, 296, 410, 251, 244, 240, 226, 273,
+	304, 343, 400, 337, 0, 293, 0, 0, 391, 316,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 279, 225, 195, 328, 392,
+	255, 0, 0, 586, 177, 178, 179, 0, 0, 0,
+	0, 0, 0, 0, 0, 217, 0, 223, 0, 0,
+	0, 0, 237, 277, 243, 236, 407, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 263,
+	0, 317, 0, 0, 0, 438, 0, 0, 0, 0,
+	0, 0, 0, 0, 288, 0, 285, 191, 205, 0,
+	0, 327, 366, 372, 0, 0, 0, 228, 0, 370,
+	341, 424, 213, 253, 363, 346, 368, 0, 0, 369,
+	294, 412, 358, 422, 439, 440, 235, 321, 430, 404,
+	436, 448, 206, 232, 335, 397, 427, 388, 314, 408,
+	409, 284, 387, 261, 194, 292, 198, 399, 420, 218,
+	380, 0, 0, 0, 200, 418, 396, 311, 281, 282,
+	199, 0, 362, 239, 259, 230, 330, 415, 416, 229,
+	450, 208, 435, 202, 209, 434, 323, 411, 419, 312,
+	303, 201, 417, 310, 302, 287, 249, 269, 356, 297,
+	357, 270, 319, 318, 320, 0, 196, 0, 393, 428,
+	451, 215, 0, 0, 406, 444, 447, 0, 359, 216,
+	260, 248, 355, 258, 290, 443, 445, 446, 214, 353,
+	266, 334, 423, 252, 431, 322, 210, 272, 389, 286,
+	295, 0, 0, 340, 371, 219, 426, 390, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 190, 203,
+	291, 0, 360, 256, 449, 433, 429, 0, 0, 234,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 192, 193, 204, 212, 221, 233, 246, 254,
+	264, 268, 271, 274, 275, 278, 283, 300, 305, 306,
+	307, 308, 324, 325, 326, 329, 332, 333, 336, 338,
+	339, 342, 348, 349, 350, 351, 352, 354, 361, 365,
+	373, 374, 375, 376, 377, 378, 379, 383, 384, 385,
+	386, 394, 398, 413, 414, 425, 437, 441, 265, 421,
+	442, 0, 299, 0, 0, 301, 250, 267, 276, 0,
+	432, 395, 207, 367, 257, 197, 224, 211, 231, 245,
+	247, 280, 309, 315, 344, 347, 262, 242, 222, 364,
+	220, 381, 401, 402, 403, 405, 313, 238, 331, 0,
+	0, 0, 0, 0, 0, 0, 0, 241, 0, 0,
+	0, 0, 0, 289, 0, 0, 0, 345, 0, 382,
+	227, 298, 296, 410, 251, 244, 240, 226, 273, 304,
+	343, 400, 337, 0, 293, 0, 0, 391, 316, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 279, 225, 195, 328, 392, 255,
+	69, 0, 0, 177, 178, 179, 0, 0, 0, 0,
+	0, 0, 0, 0, 217, 0, 223, 0, 0, 0,
+	0, 237, 277, 243, 236, 407, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 263, 0,
+	317, 0, 0, 0, 438, 0, 0, 0, 0, 0,
+	0, 0, 0, 288, 0, 285, 191, 205, 0, 0,
+	327, 366, 372, 0, 0, 0, 228, 0, 370, 341,
+	424, 213, 253, 363, 346, 368, 0, 0, 369, 294,
+	412, 358, 422, 439, 440, 235, 321, 430, 404, 436,
+	448, 206, 232, 335, 397, 427, 388, 314, 408, 409,
+	284, 387, 261, 194, 292, 198, 399, 420, 218, 380,
+	0, 0, 0, 200, 418, 396, 311, 281, 282, 199,
+	0, 362, 239, 259, 230, 330, 415, 416, 229, 450,
+	208, 435, 202, 209, 434, 323, 411, 419, 312, 303,
+	201, 417, 310, 302, 287, 249, 269, 356, 297, 357,
+	270, 319, 318, 320, 0, 196, 0, 393, 428, 451,
+	215, 0, 0, 406, 444, 447, 0, 359, 216, 260,
+	248, 355, 258, 290, 443, 445, 446, 214, 353, 266,
+	334, 423, 252, 431, 322, 210, 272, 389, 286, 295,
+	0, 0, 340, 371, 219, 426, 390, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 190, 203, 291,
+	0, 360, 256, 449, 433, 429, 0, 0, 234, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 192, 193, 204, 212, 221, 233, 246, 254, 264,
+	268, 271, 274, 275, 278, 283, 300, 305, 306, 307,
+	308, 324, 325, 326, 329, 332, 333, 336, 338, 339,
+	342, 348, 349, 350, 351, 352, 354, 361, 365, 373,
+	374, 375, 376, 377, 378, 379, 383, 384, 385, 386,
+	394, 398, 413, 414, 425, 437, 441, 265, 421, 442,
+	0, 299, 0, 0, 301, 250, 267, 276, 0, 432,
+	395, 207, 367, 257, 197, 224, 211, 231, 245, 247,
+	280, 309, 315, 344, 347, 262, 242, 222, 364, 220,
+	381, 401, 402, 403, 405, 313, 238, 331, 0, 0,
+	0, 0, 0, 0, 0, 0, 241, 0, 0, 0,
+	0, 0, 289, 0, 0, 0, 345, 0, 382, 227,
+	298, 296, 410, 251, 244, 240, 226, 273, 304, 343,
+	400, 337, 0, 293, 0, 0, 391, 316, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 279, 225, 195, 328, 392, 255, 0,
+	0, 0, 177, 178, 179, 0, 1441, 0, 0, 0,
+	0, 0, 0, 217, 0, 223, 0, 0, 0, 0,
+	237, 277, 243, 236, 407, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 263, 0, 317,
+	0, 0, 0, 438, 0, 0, 0, 0, 0, 0,
+	0, 0, 288, 0, 285, 191, 205, 0, 0, 327,
+	366, 372, 0, 0, 0, 228, 0, 370, 341, 424,
+	213, 253, 363, 346, 368, 0, 0, 369, 294, 412,
+	358, 422, 439, 440, 235, 321, 430, 404, 436, 448,
+	206, 232, 335, 397, 427, 388, 314, 408, 409, 284,
+	387, 261, 194, 292, 198, 399, 420, 218, 380, 0,
+	0, 0, 200, 418, 396, 311, 281, 282, 199, 0,
+	362, 239, 259, 230, 330, 415, 416, 229, 450, 208,
+	435, 202, 209, 434, 323, 411, 419, 312, 303, 201,
+	417, 310, 302, 287, 249, 269, 356, 297, 357, 270,
+	319, 318, 320, 0, 196, 0, 393, 428, 451, 215,
+	0, 0, 406, 444, 447, 0, 359, 216, 260, 248,
+	355, 258, 290, 443, 445, 446, 214, 353, 266, 334,
+	423, 252, 431, 322, 210, 272, 389, 286, 295, 0,
+	0, 340, 371, 219, 426, 390, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 190, 203, 291, 0,
+	360, 256, 449, 433, 429, 0, 0, 234, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	192, 193, 204, 212, 221, 233, 246, 254, 264, 268,
+	271, 274, 275, 278, 283, 300, 305, 306, 307, 308,
+	324, 325, 326, 329, 332, 333, 336, 338, 339, 342,
+	348, 349, 350, 351, 352, 354, 361, 365, 373, 374,
+	375, 376, 377, 378, 379, 383, 384, 385, 386, 394,
+	398, 413, 414, 425, 437, 441, 265, 421, 442, 0,
+	299, 0, 0, 301, 250, 267, 276, 0, 432, 395,
+	207, 367, 257, 197, 224, 211, 231, 245, 247, 280,
+	309, 315, 344, 347, 262, 242, 222, 364, 220, 381,
+	401, 402, 403, 405, 313, 238, 331, 0, 0, 0,
+	0, 0, 0, 0, 0, 241, 0, 0, 0, 0,
+	0, 289, 0, 0, 0, 345, 0, 382, 227, 298,
+	296, 410, 251, 244, 240, 226, 273, 304, 343, 400,
+	337, 0, 293, 0, 0, 391, 316, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 279, 225, 195, 328, 392, 255, 0, 0,
+	0, 177, 178, 179, 0, 1072, 0, 0, 0, 0,
+	0, 0, 217, 0, 223, 0, 0, 0, 0, 237,
+	277, 243, 236, 407, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 263, 0, 317, 0,
+	0, 0, 438, 0, 0, 0, 0, 0, 0, 0,
+	0, 288, 0, 285, 191, 205, 0, 0, 327, 366,
+	372, 0, 0, 0, 228, 0, 370, 341, 424, 213,
+	253, 363, 346, 368, 0, 0, 369, 294, 412, 358,
+	422, 439, 440, 235, 321, 430, 404, 436, 448, 206,
+	232, 335, 397, 427, 388, 314, 408, 409, 284, 387,
+	261, 194, 292, 198, 399, 420, 218, 380, 0, 0,
+	0, 200, 418, 396, 311, 281, 282, 199, 0, 362,
+	239, 259, 230, 330, 415, 416, 229, 450, 208, 435,
+	202, 209, 434, 323, 411, 419, 312, 303, 201, 417,
+	310, 302, 287, 249, 269, 356, 297, 357, 270, 319,
+	318, 320, 0, 196, 0, 393, 428, 451, 215, 0,
+	0, 406, 444, 447, 0, 359, 216, 260, 248, 355,
+	258, 290, 443, 445, 446, 214, 353, 266, 334, 423,
+	252, 431, 322, 210, 272, 389, 286, 295, 0, 0,
+	340, 371, 219, 426, 390, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 190, 203, 291, 0, 360,
+	256, 449, 433, 429, 0, 0, 234, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 192,
+	193, 204, 212, 221, 233, 246, 254, 264, 268, 271,
+	274, 275, 278, 283, 300, 305, 306, 307, 308, 324,
+	325, 326, 329, 332, 333, 336, 338, 339, 342, 348,
+	349, 350, 351, 352, 354, 361, 365, 373, 374, 375,
+	376, 377, 378, 379, 383, 384, 385, 386, 394, 398,
+	413, 414, 425, 437, 441, 265, 421, 442, 0, 299,
+	0, 0, 301, 250, 267, 276, 0, 432, 395, 207,
+	367, 257, 197, 224, 211, 231, 245, 247, 280, 309,
+	315, 344, 347, 262, 242, 222, 364, 220, 381, 401,
+	402, 403, 405, 313, 238, 331, 0, 0, 0, 0,
+	0, 0, 0, 0, 241, 0, 0, 0, 0, 0,
+	289, 0, 0, 0, 345, 0, 382, 227, 298, 296,
+	410, 251, 244, 240, 226, 273, 304, 343, 400, 337,
+	0, 293, 0, 0, 391, 316, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 279, 225, 195, 328, 392, 255, 0, 0, 0,
+	177, 178, 179, 0, 0, 0, 0, 0, 0, 0,
+	0, 217, 0, 223, 0, 0, 0, 0, 237, 277,
+	243, 236, 407, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 263, 0, 317, 0, 0,
+	0, 438, 0, 0, 0, 0, 0, 0, 0, 0,
+	288, 0, 285, 191, 205, 0, 0, 327, 366, 372,
+	0, 0, 0, 228, 0, 370, 341, 424, 213, 253,
+	363, 346, 368, 0, 0, 369, 294, 412, 358, 422,
+	439, 440, 235, 321, 430, 404, 436, 448, 206, 232,
+	335, 397, 427, 388, 314, 408, 409, 284, 387, 261,
+	194, 292, 198, 399, 420, 218, 380, 0, 0, 0,
+	200, 418, 396, 311, 281, 282, 199, 0, 362, 239,
+	259, 230, 330, 415, 416, 229, 450, 208, 435, 202,
+	209, 434, 323, 411, 419, 312, 303, 201, 417, 310,
+	302, 287, 249, 269, 356, 297, 357, 270, 319, 318,
+	320, 0, 196, 0, 393, 428, 451, 215, 0, 0,
+	406, 444, 447, 0, 359, 216, 260, 248, 355, 258,
+	290, 443, 445, 446, 214, 353, 266, 334, 423, 252,
+	431, 322, 210, 272, 389, 286, 295, 0, 0, 340,
+	371, 219, 426, 390, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 190, 203, 291, 1344, 360, 256,
+	449, 433, 429, 0, 0, 234, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 192, 193,
+	204, 212, 221, 233, 246, 254, 264, 268, 271, 274,
+	275, 278, 283, 300, 305, 306, 307, 308, 324, 325,
+	326, 329, 332, 333, 336, 338, 339, 342, 348, 349,
+	350, 351, 352, 354, 361, 365, 373, 374, 375, 376,
+	377, 378, 379, 383, 384, 385, 386, 394, 398, 413,
+	414, 425, 437, 441, 265, 421, 442, 0, 299, 0,
+	0, 301, 250, 267, 276, 0, 432, 395, 207, 367,
+	257, 197, 224, 211, 231, 245, 247, 280, 309, 315,
+	344, 347, 262, 242, 222, 364, 220, 381, 401, 402,
+	403, 405, 313, 238, 331, 0, 1227, 0, 0, 0,
+	0, 0, 0, 241, 0, 0, 0, 0, 0, 289,
+	0, 0, 0, 345, 0, 382, 227, 298, 296, 410,
+	251, 244, 240, 226, 273, 304, 343, 400, 337, 0,
+	293, 0, 0, 391, 316, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	279, 225, 195, 328, 392, 255, 0, 0, 0, 177,
+	178, 179, 0, 0, 0, 0, 0, 0, 0, 0,
+	217, 0, 223, 0, 0, 0, 0, 237, 277, 243,
+	236, 407, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 263, 0, 317, 0, 0, 0,
+	438, 0, 0, 0, 0, 0, 0, 0, 0, 288,
+	0, 285, 191, 205, 0, 0, 327, 366, 372, 0,
+	0, 0, 228, 0, 370, 341, 424, 213, 253, 363,
+	346, 368, 0, 0, 369, 294, 412, 358, 422, 439,
+	440, 235, 321, 430, 404, 436, 448, 206, 232, 335,
+	397, 427, 388, 314, 408, 409, 284, 387, 261, 194,
+	292, 198, 399, 420, 218, 380, 0, 0, 0, 200,
+	418, 396, 311, 281, 282, 199, 0, 362, 239, 259,
+	230, 330, 415, 416, 229, 450, 208, 435, 202, 209,
+	434, 323, 411, 419, 312, 303, 201, 417, 310, 302,
+	287, 249, 269, 356, 297, 357, 270, 319, 318, 320,
+	0, 196, 0, 393, 428, 451, 215, 0, 0, 406,
+	444, 447, 0, 359, 216, 260, 248, 355, 258, 290,
+	443, 445, 446, 214, 353, 266, 334, 423, 252, 431,
+	322, 210, 272, 389, 286, 295, 0, 0, 340, 371,
+	219, 426, 390, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 190, 203, 291, 0, 360, 256, 449,
+	433, 429, 0, 0, 234, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 192, 193, 204,
+	212, 221, 233, 246, 254, 264, 268, 271, 274, 275,
+	278, 283, 300, 305, 306, 307, 308, 324, 325, 326,
+	329, 332, 333, 336, 338, 339, 342, 348, 349, 350,
+	351, 352, 354, 361, 365, 373, 374, 375, 376, 377,
+	378, 379, 383, 384, 385, 386, 394, 398, 413, 414,
+	425, 437, 441, 265, 421, 442, 0, 299, 0, 0,
+	301, 250, 267, 276, 0, 432, 395, 207, 367, 257,
+	197, 224, 211, 231, 245, 247, 280, 309, 315, 344,
+	347, 262, 242, 222, 364, 220, 381, 401, 402, 403,
+	405, 313, 238, 331, 0, 1225, 0, 0, 0, 0,
+	0, 0, 241, 0, 0, 0, 0, 0, 289, 0,
+	0, 0, 345, 0, 382, 227, 298, 296, 410, 251,
+	244, 240, 226, 273, 304, 343, 400, 337, 0, 293,
+	0, 0, 391, 316, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 279,
+	225, 195, 328, 392, 255, 0, 0, 0, 177, 178,
+	179, 0, 0, 0, 0, 0, 0, 0, 0, 217,
+	0, 223, 0, 0, 0, 0, 237, 277, 243, 236,
+	407, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 263, 0, 317, 0, 0, 0, 438,
+	0, 0, 0, 0, 0, 0, 0, 0, 288, 0,
+	285, 191, 205, 0, 0, 327, 366, 372, 0, 0,
+	0, 228, 0, 370, 341, 424, 213, 253, 363, 346,
+	368, 0, 0, 369, 294, 412, 358, 422, 439, 440,
+	235, 321, 430, 404, 436, 448, 206, 232, 335, 397,
+	427, 388, 314, 408, 409, 284, 387, 261, 194, 292,
+	198, 399, 420, 218, 380, 0, 0, 0, 200, 418,
+	396, 311, 281, 282, 199, 0, 362, 239, 259, 230,
+	330, 415, 416, 229, 450, 208, 435, 202, 209, 434,
+	323, 411, 419, 312, 303, 201, 417, 310, 302, 287,
+	249, 269, 356, 297, 357, 270, 319, 318, 320, 0,
+	196, 0, 393, 428, 451, 215, 0, 0, 406, 444,
+	447, 0, 359, 216, 260, 248, 355, 258, 290, 443,
+	445, 446, 214, 353, 266, 334, 423, 252, 431, 322,
+	210, 272, 389, 286, 295, 0, 0, 340, 371, 219,
+	426, 390, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 190, 203, 291, 0, 360, 256, 449, 433,
+	429, 0, 0, 234, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 192, 193, 204, 212,
+	221, 233, 246, 254, 264, 268, 271, 274, 275, 278,
+	283, 300, 305, 306, 307, 308, 324, 325, 326, 329,
+	332, 333, 336, 338, 339, 342, 348, 349, 350, 351,
+	352, 354, 361, 365, 373, 374, 375, 376, 377, 378,
+	379, 383, 384, 385, 386, 394, 398, 413, 414, 425,
+	437, 441, 265, 421, 442, 0, 299, 0, 0, 301,
+	250, 267, 276, 0, 432, 395, 207, 367, 257, 197,
+	224, 211, 231, 245, 247, 280, 309, 315, 344, 347,
+	262, 242, 222, 364, 220, 381, 401, 402, 403, 405,
+	313, 238, 331, 0, 1223, 0, 0, 0, 0, 0,
+	0, 241, 0, 0, 0, 0, 0, 289, 0, 0,
+	0, 345, 0, 382, 227, 298, 296, 410, 251, 244,
+	240, 226, 273, 304, 343, 400, 337, 0, 293, 0,
+	0, 391, 316, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 279, 225,
+	195, 328, 392, 255, 0, 0, 0, 177, 178, 179,
+	0, 0, 0, 0, 0, 0, 0, 0, 217, 0,
+	223, 0, 0, 0, 0, 237, 277, 243, 236, 407,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 263, 0, 317, 0, 0, 0, 438, 0,
+	0, 0, 0, 0, 0, 0, 0, 288, 0, 285,
+	191, 205, 0, 0, 327, 366, 372, 0, 0, 0,
+	228, 0, 370, 341, 424, 213, 253, 363, 346, 368,
+	0, 0, 369, 294, 412, 358, 422, 439, 440, 235,
+	321, 430, 404, 436, 448, 206, 232, 335, 397, 427,
+	388, 314, 408, 409, 284, 387, 261, 194, 292, 198,
+	399, 420, 218, 380, 0, 0, 0, 200, 418, 396,
+	311, 281, 282, 199, 0, 362, 239, 259, 230, 330,
+	415, 416, 229, 450, 208, 435, 202, 209, 434, 323,
+	411, 419, 312, 303, 201, 417, 310, 302, 287, 249,
+	269, 356, 297, 357, 270, 319, 318, 320, 0, 196,
+	0, 393, 428, 451, 215, 0, 0, 406, 444, 447,
+	0, 359, 216, 260, 248, 355, 258, 290, 443, 445,
+	446, 214, 353, 266, 334, 423, 252, 431, 322, 210,
+	272, 389, 286, 295, 0, 0, 340, 371, 219, 426,
+	390, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 190, 203, 291, 0, 360, 256, 449, 433, 429,
+	0, 0, 234, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 192, 193, 204, 212, 221,
+	233, 246, 254, 264, 268, 271, 274, 275, 278, 283,
+	300, 305, 306, 307, 308, 324, 325, 326, 329, 332,
+	333, 336, 338, 339, 342, 348, 349, 350, 351, 352,
+	354, 361, 365, 373, 374, 375, 376, 377, 378, 379,
+	383, 384, 385, 386, 394, 398, 413, 414, 425, 437,
+	441, 265, 421, 442, 0, 299, 0, 0, 301, 250,
+	267, 276, 0, 432, 395, 207, 367, 257, 197, 224,
+	211, 231, 245, 247, 280, 309, 315, 344, 347, 262,
+	242, 222, 364, 220, 381, 401, 402, 403, 405, 313,
+	238, 331, 0, 1221, 0, 0, 0, 0, 0, 0,
+	241, 0, 0, 0, 0, 0, 289, 0, 0, 0,
+	345, 0, 382, 227, 298, 296, 410, 251, 244, 240,
+	226, 273, 304, 343, 400, 337, 0, 293, 0, 0,
+	391, 316, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 279, 225, 195,
+	328, 392, 255, 0, 0, 0, 177, 178, 179, 0,
+	0, 0, 0, 0, 0, 0, 0, 217, 0, 223,
+	0, 0, 0, 0, 237, 277, 243, 236, 407, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 263, 0, 317, 0, 0, 0, 438, 0, 0,
+	0, 0, 0, 0, 0, 0, 288, 0, 285, 191,
+	205, 0, 0, 327, 366, 372, 0, 0, 0, 228,
+	0, 370, 341, 424, 213, 253, 363, 346, 368, 0,
+	0, 369, 294, 412, 358, 422, 439, 440, 235, 321,
+	430, 404, 436, 448, 206, 232, 335, 397, 427, 388,
+	314, 408, 409, 284, 387, 261, 194, 292, 198, 399,
+	420, 218, 380, 0, 0, 0, 200, 418, 396, 311,
+	281, 282, 199, 0, 362, 239, 259, 230, 330, 415,
+	416, 229, 450, 208, 435, 202, 209, 434, 323, 411,
+	419, 312, 303, 201, 417, 310, 302, 287, 249, 269,
+	356, 297, 357, 270, 319, 318, 320, 0, 196, 0,
+	393, 428, 451, 215, 0, 0, 406, 444, 447, 0,
+	359, 216, 260, 248, 355, 258, 290, 443, 445, 446,
+	214, 353, 266, 334, 423, 252, 431, 322, 210, 272,
+	389, 286, 295, 0, 0, 340, 371, 219, 426, 390,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	190, 203, 291, 0, 360, 256, 449, 433, 429, 0,
+	0, 234, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 192, 193, 204, 212, 221, 233,
+	246, 254, 264, 268, 271, 274, 275, 278, 283, 300,
+	305, 306, 307, 308, 324, 325, 326, 329, 332, 333,
+	336, 338, 339, 342, 348, 349, 350, 351, 352, 354,
+	361, 365, 373, 374, 375, 376, 377, 378, 379, 383,
+	384, 385, 386, 394, 398, 413, 414, 425, 437, 441,
+	265, 421, 442, 0, 299, 0, 0, 301, 250, 267,
+	276, 0, 432, 395, 207, 367, 257, 197, 224, 211,
+	231, 245, 247, 280, 309, 315, 344, 347, 262, 242,
+	222, 364, 220, 381, 401, 402, 403, 405, 313, 238,
+	331, 0, 1219, 0, 0, 0, 0, 0, 0, 241,
+	0, 0, 0, 0, 0, 289, 0, 0, 0, 345,
+	0, 382, 227, 298, 296, 410, 251, 244, 240, 226,
+	273, 304, 343, 400, 337, 0, 293, 0, 0, 391,
+	316, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 279, 225, 195, 328,
+	392, 255, 0, 0, 0, 177, 178, 179, 0, 0,
+	0, 0, 0, 0, 0, 0, 217, 0, 223, 0,
+	0, 0, 0, 237, 277, 243, 236, 407, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	263, 0, 317, 0, 0, 0, 438, 0, 0, 0,
+	0, 0, 0, 0, 0, 288, 0, 285, 191, 205,
+	0, 0, 327, 366, 372, 0, 0, 0, 228, 0,
+	370, 341, 424, 213, 253, 363, 346, 368, 0, 0,
+	369, 294, 412, 358, 422, 439, 440, 235, 321, 430,
+	404, 436, 448, 206, 232, 335, 397, 427, 388, 314,
+	408, 409, 284, 387, 261, 194, 292, 198, 399, 420,
+	218, 380, 0, 0, 0, 200, 418, 396, 311, 281,
+	282, 199, 0, 362, 239, 259, 230, 330, 415, 416,
+	229, 450, 208, 435, 202, 209, 434, 323, 411, 419,
+	312, 303, 201, 417, 310, 302, 287, 249, 269, 356,
+	297, 357, 270, 319, 318, 320, 0, 196, 0, 393,
+	428, 451, 215, 0, 0, 406, 444, 447, 0, 359,
+	216, 260, 248, 355, 258, 290, 443, 445, 446, 214,
+	353, 266, 334, 423, 252, 431, 322, 210, 272, 389,
+	286, 295, 0, 0, 340, 371, 219, 426, 390, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 190,
+	203, 291, 0, 360, 256, 449, 433, 429, 0, 0,
+	234, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 192, 193, 204, 212, 221, 233, 246,
+	254, 264, 268, 271, 274, 275, 278, 283, 300, 305,
+	306, 307, 308, 324, 325, 326, 329, 332, 333, 336,
+	338, 339, 342, 348, 349, 350, 351, 352, 354, 361,
+	365, 373, 374, 375, 376, 377, 378, 379, 383, 384,
+	385, 386, 394, 398, 413, 414, 425, 437, 441, 265,
+	421, 442, 0, 299, 0, 0, 301, 250, 267, 276,
+	0, 432, 395, 207, 367, 257, 197, 224, 211, 231,
+	245, 247, 280, 309, 315, 344, 347, 262, 242, 222,
+	364, 220, 381, 401, 402, 403, 405, 313, 238, 331,
+	0, 1215, 0, 0, 0, 0, 0, 0, 241, 0,
+	0, 0, 0, 0, 289, 0, 0, 0, 345, 0,
+	382, 227, 298, 296, 410, 251, 244, 240, 226, 273,
+	304, 343, 400, 337, 0, 293, 0, 0, 391, 316,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 279, 225, 195, 328, 392,
+	255, 0, 0, 0, 177, 178, 179, 0, 0, 0,
+	0, 0, 0, 0, 0, 217, 0, 223, 0, 0,
+	0, 0, 237, 277, 243, 236, 407, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 263,
+	0, 317, 0, 0, 0, 438, 0, 0, 0, 0,
+	0, 0, 0, 0, 288, 0, 285, 191, 205, 0,
+	0, 327, 366, 372, 0, 0, 0, 228, 0, 370,
+	341, 424, 213, 253, 363, 346, 368, 0, 0, 369,
+	294, 412, 358, 422, 439, 440, 235, 321, 430, 404,
+	436, 448, 206, 232, 335, 397, 427, 388, 314, 408,
+	409, 284, 387, 261, 194, 292, 198, 399, 420, 218,
+	380, 0, 0, 0, 200, 418, 396, 311, 281, 282,
+	199, 0, 362, 239, 259, 230, 330, 415, 416, 229,
+	450, 208, 435, 202, 209, 434, 323, 411, 419, 312,
+	303, 201, 417, 310, 302, 287, 249, 269, 356, 297,
+	357, 270, 319, 318, 320, 0, 196, 0, 393, 428,
+	451, 215, 0, 0, 406, 444, 447, 0, 359, 216,
+	260, 248, 355, 258, 290, 443, 445, 446, 214, 353,
+	266, 334, 423, 252, 431, 322, 210, 272, 389, 286,
+	295, 0, 0, 340, 371, 219, 426, 390, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 190, 203,
+	291, 0, 360, 256, 449, 433, 429, 0, 0, 234,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 192, 193, 204, 212, 221, 233, 246, 254,
+	264, 268, 271, 274, 275, 278, 283, 300, 305, 306,
+	307, 308, 324, 325, 326, 329, 332, 333, 336, 338,
+	339, 342, 348, 349, 350, 351, 352, 354, 361, 365,
+	373, 374, 375, 376, 377, 378, 379, 383, 384, 385,
+	386, 394, 398, 413, 414, 425, 437, 441, 265, 421,
+	442, 0, 299, 0, 0, 301, 250, 267, 276, 0,
+	432, 395, 207, 367, 257, 197, 224, 211, 231, 245,
+	247, 280, 309, 315, 344, 347, 262, 242, 222, 364,
+	220, 381, 401, 402, 403, 405, 313, 238, 331, 0,
+	1213, 0, 0, 0, 0, 0, 0, 241, 0, 0,
+	0, 0, 0, 289, 0, 0, 0, 345, 0, 382,
+	227, 298, 296, 410, 251, 244, 240, 226, 273, 304,
+	343, 400, 337, 0, 293, 0, 0, 391, 316, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 279, 225, 195, 328, 392, 255,
+	0, 0, 0, 177, 178, 179, 0, 0, 0, 0,
+	0, 0, 0, 0, 217, 0, 223, 0, 0, 0,
+	0, 237, 277, 243, 236, 407, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 263, 0,
+	317, 0, 0, 0, 438, 0, 0, 0, 0, 0,
+	0, 0, 0, 288, 0, 285, 191, 205, 0, 0,
+	327, 366, 372, 0, 0, 0, 228, 0, 370, 341,
+	424, 213, 253, 363, 346, 368, 0, 0, 369, 294,
+	412, 358, 422, 439, 440, 235, 321, 430, 404, 436,
+	448, 206, 232, 335, 397, 427, 388, 314, 408, 409,
+	284, 387, 261, 194, 292, 198, 399, 420, 218, 380,
+	0, 0, 0, 200, 418, 396, 311, 281, 282, 199,
+	0, 362, 239, 259, 230, 330, 415, 416, 229, 450,
+	208, 435, 202, 209, 434, 323, 411, 419, 312, 303,
+	201, 417, 310, 302, 287, 249, 269, 356, 297, 357,
+	270, 319, 318, 320, 0, 196, 0, 393, 428, 451,
+	215, 0, 0, 406, 444, 447, 0, 359, 216, 260,
+	248, 355, 258, 290, 443, 445, 446, 214, 353, 266,
+	334, 423, 252, 431, 322, 210, 272, 389, 286, 295,
+	0, 0, 340, 371, 219, 426, 390, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 190, 203, 291,
+	0, 360, 256, 449, 433, 429, 0, 0, 234, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 192, 193, 204, 212, 221, 233, 246, 254, 264,
+	268, 271, 274, 275, 278, 283, 300, 305, 306, 307,
+	308, 324, 325, 326, 329, 332, 333, 336, 338, 339,
+	342, 348, 349, 350, 351, 352, 354, 361, 365, 373,
+	374, 375, 376, 377, 378, 379, 383, 384, 385, 386,
+	394, 398, 413, 414, 425, 437, 441, 265, 421, 442,
+	0, 299, 0, 0, 301, 250, 267, 276, 0, 432,
+	395, 207, 367, 257, 197, 224, 211, 231, 245, 247,
+	280, 309, 315, 344, 347, 262, 242, 222, 364, 220,
+	381, 401, 402, 403, 405, 313, 238, 331, 0, 1211,
+	0, 0, 0, 0, 0, 0, 241, 0, 0, 0,
+	0, 0, 289, 0, 0, 0, 345, 0, 382, 227,
+	298, 296, 410, 251, 244, 240, 226, 273, 304, 343,
+	400, 337, 0, 293, 0, 0, 391, 316, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 279, 225, 195, 328, 392, 255, 0,
+	0, 0, 177, 178, 179, 0, 0, 0, 0, 0,
+	0, 0, 0, 217, 0, 223, 0, 0, 0, 0,
+	237, 277, 243, 236, 407, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 263, 0, 317,
+	0, 0, 0, 438, 0, 0, 0, 0, 0, 0,
+	0, 0, 288, 0, 285, 191, 205, 0, 0, 327,
+	366, 372, 0, 0, 0, 228, 0, 370, 341, 424,
+	213, 253, 363, 346, 368, 0, 0, 369, 294, 412,
+	358, 422, 439, 440, 235, 321, 430, 404, 436, 448,
+	206, 232, 335, 397, 427, 388, 314, 408, 409, 284,
+	387, 261, 194, 292, 198, 399, 420, 218, 380, 0,
+	0, 0, 200, 418, 396, 311, 281, 282, 199, 0,
+	362, 239, 259, 230, 330, 415, 416, 229, 450, 208,
+	435, 202, 209, 434, 323, 411, 419, 312, 303, 201,
+	417, 310, 302, 287, 249, 269, 356, 297, 357, 270,
+	319, 318, 320, 0, 196, 0, 393, 428, 451, 215,
+	0, 0, 406, 444, 447, 0, 359, 216, 260, 248,
+	355, 258, 290, 443, 445, 446, 214, 353, 266, 334,
+	423, 252, 431, 322, 210, 272, 389, 286, 295, 0,
+	0, 340, 371, 219, 426, 390, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 190, 203, 291, 0,
+	360, 256, 449, 433, 429, 0, 0, 234, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	192, 193, 204, 212, 221, 233, 246, 254, 264, 268,
+	271, 274, 275, 278, 283, 300, 305, 306, 307, 308,
+	324, 325, 326, 329, 332, 333, 336, 338, 339, 342,
+	348, 349, 350, 351, 352, 354, 361, 365, 373, 374,
+	375, 376, 377, 378, 379, 383, 384, 385, 386, 394,
+	398, 413, 414, 425, 437, 441, 265, 421, 442, 0,
+	299, 0, 0, 301, 250, 267, 276, 0, 432, 395,
+	207, 367, 257, 197, 224, 211, 231, 245, 247, 280,
+	309, 315, 344, 347, 262, 242, 222, 364, 220, 381,
+	401, 402, 403, 405, 313, 238, 331, 0, 0, 0,
+	0, 0, 0, 0, 0, 241, 0, 0, 0, 0,
+	0, 289, 0, 0, 0, 345, 0, 382, 227, 298,
+	296, 410, 251, 244, 240, 226, 273, 304, 343, 400,
+	337, 0, 293, 0, 0, 391, 316, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 279, 225, 195, 328, 392, 255, 1186, 0,
+	0, 177, 178, 179, 0, 0, 0, 0, 0, 0,
+	0, 0, 217, 0, 223, 0, 0, 0, 0, 237,
+	277, 243, 236, 407, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 263, 0, 317, 0,
+	0, 0, 438, 0, 0, 0, 0, 0, 0, 0,
+	0, 288, 0, 285, 191, 205, 0, 0, 327, 366,
+	372, 0, 0, 0, 228, 0, 370, 341, 424, 213,
+	253, 363, 346, 368, 0, 0, 369, 294, 412, 358,
+	422, 439, 440, 235, 321, 430, 404, 436, 448, 206,
+	232, 335, 397, 427, 388, 314, 408, 409, 284, 387,
+	261, 194, 292, 198, 399, 420, 218, 380, 0, 0,
+	0, 200, 418, 396, 311, 281, 282, 199, 0, 362,
+	239, 259, 230, 330, 415, 416, 229, 450, 208, 435,
+	202, 209, 434, 323, 411, 419, 312, 303, 201, 417,
+	310, 302, 287, 249, 269, 356, 297, 357, 270, 319,
+	318, 320, 0, 196, 0, 393, 428, 451, 215, 0,
+	0, 406, 444, 447, 0, 359, 216, 260, 248, 355,
+	258, 290, 443, 445, 446, 214, 353, 266, 334, 423,
+	252, 431, 322, 210, 272, 389, 286, 295, 0, 0,
+	340, 371, 219, 426, 390, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 190, 203, 291, 0, 360,
+	256, 449, 433, 429, 0, 0, 234, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 192,
+	193, 204, 212, 221, 233, 246, 254, 264, 268, 271,
+	274, 275, 278, 283, 300, 305, 306, 307, 308, 324,
+	325, 326, 329, 332, 333, 336, 338, 339, 342, 348,
+	349, 350, 351, 352, 354, 361, 365, 373, 374, 375,
+	376, 377, 378, 379, 383, 384, 385, 386, 394, 398,
+	413, 414, 425, 437, 441, 265, 421, 442, 0, 299,
+	0, 0, 301, 250, 267, 276, 0, 432, 395, 207,
+	367, 257, 197, 224, 211, 231, 245, 247, 280, 309,
+	315, 344, 347, 262, 242, 222, 364, 220, 381, 401,
+	402, 403, 405, 313, 238, 1085, 0, 0, 0, 0,
+	0, 0, 331, 0, 0, 0, 0, 0, 0, 0,
+	0, 241, 0, 0, 0, 0, 0, 289, 0, 0,
+	0, 345, 0, 382, 227, 298, 296, 410, 251, 244,
+	240, 226, 273, 304, 343, 400, 337, 0, 293, 0,
+	0, 391, 316, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 279, 225,
+	195, 328, 392, 255, 0, 0, 0, 177, 178, 179,
+	0, 0, 0, 0, 0, 0, 0, 0, 217, 0,
+	223, 0, 0, 0, 0, 237, 277, 243, 236, 407,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 263, 0, 317, 0, 0, 0, 438, 0,
+	0, 0, 0, 0, 0, 0, 0, 288, 0, 285,
+	191, 205, 0, 0, 327, 366, 372, 0, 0, 0,
+	228, 0, 370, 341, 424, 213, 253, 363, 346, 368,
+	0, 0, 369, 294, 412, 358, 422, 439, 440, 235,
+	321, 430, 404, 436, 448, 206, 232, 335, 397, 427,
+	388, 314, 408, 409, 284, 387, 261, 194, 292, 198,
+	399, 420, 218, 380, 0, 0, 0, 200, 418, 396,
+	311, 281, 282, 199, 0, 362, 239, 259, 230, 330,
+	415, 416, 229, 450, 208, 435, 202, 209, 434, 323,
+	411, 419, 312, 303, 201, 417, 310, 302, 287, 249,
+	269, 356, 297, 357, 270, 319, 318, 320, 0, 196,
+	0, 393, 428, 451, 215, 0, 0, 406, 444, 447,
+	0, 359, 216, 260, 248, 355, 258, 290, 443, 445,
+	446, 214, 353, 266, 334, 423, 252, 431, 322, 210,
+	272, 389, 286, 295, 0, 0, 340, 371, 219, 426,
+	390, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 190, 203, 291, 0, 360, 256, 449, 433, 429,
+	0, 0, 234, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 192, 193, 204, 212, 221,
+	233, 246, 254, 264, 268, 271, 274, 275, 278, 283,
+	300, 305, 306, 307, 308, 324, 325, 326, 329, 332,
+	333, 336, 338, 339, 342, 348, 349, 350, 351, 352,
+	354, 361, 365, 373, 374, 375, 376, 377, 378, 379,
+	383, 384, 385, 386, 394, 398, 413, 414, 425, 437,
+	441, 265, 421, 442, 0, 299, 0, 0, 301, 250,
+	267, 276, 0, 432, 395, 207, 367, 257, 197, 224,
+	211, 231, 245, 247, 280, 309, 315, 344, 347, 262,
+	242, 222, 364, 220, 381, 401, 402, 403, 405, 313,
+	238, 331, 0, 0, 0, 0, 0, 0, 0, 1076,
+	241, 0, 0, 0, 0, 0, 289, 0, 0, 0,
+	345, 0, 382, 227, 298, 296, 410, 251, 244, 240,
+	226, 273, 304, 343, 400, 337, 0, 293, 0, 0,
+	391, 316, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 279, 225, 195,
+	328, 392, 255, 0, 0, 0, 177, 178, 179, 0,
+	0, 0, 0, 0, 0, 0, 0, 217, 0, 223,
+	0, 0, 0, 0, 237, 277, 243, 236, 407, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 263, 0, 317, 0, 0, 0, 438, 0, 0,
+	0, 0, 0, 0, 0, 0, 288, 0, 285, 191,
+	205, 0, 0, 327, 366, 372, 0, 0, 0, 228,
+	0, 370, 341, 424, 213, 253, 363, 346, 368, 0,
+	0, 369, 294, 412, 358, 422, 439, 440, 235, 321,
+	430, 404, 436, 448, 206, 232, 335, 397, 427, 388,
+	314, 408, 409, 284, 387, 261, 194, 292, 198, 399,
+	420, 218, 380, 0, 0, 0, 200, 418, 396, 311,
+	281, 282, 199, 0, 362, 239, 259, 230, 330, 415,
+	416, 229, 450, 208, 435, 202, 209, 434, 323, 411,
+	419, 312, 303, 201, 417, 310, 302, 287, 249, 269,
+	356, 297, 357, 270, 319, 318, 320, 0, 196, 0,
+	393, 428, 451, 215, 0, 0, 406, 444, 447, 0,
+	359, 216, 260, 248, 355, 258, 290, 443, 445, 446,
+	214, 353, 266, 334, 423, 252, 431, 322, 210, 272,
+	389, 286, 295, 0, 0, 340, 371, 219, 426, 390,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	190, 203, 291, 0, 360, 256, 449, 433, 429, 0,
+	0, 234, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 192, 193, 204, 212, 221, 233,
+	246, 254, 264, 268, 271, 274, 275, 278, 283, 300,
+	305, 306, 307, 308, 324, 325, 326, 329, 332, 333,
+	336, 338, 339, 342, 348, 349, 350, 351, 352, 354,
+	361, 365, 373, 374, 375, 376, 377, 378, 379, 383,
+	384, 385, 386, 394, 398, 413, 414, 425, 437, 441,
+	265, 421, 442, 0, 299, 0, 0, 301, 250, 267,
+	276, 0, 432, 395, 207, 367, 257, 197, 224, 211,
+	231, 245, 247, 280, 309, 315, 344, 347, 262, 242,
+	222, 364, 220, 381, 401, 402, 403, 405, 313, 238,
+	331, 0, 0, 0, 0, 0, 0, 0, 0, 241,
+	0, 0, 0, 0, 0, 289, 0, 0, 0, 345,
+	0, 382, 227, 298, 296, 410, 251, 244, 240, 226,
+	273, 304, 343, 400, 337, 0, 293, 0, 0, 391,
+	316, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 279, 225, 195, 328,
+	392, 255, 0, 0, 0, 177, 178, 179, 0, 934,
+	0, 0, 0, 0, 0, 0, 217, 0, 223, 0,
+	0, 0, 0, 237, 277, 243, 236, 407, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	263, 0, 317, 0, 0, 0, 438, 0, 0, 0,
+	0, 0, 0, 0, 0, 288, 0, 285, 191, 205,
+	0, 0, 327, 366, 372, 0, 0, 0, 228, 0,
+	370, 341, 424, 213, 253, 363, 346, 368, 0, 0,
+	369, 294, 412, 358, 422, 439, 440, 235, 321, 430,
+	404, 436, 448, 206, 232, 335, 397, 427, 388, 314,
+	408, 409, 284, 387, 261, 194, 292, 198, 399, 420,
+	218, 380, 0, 0, 0, 200, 418, 396, 311, 281,
+	282, 199, 0, 362, 239, 259, 230, 330, 415, 416,
+	229, 450, 208, 435, 202, 209, 434, 323, 411, 419,
+	312, 303, 201, 417, 310, 302, 287, 249, 269, 356,
+	297, 357, 270, 319, 318, 320, 0, 196, 0, 393,
+	428, 451, 215, 0, 0, 406, 444, 447, 0, 359,
+	216, 260, 248, 355, 258, 290, 443, 445, 446, 214,
+	353, 266, 334, 423, 252, 431, 322, 210, 272, 389,
+	286, 295, 0, 0, 340, 371, 219, 426, 390, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 190,
+	203, 291, 0, 360, 256, 449, 433, 429, 0, 0,
+	234, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 192, 193, 204, 212, 221, 233, 246,
+	254, 264, 268, 271, 274, 275, 278, 283, 300, 305,
+	306, 307, 308, 324, 325, 326, 329, 332, 333, 336,
+	338, 339, 342, 348, 349, 350, 351, 352, 354, 361,
+	365, 373, 374, 375, 376, 377, 378, 379, 383, 384,
+	385, 386, 394, 398, 413, 414, 425, 437, 441, 265,
+	421, 442, 0, 299, 0, 0, 301, 250, 267, 276,
+	0, 432, 395, 207, 367, 257, 197, 224, 211, 231,
+	245, 247, 280, 309, 315, 344, 347, 262, 242, 222,
+	364, 220, 381, 401, 402, 403, 405, 313, 238, 331,
+	0, 0, 0, 0, 0, 0, 0, 0, 241, 0,
+	0, 0, 0, 0, 289, 0, 0, 0, 345, 0,
+	382, 227, 298, 296, 410, 251, 244, 240, 226, 273,
+	304, 343, 400, 337, 0, 293, 0, 0, 391, 316,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 279, 225, 195, 328, 392,
+	255, 0, 0, 0, 177, 178, 179, 0, 0, 0,
+	0, 0, 0, 0, 0, 217, 0, 223, 0, 0,
+	0, 0, 237, 277, 243, 236, 407, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 499, 0, 263,
+	0, 317, 0, 0, 0, 438, 0, 0, 0, 0,
+	0, 0, 0, 0, 288, 0, 285, 191, 205, 0,
+	0, 327, 366, 372, 0, 0, 0, 228, 0, 370,
+	341, 424, 213, 253, 363, 346, 368, 0, 0, 369,
+	294, 412, 358, 422, 439, 440, 235, 321, 430, 404,
+	436, 448, 206, 232, 335, 397, 427, 388, 314, 408,
+	409, 284, 387, 261, 194, 292, 198, 399, 420, 218,
+	380, 0, 0, 0, 200, 418, 396, 311, 281, 282,
+	199, 0, 362, 239, 259, 230, 330, 415, 416, 229,
+	450, 208, 435, 202, 209, 434, 323, 411, 419, 312,
+	303, 201, 417, 310, 302, 287, 249, 269, 356, 297,
+	357, 270, 319, 318, 320, 0, 196, 0, 393, 428,
+	451, 215, 0, 0, 406, 444, 447, 0, 359, 216,
+	260, 248, 355, 258, 290, 443, 445, 446, 214, 353,
+	266, 334, 423, 252, 431, 322, 210, 272, 389, 286,
+	295, 0, 0, 340, 371, 219, 426, 390, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 190, 203,
+	291, 0, 360, 256, 449, 433, 429, 0, 0, 234,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 192, 193, 204, 212, 221, 233, 246, 254,
+	264, 268, 271, 274, 275, 278, 283, 300, 305, 306,
+	307, 308, 324, 325, 326, 329, 332, 333, 336, 338,
+	339, 342, 348, 349, 350, 351, 352, 354, 361, 365,
+	373, 374, 375, 376, 377, 378, 379, 383, 384, 385,
+	386, 394, 398, 413, 414, 425, 437, 441, 498, 421,
+	442, 0, 299, 0, 0, 301, 250, 267, 276, 0,
+	432, 395, 207, 367, 257, 197, 224, 211, 231, 245,
+	247, 280, 309, 315, 344, 347, 262, 242, 222, 364,
+	220, 381, 401, 402, 403, 405, 313, 238, 331, 0,
+	0, 0, 0, 0, 0, 0, 0, 241, 0, 0,
+	0, 0, 0, 289, 0, 0, 0, 345, 0, 382,
+	227, 298, 296, 410, 251, 244, 240, 226, 273, 304,
+	343, 400, 337, 0, 293, 0, 0, 391, 316, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 279, 225, 195, 328, 392, 255,
+	0, 0, 0, 177, 178, 179, 0, 0, 0, 0,
+	0, 0, 0, 0, 217, 0, 223, 0, 0, 0,
+	0, 237, 277, 243, 236, 407, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 263, 0,
+	317, 0, 185, 0, 438, 0, 0, 0, 0, 0,
+	0, 0, 0, 288, 0, 285, 191, 205, 0, 0,
+	327, 366, 372, 0, 0, 0, 228, 0, 370, 341,
+	424, 213, 253, 363, 346, 368, 0, 0, 369, 294,
+	412, 358, 422, 439, 440, 235, 321, 430, 404, 436,
+	448, 206, 232, 335, 397, 427, 388, 314, 408, 409,
+	284, 387, 261, 194, 292, 198, 399, 420, 218, 380,
+	0, 0, 0, 200, 418, 396, 311, 281, 282, 199,
+	0, 362, 239, 259, 230, 330, 415, 416, 229, 450,
+	208, 435, 202, 209, 434, 323, 411, 419, 312, 303,
+	201, 417, 310, 302, 287, 249, 269, 356, 297, 357,
+	270, 319, 318, 320, 0, 196, 0, 393, 428, 451,
+	215, 0, 0, 406, 444, 447, 0, 359, 216, 260,
+	248, 355, 258, 290, 443, 445, 446, 214, 353, 266,
+	334, 423, 252, 431, 322, 210, 272, 389, 286, 295,
+	0, 0, 340, 371, 219, 426, 390, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 190, 203, 291,
+	0, 360, 256, 449, 433, 429, 0, 0, 234, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 192, 193, 204, 212, 221, 233, 246, 254, 264,
+	268, 271, 274, 275, 278, 283, 300, 305, 306, 307,
+	308, 324, 325, 326, 329, 332, 333, 336, 338, 339,
+	342, 348, 349, 350, 351, 352, 354, 361, 365, 373,
+	374, 375, 376, 377, 378, 379, 383, 384, 385, 386,
+	394, 398, 413, 414, 425, 437, 441, 265, 421, 442,
+	0, 299, 0, 0, 301, 250, 267, 276, 0, 432,
+	395, 207, 367, 257, 197, 224, 211, 231, 245, 247,
+	280, 309, 315, 344, 347, 262, 242, 222, 364, 220,
+	381, 401, 402, 403, 405, 313, 238, 331, 0, 0,
+	0, 0, 0, 0, 0, 0, 241, 0, 0, 0,
+	0, 0, 289, 0, 0, 0, 345, 0, 382, 227,
+	298, 296, 410, 251, 244, 240, 226, 273, 304, 343,
+	400, 337, 0, 293, 0, 0, 391, 316, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 279, 225, 195, 328, 392, 255, 0,
+	0, 0, 177, 178, 179, 0, 0, 0, 0, 0,
+	0, 0, 0, 217, 0, 223, 0, 0, 0, 0,
+	237, 277, 243, 236, 407, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 263, 0, 317,
+	0, 0, 0, 438, 0, 0, 0, 0, 0, 0,
+	0, 0, 288, 0, 285, 191, 205, 0, 0, 327,
+	366, 372, 0, 0, 0, 228, 0, 370, 341, 424,
+	213, 253, 363, 346, 368, 0, 0, 369, 294, 412,
+	358, 422, 439, 440, 235, 321, 430, 404, 436, 448,
+	206, 232, 335, 397, 427, 388, 314, 408, 409, 284,
+	387, 261, 194, 292, 198, 399, 420, 218, 380, 0,
+	0, 0, 200, 418, 396, 311, 281, 282, 199, 0,
+	362, 239, 259, 230, 330, 415, 416, 229, 450, 208,
+	435, 202, 209, 434, 323, 411, 419, 312, 303, 201,
+	417, 310, 302, 287, 249, 269, 356, 297, 357, 270,
+	319, 318, 320, 0, 196, 0, 393, 428, 451, 215,
+	0, 0, 406, 444, 447, 0, 359, 216, 260, 248,
+	355, 258, 290, 443, 445, 446, 214, 353, 266, 334,
+	423, 252, 431, 322, 210, 272, 389, 286, 295, 0,
+	0, 340, 371, 219, 426, 390, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 190, 203, 291, 0,
+	360, 256, 449, 433, 429, 0, 0, 234, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	192, 193, 204, 212, 221, 233, 246, 254, 264, 268,
+	271, 274, 275, 278, 283, 300, 305, 306, 307, 308,
+	324, 325, 326, 329, 332, 333, 336, 338, 339, 342,
+	348, 349, 350, 351, 352, 354, 361, 365, 373, 374,
+	375, 376, 377, 378, 379, 383, 384, 385, 386, 394,
+	398, 413, 414, 425, 437, 441, 265, 421, 442, 0,
+	299, 0, 0, 301, 250, 267, 276, 0, 432, 395,
+	207, 367, 257, 197, 224, 211, 231, 245, 247, 280,
+	309, 315, 344, 347, 262, 242, 222, 364, 220, 381,
+	401, 402, 403, 405, 313, 238,
 }
+
 var yyPact = [...]int{
-
-	1846, -1000, -278, 971, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 912, 788,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, 275, 12289, 43,
-	130, 12, 17139, 129, 1947, 17484, -1000, 31, -1000, -5,
-	17484, 4, 16794, -1000, -1000, -95, -97, -1000, 10219, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, 737, 924, 898,
-	909, 585, 990, -1000, 8826, 8826, 105, 105, 16449, 7446,
-	-1000, -1000, 362, 17484, 127, 17484, -153, 102, 102, 102,
+	4075, -1000, -339, 1534, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, 124, 17484, 531, 531, 256, -1000, 17484, 100, 531,
-	100, 100, 100, 17484, -1000, 175, -1000, -1000, -1000, 17484,
-	531, 866, 337, 56, 4933, -1000, 194, -1000, 4933, 44,
-	4933, -44, 939, 37, -22, -1000, 4933, -1000, -1000, -1000,
-	-1000, -1000, -1000, 111, -1000, -1000, 17484, 16097, 131, 294,
-	-1000, -1000, -1000, -1000, -1000, -1000, 609, 421, -1000, 10219,
-	1612, 728, 728, -1000, -1000, 146, -1000, -1000, 11254, 11254,
-	11254, 11254, 11254, 11254, 11254, 11254, 11254, 11254, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, 728, 172, -1000, 9874, 728, 728, 728, 728,
-	728, 728, 728, 728, 10219, 728, 728, 728, 728, 728,
-	728, 728, 728, 728, 728, 728, 728, 728, 728, 728,
-	728, -1000, -1000, 912, -1000, 788, -1000, -1000, -1000, 871,
-	10219, 10219, 912, -1000, 841, 8826, -1000, -1000, 919, -1000,
-	-1000, -1000, -1000, 335, 949, -1000, 11944, 171, 948, 15752,
-	14717, 17484, 732, 668, -1000, -1000, 168, 724, 7087, -123,
-	-1000, -1000, -1000, 292, 14027, -1000, -1000, -1000, 863, -1000,
+	-1000, -1000, 1499, 1161, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, 545, 1169, 137, 1416, 275, 172, 928, 392, 119,
+	27059, 391, 113, 27508, -1000, 102, -1000, 94, 27508, 98,
+	26610, -1000, -1000, -278, 12658, 1343, 27, 14, 27508, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, 1185, 1452, 1468,
+	1495, 1011, 1407, -1000, 10849, 10849, 327, 327, 327, 9053,
+	-1000, -1000, 16712, 27508, 27508, 1176, 387, 928, 378, 376,
+	375, 314, -113, -1000, -1000, -1000, -1000, 1416, -1000, -1000,
+	170, -1000, 190, 1143, -1000, 1141, -1000, 569, 586, 247,
+	295, 283, 246, 245, 243, 242, 227, 224, 220, 219,
+	208, -1000, 511, 511, -171, -175, 1955, 304, 304, 304,
+	348, 1386, 1385, -1000, 548, -1000, 511, 511, 157, 511,
+	511, 511, 511, 165, 163, 511, 511, 511, 511, 511,
+	511, 511, 511, 511, 511, 511, 511, 511, 511, 511,
+	27508, -1000, 144, 512, 555, 1416, 158, -1000, -1000, -1000,
+	27508, 385, 928, 309, 309, 27508, -1000, 433, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
@@ -2735,315 +4010,478 @@ var yyPact = [...]int{
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 654,
-	17484, -1000, 328, -1000, 531, 4933, 110, 531, 307, 531,
-	17484, 17484, 4933, 4933, 4933, 48, 86, 80, 17484, 723,
-	108, 17484, 890, 796, 17484, 531, 531, -1000, 6369, -1000,
-	4933, 337, -1000, 440, 10219, 4933, 4933, 4933, 17484, 4933,
-	4933, -1000, -1000, -1000, 320, -1000, -1000, -1000, -1000, 4933,
-	4933, -1000, 947, 312, -1000, -1000, -1000, -1000, 10219, 219,
-	-1000, 781, -1000, 1, -1000, -1000, -1000, -1000, -1000, 971,
-	-1000, -1000, -1000, -128, -1000, -1000, 10219, 10219, 10219, 10219,
-	364, 227, 11254, 506, 232, 11254, 11254, 11254, 11254, 11254,
-	11254, 11254, 11254, 11254, 11254, 11254, 11254, 11254, 11254, 11254,
-	542, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 531,
-	-1000, 969, 621, 621, 191, 191, 191, 191, 191, 191,
-	191, 191, 191, 11599, 7791, 6369, 585, 652, 912, 8826,
-	8826, 10219, 10219, 9516, 9171, 8826, 870, 271, 421, 17484,
-	-1000, -1000, 10909, -1000, -1000, -1000, -1000, -1000, 470, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, 17484, 17484, 8826, 8826,
-	8826, 8826, 8826, 898, 585, 919, -1000, 964, 211, 587,
-	718, -1000, 558, 898, 13682, 712, -1000, 919, -1000, -1000,
-	-1000, 17484, -1000, -1000, 15407, -1000, -1000, 6010, 17484, 64,
-	17484, -1000, 688, 756, -1000, -1000, -1000, 892, 12992, 13337,
-	64, 559, 14717, 17484, -1000, -1000, 14717, 17484, 5651, 6728,
-	-123, -1000, 6728, 693, -1000, -121, -134, 8136, 189, -1000,
-	-1000, -1000, -1000, 4574, 1155, 509, 327, -79, -1000, -1000,
-	-1000, 739, -1000, 739, 739, 739, 739, -47, -47, -47,
-	-47, -1000, -1000, -1000, -1000, -1000, 762, 760, -1000, 739,
-	739, 739, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	759, 759, 759, 742, 742, 771, -1000, 17484, 4933, 889,
-	4933, -1000, 123, -1000, -1000, -1000, 17484, 17484, 17484, 17484,
-	17484, 137, 17484, 17484, 702, -1000, 17484, 4933, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, 421, -1000, -1000, -1000,
-	-1000, -1000, -1000, 17484, -1000, -1000, -1000, -1000, 17484, 337,
-	17484, 17484, 421, -1000, 438, 17484, 17484, -1000, -1000, -1000,
-	-1000, -1000, 421, 227, 283, 272, -1000, -1000, 433, -1000,
-	-1000, 1843, -1000, -1000, -1000, -1000, 506, 11254, 11254, 11254,
-	829, 1843, 2362, 449, 519, 191, 289, 289, 186, 186,
-	186, 186, 186, 568, 568, -1000, -1000, -1000, 470, -1000,
-	-1000, -1000, 470, 8826, 8826, 699, 728, 167, -1000, 737,
-	-1000, -1000, 898, 647, 647, 334, 408, 267, 946, 647,
-	252, 945, 647, 647, 8826, -1000, -1000, 299, -1000, 10219,
-	470, -1000, 166, -1000, 1667, 698, 697, 647, 470, 470,
-	647, 647, 871, -1000, -1000, 830, 10219, 10219, 10219, -1000,
-	-1000, -1000, 871, 930, -1000, 848, 847, 938, 8826, 14717,
-	919, -1000, -1000, -1000, 162, 938, 692, 728, -1000, 17484,
-	14717, 14717, 14717, 14717, 14717, -1000, 822, 818, -1000, 816,
-	810, 817, 17484, -1000, 649, 585, 12992, 178, 728, -1000,
-	15062, -1000, -1000, 938, 14717, 707, -1000, 707, -1000, 161,
-	-1000, -1000, 693, -123, -72, -1000, -1000, -1000, -1000, 421,
-	-1000, 552, 689, 4215, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, 753, 531, -1000, 882, 228, 209, 531, 881, -1000,
-	-1000, -1000, 868, -1000, 331, -90, -1000, -1000, 389, -47,
-	-47, -1000, -1000, 189, 862, 189, 189, 189, 432, 432,
-	-1000, -1000, -1000, -1000, 385, -1000, -1000, -1000, 376, -1000,
-	779, 17484, 4933, -1000, -1000, -1000, -1000, 308, 308, 222,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, 63, 765, -1000, -1000, -1000, -1000, -18, 45, 107,
-	-1000, 4933, -1000, 312, 312, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, 829, 1843, 1810, -1000, 11254,
-	11254, -1000, -1000, 647, 647, 8826, 6369, 912, 871, -1000,
-	-1000, 109, 542, 109, 11254, 11254, -1000, 11254, 11254, -1000,
-	-165, 722, 257, -1000, 10219, 382, -1000, 6369, -1000, 11254,
-	11254, -1000, -1000, -1000, -1000, -1000, -1000, 833, 421, 421,
-	-1000, -1000, 17484, -1000, -1000, -1000, -1000, 934, 10219, -1000,
-	644, -1000, 5292, 898, 777, 17484, 728, 971, 12992, 17484,
-	733, -1000, 269, 756, 758, 776, 684, -1000, -1000, -1000,
-	-1000, 809, -1000, 770, -1000, -1000, -1000, -1000, -1000, 585,
-	-1000, 126, 125, 114, 17484, -1000, 912, 707, -1000, -1000,
-	203, -1000, -1000, -131, -140, -1000, -1000, -1000, 4574, -1000,
-	4574, 17484, 78, -1000, 531, 531, -1000, -1000, -1000, 743,
-	775, 11254, -1000, -1000, -1000, 507, 189, 189, -1000, 258,
-	-1000, -1000, -1000, 637, -1000, 632, 634, 604, 17484, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 17484, -1000,
-	-1000, -1000, -1000, -1000, 17484, -172, 531, 17484, 17484, 17484,
-	17484, -1000, 337, 337, -1000, 11254, 1843, 1843, -1000, -1000,
-	470, -1000, 898, -1000, 470, 739, 739, -1000, 739, 742,
-	-1000, 739, -16, 739, -17, 470, 470, 2293, 2224, 2191,
-	1993, 728, -160, -1000, 421, 10219, -1000, 1880, 1760, -1000,
-	-1000, 932, 905, 421, -1000, -1000, -1000, 884, 597, 573,
-	-1000, -1000, 8481, 600, 160, 591, -1000, 912, 17484, 10219,
-	-1000, -1000, 10219, 740, -1000, 10219, -1000, -1000, -1000, 912,
-	728, 728, 728, 591, 898, -1000, -1000, -1000, -1000, 4215,
-	-1000, 588, -1000, 739, -1000, -1000, -1000, 17484, -73, 962,
-	1843, -1000, -1000, -1000, -1000, -1000, -47, 431, -47, 370,
-	-1000, 366, 4933, -1000, -1000, -1000, -1000, 872, -1000, 6369,
-	-1000, -1000, 735, 768, -1000, -1000, -1000, -1000, 1843, -1000,
-	871, -1000, -1000, 142, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, 11254, 11254, 11254, 11254, 11254, 898, 424, 421,
-	11254, 11254, -1000, 10219, 10219, 880, -1000, 728, -1000, 716,
-	17484, 17484, -1000, 17484, 898, -1000, 421, 421, 17484, 421,
-	14372, 17484, 17484, 12634, -1000, 183, 17484, -1000, 584, -1000,
-	202, -1000, -60, 189, -1000, 189, 502, 472, -1000, 728,
-	612, -1000, 264, 17484, 17484, -1000, -1000, -1000, 1667, 1667,
-	1667, 1667, 58, 470, -1000, 1667, 1667, 421, 609, 961,
-	-1000, 728, 971, 156, -1000, -1000, -1000, 580, 575, -1000,
-	575, 575, 178, 183, -1000, 531, 249, 401, -1000, 69,
-	17484, 346, 878, -1000, 873, -1000, -1000, -1000, -1000, -1000,
-	59, 6369, 4574, 549, -1000, -1000, -1000, -1000, -1000, 470,
-	54, -175, -1000, -1000, -1000, 17484, 573, 17484, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, 361, -1000, -1000, 17484, -1000,
-	-1000, 400, -1000, -1000, 521, -1000, 17484, -1000, -1000, 765,
-	-1000, 828, -170, -180, 536, -1000, -1000, 729, -1000, -1000,
-	59, 846, -172, -1000, 827, -1000, 17484, -1000, 55, -1000,
-	-173, 518, 52, -177, 774, 728, -181, 773, -1000, 943,
-	10564, -1000, -1000, 955, 199, 199, 1667, 470, -1000, -1000,
-	-1000, 83, 428, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, 27508, 609, 609, 53, 609, 609, 609, 609,
+	85, 420, 13, -1000, 78, 151, 149, 155, 589, 123,
+	63, -1000, -1000, 153, 103, -1000, 609, 7201, 7201, 7201,
+	-1000, 1396, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	343, -1000, -1000, -1000, -1000, 27508, 26161, 258, 544, -1000,
+	-1000, -1000, 49, -1000, -1000, 1078, 753, -1000, 12658, 2116,
+	1146, 1146, -1000, -1000, 407, -1000, -1000, 14005, 14005, 14005,
+	14005, 14005, 14005, 14005, 14005, 14005, 14005, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, 1146, 432, -1000, 12209, 1146, 1146, 1146, 1146, 1146,
+	1146, 1146, 1146, 12658, 1146, 1146, 1146, 1146, 1146, 1146,
+	1146, 1146, 1146, 1146, 1146, 1146, 1146, 1146, 1146, 1146,
+	-1000, -1000, -1000, 27508, -1000, 1146, 1499, -1000, 1161, -1000,
+	-1000, -1000, 1401, 12658, 12658, 1499, -1000, 1279, 10849, -1000,
+	-1000, 1374, -1000, -1000, -1000, -1000, 701, 1513, -1000, 15352,
+	430, 1512, 25712, -1000, 19419, 25263, 1140, 8590, -61, -1000,
+	-1000, -1000, 540, 18521, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, 1396, 1031, 27508, -1000, -1000,
+	3604, 928, -1000, 1168, -1000, 1029, -1000, 1150, 144, 314,
+	1199, 928, 928, 928, 928, 600, -1000, -1000, -1000, 511,
+	511, 202, 275, 4093, -1000, -1000, -1000, 24807, 1167, 928,
+	-1000, 1166, -1000, 1427, 292, 496, 496, 928, -1000, -1000,
+	27508, 928, 1426, 1425, 27508, 27508, -1000, 24358, -1000, 23909,
+	23460, 869, 27508, 23011, 22562, 22113, 21664, 21215, -1000, 1239,
+	-1000, 1136, -1000, -1000, -1000, 27508, 27508, 27508, 39, -1000,
+	-1000, 27508, 928, -1000, -1000, 847, 834, 511, 511, 812,
+	947, 945, 941, 511, 511, 800, 937, 921, 150, 787,
+	779, 761, 891, 936, 110, 867, 850, 756, 27508, 1162,
+	-1000, 134, 538, 181, 230, 199, 27508, 135, 1416, 1342,
+	1129, 341, 309, 1232, 27508, 1441, 928, -1000, 7664, -1000,
+	-1000, 933, 12658, -1000, 641, 589, 589, -1000, -1000, -1000,
+	-1000, -1000, -1000, 609, 27508, 641, -1000, -1000, -1000, 589,
+	609, 27508, 609, 609, 609, 609, 589, 609, 27508, 27508,
+	27508, 27508, 27508, 27508, 27508, 27508, 27508, 7201, 7201, 7201,
+	492, -1000, 1231, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	97, -1000, -1000, -1000, -1000, -1000, 1534, -1000, -1000, -1000,
+	-110, 1127, 20766, -1000, -282, -283, -285, -290, -1000, -1000,
+	-1000, -291, -298, -1000, -1000, -1000, 12658, 12658, 12658, 12658,
+	786, 499, 14005, 710, 633, 14005, 14005, 14005, 14005, 14005,
+	14005, 14005, 14005, 14005, 14005, 14005, 14005, 14005, 14005, 14005,
+	590, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 928,
+	-1000, 1522, 896, 896, 444, 444, 444, 444, 444, 444,
+	444, 444, 444, 14454, 9502, 7664, 1011, 1027, 1499, 10849,
+	10849, 12658, 12658, 11747, 11298, 10849, 1408, 565, 753, 27508,
+	-1000, -1000, 13556, -1000, -1000, -1000, -1000, -1000, 953, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, 27508, 27508, 10849, 10849,
+	10849, 10849, 10849, -1000, 1126, -1000, -170, 16263, 12658, 1468,
+	1011, 1374, 1436, 1528, 461, 744, 1114, -1000, 729, 1468,
+	18072, 1135, -1000, 1374, -1000, -1000, -1000, 27508, -1000, -1000,
+	20317, -1000, -1000, 6738, 27508, 204, 27508, -1000, 1128, 1307,
+	-1000, -1000, -1000, 1449, 17623, 27508, 1071, 1045, -1000, -1000,
+	429, 8127, -61, -1000, 8127, 1099, -1000, -25, -51, 9951,
+	419, -1000, -1000, -1000, 1955, 14903, 1041, -1000, 35, -1000,
+	-1000, -1000, 1150, -1000, 1150, 1150, 1150, 1150, 39, 39,
+	39, 39, -1000, -1000, -1000, -1000, -1000, 1160, 1159, -1000,
+	1150, 1150, 1150, 1150, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, 1155, 1155, 1155, 1151, 1151, 285, -1000, 12658, 105,
+	27508, 1434, 755, 134, 27508, 1230, -1000, 27508, 1199, 1199,
+	1199, -1000, 1437, 914, 860, -1000, 1112, -1000, -1000, 1493,
+	-1000, -1000, 614, 637, 626, 484, 27508, 117, 193, -1000,
+	277, -1000, 27508, 1153, 1422, 496, 928, -1000, 928, -1000,
+	-1000, -1000, -1000, 425, -1000, -1000, 928, 1110, -1000, 1095,
+	671, 612, 670, 587, 1110, -1000, -1000, -139, 1110, -1000,
+	1110, -1000, 1110, -1000, 1110, -1000, 1110, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, 550, 27508, 117, 590, -1000,
+	336, -1000, -1000, 590, 590, -1000, -1000, -1000, -1000, 932,
+	930, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -332, 27508, 355,
+	122, 186, 27508, 27508, 27508, 27508, 27508, 402, -1000, -1000,
+	-1000, 159, 27508, 27508, 27508, 27508, 369, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, 753, 27508, -1000, -1000, 609, 609,
+	-1000, -1000, 27508, 609, -1000, -1000, -1000, -1000, -1000, -1000,
+	609, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, 929, 27508, 27508, -1000, -1000,
+	-1000, -1000, -1000, 93, -29, 183, -1000, -1000, -1000, -1000,
+	1464, -1000, 753, 499, 674, 583, -1000, -1000, 773, -1000,
+	-1000, 2664, -1000, -1000, -1000, -1000, 710, 14005, 14005, 14005,
+	1270, 2664, 2643, 1255, 2256, 444, 684, 684, 454, 454,
+	454, 454, 454, 831, 831, -1000, -1000, -1000, -1000, 953,
+	-1000, -1000, -1000, 953, 10849, 10849, 1107, 1146, 423, -1000,
+	1185, -1000, -1000, 1468, 996, 996, 722, 672, 595, 1511,
+	996, 564, 1510, 996, 996, 10849, -1000, -1000, 597, -1000,
+	12658, 953, -1000, 1518, 1102, 1100, 996, 953, 953, 996,
+	996, 27508, -1000, -273, -1000, -41, 450, 1146, -1000, 19868,
+	-1000, -1000, 953, 1078, 1401, -1000, -1000, 1375, -1000, 1285,
+	12658, 12658, 12658, -1000, -1000, -1000, 1401, 1469, -1000, 1295,
+	1294, 1505, 10849, 19419, 1374, -1000, -1000, -1000, 422, 1505,
+	1092, 1146, -1000, 27508, 19419, 19419, 19419, 19419, 19419, -1000,
+	1266, 1249, -1000, 1263, 1248, 1276, 27508, -1000, 1020, 1011,
+	17623, 204, 1076, 19419, 27508, -1000, -1000, 19419, 27508, 6275,
+	-1000, 1099, -61, -39, -1000, -1000, -1000, -1000, 753, -1000,
+	806, -1000, 2276, -1000, 340, -1000, -1000, -1000, -1000, 443,
+	32, -1000, -1000, 39, 39, -1000, -1000, 419, 525, 419,
+	419, 419, 927, 927, -1000, -1000, -1000, -1000, -1000, 723,
+	-1000, -1000, -1000, 718, -1000, -1000, 852, 1223, 105, -1000,
+	-1000, 511, 922, 1378, -1000, -1000, 1037, 352, -1000, 27508,
+	-1000, 1228, 1218, 1216, -1000, -1000, -1000, -1000, -1000, 3612,
+	27508, 1018, -1000, 108, 27508, 1021, 27508, -1000, 1014, 27508,
+	-1000, 928, -1000, -1000, 7664, -1000, 27508, 1146, -1000, -1000,
+	-1000, -1000, 383, 1413, 1411, 117, 108, 419, 928, -1000,
+	-1000, -1000, -1000, -1000, -335, 998, 27508, 133, -1000, 1152,
+	894, -1000, 1183, -1000, -1000, -1000, -1000, 114, 178, 161,
+	329, -1000, 366, 1223, 27508, -1000, -1000, -1000, 589, -1000,
+	-1000, 589, -1000, -1000, -1000, -1000, -1000, -1000, 1393, -34,
+	-309, -1000, -306, -1000, -1000, -1000, -1000, 1270, 2664, 2380,
+	-1000, 14005, 14005, -1000, -1000, 996, 996, 10849, 7664, 1499,
+	1401, -1000, -1000, 412, 590, 412, 14005, 14005, -1000, 14005,
+	14005, -1000, -129, 1101, 549, -1000, 12658, 749, -1000, -1000,
+	14005, 14005, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, 373, 371, 363, 27508, -1000, -1000, -1000, 841, 920,
+	1277, 753, 753, -1000, -1000, 27508, -1000, -1000, -1000, -1000,
+	1503, 12658, -1000, 1097, -1000, 5812, 1468, 1205, 27508, 1146,
+	1534, 15814, 27508, 1080, -1000, 533, 1307, 1194, 1204, 1254,
+	-1000, -1000, -1000, -1000, 1247, -1000, 1246, -1000, -1000, -1000,
+	-1000, -1000, 1011, 1505, 19419, 1075, -1000, 1075, -1000, 415,
+	-1000, -1000, -1000, -38, -56, -1000, -1000, -1000, 1955, -1000,
+	-1000, -1000, 667, 14005, 1526, -1000, 915, 1420, -1000, 1418,
+	-1000, -1000, 419, 419, -1000, -1000, -1000, -1000, -1000, -1000,
+	987, -1000, 984, 1096, 982, 59, -1000, 1174, 1392, 511,
+	511, -1000, 712, -1000, 928, -1000, 27508, -1000, 27508, 27508,
+	27508, 1492, 1090, -1000, 27508, -1000, -1000, 27508, -1000, -1000,
+	1291, 105, 980, -1000, -1000, -1000, 193, 27508, -1000, 896,
+	108, -1000, -1000, -1000, -1000, -1000, -1000, 1148, -1000, -1000,
+	-1000, 1008, -1000, -140, 928, 27508, 27508, 27508, -1000, 27508,
+	-1000, -1000, -1000, 609, 609, -1000, 1391, -1000, 928, -1000,
+	14005, 2664, 2664, -1000, -1000, 953, -1000, 1468, -1000, 953,
+	1150, 1150, -1000, 1150, 1151, -1000, 1150, 84, 1150, 83,
+	953, 953, 2548, 2463, 2342, 2154, 1146, -120, -1000, 753,
+	12658, 2133, 1772, 1146, 1146, 1146, 973, 913, 39, -1000,
+	-1000, -1000, 1501, 1489, 753, -1000, -1000, -1000, 1409, 1034,
+	1069, -1000, -1000, 10400, 977, 1290, 414, 973, 1499, 27508,
+	12658, -1000, -1000, 12658, 1149, -1000, 12658, -1000, -1000, -1000,
+	1499, 1499, 1075, -1000, -1000, 453, -1000, -1000, -1000, -1000,
+	-1000, 2664, -80, -1000, -1000, -1000, -1000, -1000, 39, 905,
+	39, 711, -1000, 679, -1000, -1000, -213, -1000, -1000, 1091,
+	1222, -1000, -1000, 1148, -1000, -1000, -1000, 27508, 27508, -1000,
+	-1000, 188, -1000, 265, 971, -1000, -169, -1000, -1000, 1447,
+	27508, -1000, -1000, 7664, -1000, -1000, 1147, 1196, -1000, -1000,
+	-1000, -1000, -1000, -1000, 2664, -1000, 1401, -1000, -1000, 205,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 14005, 14005,
+	14005, 14005, 14005, 1468, 901, 753, 14005, 14005, 18970, 27508,
+	27508, 17161, 39, 6, -1000, 12658, 12658, 1402, -1000, 1146,
+	-1000, 1109, 27508, 1146, 27508, -1000, 1468, -1000, 753, 753,
+	27508, 753, 1468, -1000, -1000, 419, -1000, 419, 990, 963,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 1443, 1090,
+	-1000, 173, 27508, -1000, 193, -1000, -177, -178, 1161, 969,
+	1082, -1000, 507, 27508, 27508, -1000, -1000, -1000, 1518, 1518,
+	1518, 1518, 502, 953, -1000, 1518, 1518, 967, -1000, 967,
+	967, 450, -267, -1000, 1339, 1336, 753, 1078, 1524, -1000,
+	1146, 1534, 411, 1069, -1000, -1000, 961, -1000, -1000, -1000,
+	-1000, -1000, 1161, 1146, 1145, -1000, -1000, -1000, 177, -1000,
+	7664, 5349, 959, -1000, -1000, -1000, -1000, -1000, 953, 169,
+	-157, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 6, 269,
+	-1000, 1302, 1300, 1487, 27508, 1069, 27508, -1000, 177, 13107,
+	27508, -1000, -48, -1000, -1000, -1000, -1000, -1000, 1183, -1000,
+	1275, -134, -166, 1308, 1310, 1310, 1336, 1480, 1324, 1317,
+	-1000, 890, 1067, -1000, -1000, 1518, 953, 957, 280, -1000,
+	-1000, -140, -1000, 1274, -1000, 1306, 769, -1000, -1000, -1000,
+	-1000, 888, -1000, 1473, 1471, -1000, -1000, -1000, 1203, 136,
+	-1000, -146, -1000, 691, -1000, -1000, -1000, 887, 875, 1202,
+	-1000, 1509, -1000, -164, -1000, -1000, -1000, -1000, -1000, 1517,
+	469, 469, -167, -1000, -1000, -1000, 251, 741, -1000, -1000,
+	-1000, -1000, -1000,
 }
+
 var yyPgo = [...]int{
-
-	0, 1197, 1196, 48, 67, 68, 1195, 1192, 1191, 1190,
-	91, 90, 88, 1188, 1186, 1182, 1181, 1179, 1178, 1177,
-	1176, 1175, 1174, 1173, 1171, 1169, 1168, 1167, 1166, 1165,
-	1164, 1163, 1158, 94, 1157, 78, 1156, 1155, 1154, 1152,
-	1151, 1150, 1149, 1148, 34, 182, 55, 57, 1146, 58,
-	62, 1145, 60, 69, 64, 1144, 28, 1142, 1141, 76,
-	1140, 1139, 56, 1136, 1135, 70, 1133, 77, 1131, 11,
-	35, 1129, 1126, 1125, 1124, 106, 2207, 1123, 1121, 14,
-	1120, 1119, 101, 1118, 66, 33, 13, 18, 24, 1115,
-	71, 1114, 10, 1113, 65, 1112, 1111, 1110, 1107, 32,
-	1106, 59, 1105, 38, 23, 1098, 12, 75, 29, 21,
-	6, 1097, 1096, 17, 72, 47, 73, 1095, 1090, 416,
-	1089, 1088, 37, 1086, 1083, 1082, 20, 1080, 95, 364,
-	1079, 1078, 1076, 1074, 1072, 30, 1048, 1843, 40, 81,
-	1071, 1064, 1062, 2751, 42, 54, 16, 1060, 1056, 1055,
-	41, 1229, 36, 415, 1054, 31, 1052, 1047, 1043, 1036,
-	1032, 1030, 1029, 173, 1028, 1027, 1024, 89, 26, 63,
-	25, 1020, 1019, 1018, 1016, 50, 74, 1015, 1014, 52,
-	1011, 1009, 19, 1000, 999, 998, 997, 995, 22, 7,
-	994, 15, 993, 8, 992, 27, 991, 4, 989, 9,
-	988, 3, 0, 987, 5, 44, 1, 982, 2, 980,
-	979, 1367, 1268, 82, 977, 93,
+	0, 1788, 1787, 14, 82, 79, 1786, 1785, 1783, 1782,
+	130, 125, 122, 1781, 1779, 1777, 1775, 1774, 1773, 1772,
+	1770, 1769, 1766, 1765, 1764, 62, 120, 38, 40, 124,
+	1763, 1762, 45, 1761, 1760, 1759, 127, 126, 470, 1758,
+	128, 1757, 1755, 1754, 1753, 1748, 1747, 1746, 1744, 1743,
+	1742, 1741, 1740, 1737, 151, 1736, 1735, 9, 1734, 47,
+	1733, 1730, 1725, 1720, 1719, 84, 1718, 1715, 1714, 111,
+	1711, 1710, 44, 336, 49, 72, 1709, 1705, 80, 770,
+	1704, 100, 119, 1703, 908, 1702, 39, 97, 85, 1701,
+	41, 1700, 1698, 102, 1697, 1694, 1693, 68, 1691, 1690,
+	3134, 1689, 67, 75, 19, 32, 1686, 1683, 1682, 1680,
+	33, 162, 1679, 1677, 28, 1676, 1675, 146, 1674, 81,
+	27, 1673, 16, 18, 21, 1671, 83, 1668, 8, 50,
+	31, 1667, 77, 1666, 1664, 1662, 1660, 25, 1645, 73,
+	101, 22, 1644, 1643, 4, 11, 1642, 1641, 1640, 1638,
+	1636, 1635, 10, 1634, 1633, 1631, 56, 1630, 6, 24,
+	71, 116, 29, 7, 1629, 143, 1626, 26, 114, 65,
+	108, 1624, 1623, 1622, 849, 55, 134, 1621, 1620, 46,
+	1619, 118, 117, 1617, 1362, 1616, 1615, 78, 1271, 2560,
+	13, 109, 1614, 1611, 1627, 52, 74, 23, 1610, 1609,
+	1608, 121, 112, 63, 863, 42, 1606, 1605, 1604, 1603,
+	1602, 1597, 1596, 87, 34, 20, 105, 30, 1595, 1594,
+	1593, 66, 37, 1592, 107, 106, 70, 86, 1591, 115,
+	96, 57, 1590, 60, 1589, 1588, 1581, 1579, 43, 1576,
+	1574, 1573, 1570, 104, 88, 64, 35, 1569, 36, 91,
+	99, 89, 1567, 17, 123, 12, 1565, 3, 0, 1557,
+	5, 138, 1368, 113, 1555, 1553, 1, 1549, 2, 1547,
+	1546, 76, 1544, 1543, 1542, 1541, 3253, 1439, 110, 1540,
+	139,
 }
+
 var yyR1 = [...]int{
-
-	0, 209, 210, 210, 1, 1, 1, 1, 1, 1,
+	0, 274, 275, 275, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	202, 202, 202, 21, 3, 3, 3, 3, 2, 2,
-	8, 9, 4, 5, 5, 10, 10, 36, 36, 11,
-	12, 12, 12, 12, 213, 213, 59, 59, 60, 60,
-	107, 107, 13, 14, 14, 116, 116, 115, 115, 115,
-	117, 117, 117, 117, 153, 153, 15, 15, 15, 15,
-	15, 15, 15, 204, 204, 203, 201, 201, 200, 200,
-	199, 22, 184, 186, 186, 185, 185, 185, 185, 176,
-	156, 156, 156, 156, 159, 159, 157, 157, 157, 157,
-	157, 157, 157, 157, 157, 158, 158, 158, 158, 158,
-	160, 160, 160, 160, 160, 161, 161, 161, 161, 161,
-	161, 161, 161, 161, 161, 161, 161, 161, 161, 161,
-	162, 162, 162, 162, 162, 162, 162, 162, 175, 175,
-	163, 163, 169, 169, 170, 170, 170, 172, 172, 173,
-	173, 130, 130, 130, 165, 165, 166, 166, 171, 171,
-	167, 167, 167, 168, 168, 168, 174, 174, 174, 174,
-	174, 164, 164, 177, 177, 194, 194, 193, 193, 193,
-	183, 183, 190, 190, 190, 190, 190, 180, 180, 180,
-	181, 181, 179, 179, 182, 182, 192, 192, 191, 178,
-	178, 195, 195, 195, 195, 207, 208, 206, 206, 206,
-	206, 206, 187, 187, 187, 188, 188, 188, 189, 189,
-	189, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-	16, 16, 16, 16, 16, 16, 16, 16, 205, 205,
-	205, 205, 205, 205, 205, 205, 205, 205, 205, 205,
-	205, 205, 198, 196, 196, 197, 197, 17, 23, 23,
-	18, 18, 18, 18, 18, 19, 19, 24, 25, 25,
+	1, 1, 1, 1, 258, 258, 258, 261, 261, 21,
+	50, 3, 3, 3, 3, 2, 2, 8, 9, 4,
+	5, 5, 10, 10, 61, 61, 11, 12, 12, 12,
+	12, 278, 278, 95, 95, 93, 93, 94, 94, 160,
+	160, 13, 14, 14, 170, 170, 169, 169, 169, 171,
+	171, 171, 171, 204, 204, 15, 15, 15, 15, 15,
+	70, 70, 260, 260, 259, 257, 257, 256, 256, 255,
+	23, 24, 33, 33, 33, 33, 34, 35, 262, 262,
+	234, 39, 39, 38, 38, 38, 38, 40, 40, 37,
+	37, 36, 36, 236, 236, 223, 223, 235, 235, 235,
+	235, 235, 235, 235, 222, 143, 143, 143, 143, 143,
+	143, 143, 143, 143, 143, 143, 206, 206, 206, 206,
+	209, 209, 207, 207, 207, 207, 207, 207, 207, 207,
+	207, 208, 208, 208, 208, 208, 210, 210, 210, 210,
+	210, 211, 211, 211, 211, 211, 211, 211, 211, 211,
+	211, 211, 211, 211, 211, 211, 212, 212, 212, 212,
+	212, 212, 212, 212, 221, 221, 213, 213, 216, 216,
+	217, 217, 217, 218, 218, 219, 219, 214, 214, 214,
+	215, 215, 215, 224, 248, 248, 247, 247, 245, 245,
+	245, 245, 233, 233, 242, 242, 242, 242, 242, 232,
+	232, 228, 228, 228, 229, 229, 230, 230, 227, 227,
+	231, 231, 244, 244, 243, 225, 225, 226, 226, 250,
+	250, 250, 250, 251, 267, 268, 266, 266, 266, 266,
+	266, 59, 59, 59, 183, 183, 183, 240, 240, 239,
+	239, 239, 241, 241, 238, 238, 238, 238, 238, 238,
+	238, 238, 238, 238, 238, 238, 238, 238, 238, 238,
+	238, 238, 238, 238, 238, 238, 238, 238, 238, 238,
+	238, 238, 238, 178, 178, 178, 265, 265, 265, 265,
+	265, 265, 264, 264, 264, 237, 237, 237, 263, 263,
+	129, 129, 130, 130, 30, 30, 30, 30, 30, 30,
+	29, 29, 29, 25, 25, 25, 25, 25, 25, 25,
 	25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
-	25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
-	25, 25, 25, 25, 25, 123, 123, 125, 125, 121,
-	121, 124, 124, 122, 122, 122, 126, 126, 126, 127,
-	127, 154, 154, 154, 26, 26, 28, 28, 29, 30,
-	30, 148, 148, 149, 149, 31, 32, 37, 37, 37,
-	37, 37, 37, 39, 39, 39, 7, 7, 7, 7,
-	38, 38, 38, 6, 6, 27, 27, 27, 27, 20,
-	214, 33, 34, 34, 35, 35, 35, 41, 41, 41,
-	40, 40, 40, 46, 46, 48, 48, 48, 48, 48,
-	49, 49, 49, 49, 49, 49, 45, 45, 47, 47,
-	47, 47, 140, 140, 140, 139, 139, 51, 51, 52,
-	52, 53, 53, 54, 54, 54, 91, 68, 68, 106,
-	106, 108, 108, 55, 55, 55, 55, 56, 56, 57,
-	57, 58, 58, 147, 147, 146, 146, 146, 145, 145,
-	61, 61, 61, 63, 62, 62, 62, 62, 64, 64,
-	66, 66, 65, 65, 67, 69, 69, 69, 69, 69,
-	70, 70, 50, 50, 50, 50, 50, 50, 50, 50,
-	120, 120, 72, 72, 71, 71, 71, 71, 71, 71,
-	71, 71, 71, 71, 83, 83, 83, 83, 83, 83,
-	73, 73, 73, 73, 73, 73, 73, 44, 44, 84,
-	84, 84, 90, 85, 85, 76, 76, 76, 76, 76,
-	76, 76, 76, 76, 76, 76, 76, 76, 76, 76,
-	76, 76, 76, 76, 76, 76, 76, 76, 76, 76,
-	76, 76, 76, 76, 76, 76, 76, 76, 76, 80,
-	80, 80, 80, 78, 78, 78, 78, 78, 78, 78,
-	78, 78, 78, 78, 78, 78, 79, 79, 79, 79,
-	79, 79, 79, 79, 79, 79, 79, 79, 79, 79,
-	79, 79, 215, 215, 82, 81, 81, 81, 81, 81,
-	81, 81, 42, 42, 42, 42, 42, 152, 152, 155,
-	155, 155, 155, 155, 155, 155, 155, 155, 155, 155,
-	155, 155, 95, 95, 43, 43, 93, 93, 94, 96,
-	96, 92, 92, 92, 75, 75, 75, 75, 75, 75,
-	75, 75, 77, 77, 77, 97, 97, 98, 98, 99,
-	99, 100, 100, 101, 102, 102, 102, 103, 103, 103,
-	103, 104, 104, 104, 74, 74, 74, 74, 105, 105,
-	105, 105, 109, 109, 86, 86, 88, 88, 87, 89,
-	110, 110, 113, 111, 111, 114, 114, 114, 114, 114,
-	112, 112, 112, 142, 142, 142, 118, 118, 128, 128,
-	129, 129, 119, 119, 131, 131, 131, 131, 131, 131,
-	131, 131, 131, 131, 132, 132, 132, 133, 133, 134,
-	134, 134, 141, 141, 137, 137, 138, 138, 143, 143,
-	144, 144, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
-	135, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 136, 136, 136, 136,
-	136, 136, 136, 136, 136, 136, 211, 212, 150, 151,
-	151, 151,
+	25, 25, 25, 25, 25, 31, 31, 26, 26, 26,
+	26, 26, 26, 26, 26, 26, 16, 16, 16, 16,
+	16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+	16, 254, 254, 254, 254, 254, 254, 254, 254, 254,
+	254, 254, 254, 254, 254, 254, 254, 254, 254, 254,
+	254, 254, 254, 220, 220, 220, 252, 252, 253, 253,
+	17, 22, 22, 18, 18, 18, 18, 19, 19, 41,
+	42, 42, 42, 42, 42, 42, 42, 42, 42, 42,
+	42, 42, 42, 42, 42, 42, 42, 42, 42, 42,
+	42, 42, 42, 42, 42, 42, 42, 42, 42, 42,
+	42, 42, 42, 42, 42, 42, 42, 42, 42, 42,
+	42, 42, 42, 269, 269, 177, 177, 185, 185, 176,
+	176, 175, 175, 175, 179, 179, 179, 180, 180, 273,
+	273, 273, 43, 43, 45, 45, 46, 47, 47, 199,
+	199, 200, 200, 48, 49, 60, 60, 60, 60, 60,
+	60, 62, 62, 62, 7, 7, 7, 7, 56, 56,
+	56, 6, 6, 44, 44, 51, 270, 270, 271, 272,
+	272, 272, 272, 52, 20, 20, 20, 20, 20, 20,
+	77, 77, 65, 65, 65, 65, 65, 65, 65, 65,
+	65, 65, 65, 65, 71, 71, 71, 66, 66, 279,
+	54, 55, 55, 69, 69, 69, 63, 63, 63, 68,
+	68, 68, 74, 74, 76, 76, 76, 76, 76, 78,
+	78, 78, 78, 78, 78, 73, 73, 75, 75, 75,
+	75, 192, 192, 192, 191, 191, 85, 85, 86, 86,
+	87, 87, 88, 88, 88, 127, 103, 103, 159, 159,
+	158, 158, 161, 161, 89, 89, 89, 89, 90, 90,
+	91, 91, 92, 92, 198, 198, 197, 197, 197, 196,
+	196, 96, 96, 96, 98, 97, 97, 97, 97, 99,
+	99, 101, 101, 100, 100, 102, 104, 104, 104, 104,
+	104, 105, 105, 84, 84, 84, 84, 84, 84, 84,
+	84, 173, 173, 107, 107, 106, 106, 106, 106, 106,
+	106, 106, 106, 106, 106, 118, 118, 118, 118, 118,
+	118, 108, 108, 108, 108, 108, 108, 108, 72, 72,
+	119, 119, 119, 126, 120, 120, 111, 111, 111, 111,
+	111, 111, 111, 111, 111, 111, 111, 111, 111, 111,
+	111, 111, 111, 111, 111, 111, 111, 111, 111, 111,
+	111, 111, 111, 111, 111, 111, 111, 111, 111, 111,
+	115, 115, 115, 115, 113, 113, 113, 113, 113, 113,
+	113, 113, 113, 113, 113, 113, 113, 114, 114, 114,
+	114, 114, 114, 114, 114, 114, 114, 114, 114, 114,
+	114, 114, 114, 280, 280, 117, 116, 116, 116, 116,
+	116, 116, 116, 67, 67, 67, 67, 67, 203, 203,
+	203, 205, 205, 205, 205, 205, 205, 205, 205, 205,
+	205, 205, 205, 205, 133, 133, 64, 64, 131, 131,
+	132, 134, 134, 128, 128, 128, 110, 110, 110, 110,
+	110, 110, 110, 110, 112, 112, 112, 135, 135, 136,
+	136, 137, 137, 138, 138, 139, 140, 140, 140, 141,
+	141, 141, 141, 32, 32, 32, 32, 32, 27, 27,
+	27, 27, 28, 28, 28, 79, 79, 79, 79, 81,
+	81, 80, 80, 57, 57, 58, 58, 58, 82, 82,
+	83, 83, 83, 83, 156, 156, 156, 142, 142, 142,
+	142, 148, 148, 148, 144, 144, 146, 146, 146, 147,
+	147, 147, 145, 151, 151, 153, 153, 152, 152, 150,
+	150, 155, 155, 154, 154, 149, 149, 109, 109, 109,
+	109, 109, 157, 157, 157, 157, 162, 162, 122, 122,
+	124, 124, 123, 125, 163, 163, 167, 164, 164, 168,
+	168, 168, 168, 168, 165, 165, 166, 166, 193, 193,
+	193, 172, 172, 184, 184, 181, 181, 182, 182, 174,
+	174, 186, 186, 186, 53, 121, 121, 249, 249, 246,
+	189, 189, 190, 190, 194, 194, 195, 195, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 187, 187, 187, 187, 187, 187,
+	187, 187, 187, 187, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 188, 188, 188, 188,
+	188, 188, 188, 188, 188, 188, 276, 277, 201, 202,
+	202, 202,
 }
-var yyR2 = [...]int{
 
+var yyR2 = [...]int{
 	0, 2, 0, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	1, 1, 1, 2, 4, 6, 6, 7, 4, 6,
-	5, 7, 8, 1, 3, 7, 8, 1, 1, 9,
-	8, 7, 6, 6, 1, 1, 1, 3, 1, 3,
-	0, 4, 3, 5, 4, 1, 3, 3, 2, 2,
-	2, 2, 2, 1, 1, 1, 2, 2, 8, 4,
-	6, 5, 5, 0, 2, 1, 0, 2, 1, 3,
-	3, 4, 4, 2, 4, 1, 3, 3, 3, 8,
-	3, 1, 1, 1, 2, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
-	1, 2, 2, 2, 1, 4, 4, 2, 2, 3,
-	3, 3, 3, 1, 1, 1, 1, 1, 6, 6,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
-	0, 3, 0, 5, 0, 3, 5, 0, 1, 0,
-	1, 0, 1, 2, 0, 2, 0, 3, 0, 1,
-	0, 3, 3, 0, 2, 2, 0, 2, 1, 2,
-	1, 0, 2, 5, 4, 1, 2, 2, 3, 2,
-	0, 1, 2, 3, 3, 2, 2, 1, 1, 1,
-	1, 1, 1, 1, 0, 1, 1, 3, 2, 3,
-	1, 10, 11, 11, 12, 3, 3, 1, 1, 2,
-	2, 2, 0, 1, 3, 1, 2, 3, 1, 1,
-	1, 6, 7, 7, 7, 7, 4, 5, 4, 4,
-	7, 5, 5, 5, 12, 7, 5, 9, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 7, 1, 3, 8, 8, 3, 3, 5,
-	4, 6, 5, 4, 4, 3, 2, 3, 4, 4,
-	3, 4, 4, 4, 4, 4, 4, 3, 2, 7,
-	2, 3, 4, 3, 7, 5, 4, 2, 4, 4,
-	3, 3, 5, 2, 3, 1, 1, 0, 1, 0,
-	1, 1, 1, 0, 2, 2, 0, 2, 2, 0,
-	2, 0, 1, 1, 2, 1, 1, 2, 1, 1,
-	5, 0, 1, 0, 1, 2, 3, 0, 3, 3,
-	3, 3, 1, 1, 1, 1, 1, 1, 1, 1,
-	0, 1, 1, 3, 3, 2, 2, 3, 3, 2,
-	0, 2, 0, 2, 1, 2, 2, 0, 1, 1,
-	0, 1, 1, 0, 1, 0, 1, 2, 3, 4,
-	1, 1, 1, 1, 1, 1, 1, 3, 1, 2,
-	3, 5, 0, 1, 2, 1, 1, 0, 2, 1,
-	3, 1, 1, 1, 3, 3, 3, 3, 7, 1,
-	3, 1, 3, 4, 4, 4, 3, 2, 4, 0,
-	1, 0, 2, 0, 1, 0, 1, 2, 1, 1,
-	1, 2, 2, 1, 2, 3, 2, 3, 2, 2,
-	2, 1, 1, 3, 3, 0, 5, 4, 5, 5,
-	0, 2, 1, 3, 3, 3, 2, 3, 1, 2,
-	0, 3, 1, 1, 3, 3, 4, 4, 5, 3,
-	4, 5, 6, 2, 1, 2, 1, 2, 1, 2,
-	1, 1, 1, 1, 1, 1, 1, 0, 2, 1,
-	1, 1, 3, 1, 3, 1, 1, 1, 1, 1,
+	1, 1, 1, 0, 1, 1, 1, 0, 1, 2,
+	3, 5, 6, 6, 7, 4, 6, 5, 7, 8,
+	1, 3, 7, 8, 1, 1, 9, 9, 8, 7,
+	7, 1, 1, 1, 3, 1, 3, 1, 3, 0,
+	4, 3, 5, 4, 1, 3, 3, 2, 2, 2,
+	2, 2, 1, 1, 1, 2, 2, 6, 11, 2,
+	0, 2, 0, 2, 1, 0, 2, 1, 3, 3,
+	5, 3, 6, 7, 7, 7, 4, 2, 1, 1,
+	4, 0, 1, 1, 1, 2, 2, 0, 1, 4,
+	4, 4, 4, 2, 4, 1, 3, 1, 1, 3,
+	4, 3, 3, 3, 3, 0, 2, 3, 3, 4,
+	2, 3, 3, 2, 3, 2, 3, 1, 1, 1,
+	2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 2, 2, 2, 2, 2, 1, 2, 2, 2,
+	2, 4, 4, 2, 2, 3, 3, 3, 3, 1,
+	1, 1, 1, 1, 6, 6, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 3, 0, 3, 0, 5,
+	0, 3, 5, 0, 1, 0, 1, 0, 2, 2,
+	0, 2, 2, 5, 0, 1, 1, 2, 1, 3,
+	2, 3, 0, 1, 3, 3, 3, 4, 2, 0,
+	2, 1, 1, 1, 1, 1, 0, 1, 1, 1,
+	0, 1, 1, 3, 3, 3, 1, 3, 1, 10,
+	11, 11, 12, 5, 3, 3, 1, 1, 2, 2,
+	2, 0, 1, 1, 0, 1, 2, 0, 1, 1,
+	3, 2, 1, 2, 3, 3, 4, 4, 3, 3,
+	3, 3, 4, 4, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 3, 1, 1, 1, 1, 4,
-	5, 5, 6, 4, 4, 6, 6, 6, 8, 8,
-	8, 8, 9, 8, 5, 4, 2, 2, 2, 2,
+	3, 4, 5, 0, 2, 2, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+	0, 2, 0, 2, 0, 1, 5, 1, 3, 7,
+	1, 3, 3, 1, 2, 2, 2, 5, 5, 5,
+	6, 6, 5, 5, 2, 2, 2, 2, 3, 3,
+	3, 4, 1, 3, 5, 1, 3, 3, 3, 3,
+	3, 3, 3, 3, 2, 2, 2, 4, 4, 2,
+	10, 3, 6, 7, 5, 5, 5, 12, 7, 5,
+	9, 5, 3, 7, 4, 4, 4, 4, 3, 3,
+	3, 7, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 2, 0, 2, 2, 1, 3, 8, 8,
+	3, 3, 5, 6, 6, 5, 4, 3, 2, 3,
+	3, 3, 7, 3, 3, 3, 3, 4, 7, 5,
+	2, 4, 4, 4, 4, 4, 5, 5, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 2,
+	4, 2, 4, 5, 4, 3, 3, 5, 2, 3,
+	3, 3, 3, 1, 1, 0, 1, 0, 1, 1,
+	1, 0, 2, 2, 0, 2, 2, 0, 2, 0,
+	1, 1, 2, 1, 1, 2, 1, 1, 5, 0,
+	1, 0, 1, 2, 3, 0, 3, 3, 3, 3,
+	1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+	1, 3, 3, 2, 2, 3, 1, 3, 2, 1,
+	2, 1, 2, 2, 3, 3, 6, 4, 7, 6,
+	1, 3, 2, 2, 2, 2, 1, 1, 1, 3,
+	2, 1, 1, 1, 0, 1, 1, 0, 3, 0,
+	2, 0, 2, 1, 2, 2, 0, 1, 1, 0,
+	1, 1, 0, 1, 0, 1, 2, 3, 4, 1,
+	1, 1, 1, 1, 1, 1, 3, 1, 2, 3,
+	5, 0, 1, 2, 1, 1, 0, 2, 1, 3,
+	1, 1, 1, 3, 3, 3, 3, 7, 0, 3,
+	1, 3, 1, 3, 4, 4, 4, 3, 2, 4,
+	0, 1, 0, 2, 0, 1, 0, 1, 2, 1,
+	1, 1, 2, 2, 1, 2, 3, 2, 3, 2,
+	2, 2, 1, 1, 3, 3, 0, 5, 4, 5,
+	5, 0, 2, 1, 3, 3, 3, 2, 3, 1,
+	2, 0, 3, 1, 1, 3, 3, 4, 4, 5,
+	3, 4, 5, 6, 2, 1, 2, 1, 2, 1,
+	2, 1, 1, 1, 1, 1, 1, 1, 0, 2,
+	1, 1, 1, 3, 1, 3, 1, 1, 1, 1,
+	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 3, 1, 1, 1, 1,
+	4, 5, 5, 6, 4, 4, 6, 6, 6, 8,
+	8, 8, 8, 9, 8, 5, 4, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	8, 8, 0, 2, 3, 4, 4, 4, 4, 4,
-	4, 4, 0, 3, 4, 7, 3, 1, 1, 2,
-	3, 3, 1, 2, 2, 1, 2, 1, 2, 2,
-	1, 2, 0, 1, 0, 2, 1, 2, 4, 0,
-	2, 1, 3, 5, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 2, 2, 0, 3, 0, 2, 0,
-	3, 1, 3, 2, 0, 1, 1, 0, 2, 4,
-	4, 0, 2, 4, 2, 1, 5, 4, 1, 3,
-	3, 5, 0, 5, 1, 3, 1, 2, 3, 1,
-	1, 3, 3, 1, 3, 3, 3, 3, 3, 2,
-	1, 2, 1, 1, 1, 1, 1, 1, 0, 2,
-	0, 3, 0, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 0, 1, 1, 1, 1, 0,
-	1, 1, 0, 2, 1, 1, 1, 1, 1, 1,
+	2, 8, 8, 0, 2, 3, 4, 4, 4, 4,
+	4, 4, 4, 0, 3, 4, 7, 3, 1, 1,
+	1, 2, 3, 3, 1, 2, 2, 1, 2, 1,
+	2, 2, 1, 2, 0, 1, 0, 2, 1, 2,
+	4, 0, 2, 1, 3, 5, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 2, 2, 0, 3, 0,
+	2, 0, 3, 1, 3, 2, 0, 1, 1, 0,
+	2, 4, 4, 0, 2, 2, 1, 1, 3, 3,
+	3, 3, 3, 3, 3, 0, 3, 3, 3, 0,
+	3, 1, 1, 0, 4, 0, 1, 1, 0, 3,
+	1, 3, 2, 1, 0, 2, 4, 0, 9, 3,
+	5, 0, 3, 3, 0, 1, 0, 2, 2, 0,
+	2, 2, 2, 0, 3, 0, 3, 0, 3, 0,
+	4, 0, 3, 0, 4, 0, 1, 2, 1, 5,
+	4, 4, 1, 3, 3, 5, 0, 5, 1, 3,
+	1, 2, 3, 1, 1, 3, 3, 1, 3, 3,
+	3, 3, 3, 2, 1, 2, 1, 1, 1, 1,
+	1, 1, 1, 0, 1, 0, 2, 0, 3, 0,
+	1, 0, 1, 1, 5, 0, 1, 0, 1, 2,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -3076,368 +4514,490 @@ var yyR2 = [...]int{
 	1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
 	1, 1,
 }
+
 var yyChk = [...]int{
-
-	-1000, -209, -1, -3, -8, -9, -10, -11, -12, -13,
-	-14, -15, -16, -17, -18, -19, -24, -25, -26, -28,
-	-29, -30, -31, -32, -6, -27, -20, -21, -4, -211,
-	6, 7, 8, -36, 10, 11, 31, -22, 124, 125,
-	127, 126, 160, 128, 153, 54, 174, 175, 177, 178,
-	179, 180, -39, 158, 159, 32, 33, 130, 35, 58,
-	9, 263, 155, 154, 26, -210, 365, -35, 5, -99,
-	16, -3, -33, -214, -33, -33, -33, -33, -33, -33,
-	-184, -186, 58, 97, -134, 134, 78, 255, 131, 132,
-	138, -137, -202, -136, 61, 62, 63, 273, 146, 305,
-	306, 174, 188, 182, 209, 201, 274, 307, 147, 199,
-	202, 242, 144, 308, 229, 236, 72, 177, 251, 309,
-	156, 197, 193, 310, 282, 191, 28, 311, 238, 214,
-	312, 278, 240, 192, 237, 130, 313, 149, 361, 142,
-	314, 215, 219, 315, 243, 316, 317, 318, 186, 187,
-	319, 145, 245, 213, 143, 34, 275, 38, 164, 246,
-	217, 320, 212, 208, 321, 322, 323, 324, 211, 185,
-	207, 42, 221, 220, 222, 241, 204, 325, 326, 327,
-	150, 328, 194, 19, 329, 330, 331, 332, 333, 249,
-	159, 334, 162, 335, 336, 337, 338, 339, 340, 239,
-	216, 218, 139, 166, 235, 277, 341, 247, 190, 342,
-	151, 163, 158, 250, 152, 343, 344, 345, 346, 347,
-	348, 349, 178, 350, 351, 352, 353, 173, 244, 253,
-	41, 226, 354, 184, 141, 355, 175, 170, 231, 205,
-	165, 356, 357, 195, 196, 210, 183, 206, 176, 362,
-	167, 160, 358, 252, 227, 279, 203, 200, 171, 359,
-	168, 169, 360, 363, 232, 233, 172, 276, 248, 198,
-	228, -119, 134, 255, 131, 233, 136, 132, 132, 133,
-	134, 255, 131, 132, -65, -143, -202, -136, 134, 132,
-	115, 202, 242, 124, 230, 238, -125, 239, 166, -154,
-	132, -121, 229, 232, 233, 172, -202, 240, 244, 243,
-	234, -143, 176, -148, 181, -137, 179, -65, -37, 361,
-	128, -150, -150, 231, 231, -150, -85, -50, -71, 81,
-	-76, 30, 24, -75, -72, -92, -89, -90, 115, 116,
-	118, 117, 119, 104, 105, 112, 82, 120, -80, -78,
-	-79, -81, 65, 64, 73, 66, 67, 68, 69, 74,
-	75, 76, -137, -143, -87, -211, 48, 49, 264, 265,
-	266, 267, 272, 268, 84, 37, 254, 262, 261, 260,
-	258, 259, 256, 257, 270, 271, 137, 255, 131, 110,
-	263, -202, -136, -5, -4, -211, 6, 21, 22, -103,
-	18, 17, -212, 60, -41, -48, 43, 44, -49, 22,
-	36, 47, 45, -34, -47, 106, -50, -143, -47, -119,
-	-119, 12, -59, -60, -65, -67, -143, -111, -153, 176,
-	-114, 244, 243, -138, -112, -137, -135, 242, 202, 241,
-	129, 280, 80, 23, 25, 224, 83, 115, 17, 84,
-	114, 264, 124, 52, 281, 256, 257, 254, 266, 267,
-	255, 230, 30, 11, 283, 26, 154, 22, 36, 108,
-	126, 87, 88, 157, 24, 155, 76, 286, 20, 55,
-	12, 14, 287, 288, 15, 137, 136, 99, 133, 50,
-	9, 120, 27, 96, 46, 289, 29, 290, 291, 292,
-	293, 48, 97, 18, 258, 259, 32, 294, 272, 161,
-	110, 53, 39, 81, 295, 296, 74, 297, 77, 56,
-	78, 16, 51, 298, 299, 300, 301, 98, 127, 263,
-	49, 302, 131, 6, 269, 31, 153, 47, 303, 132,
-	86, 270, 271, 135, 75, 5, 138, 33, 10, 54,
-	57, 260, 261, 262, 37, 85, 13, 304, 79, -185,
-	97, -176, -202, -65, 133, -65, 263, -129, 137, -129,
-	-129, 132, -65, -202, -202, 124, 126, 129, 56, -23,
-	-65, -128, 137, -202, -128, -128, -128, -65, 121, -65,
-	-202, 31, -126, 97, 13, 255, -202, 166, 132, 167,
-	134, -151, -211, -138, -180, 133, 34, 145, -151, 170,
-	171, -151, -124, -123, 236, 237, 231, 235, 13, 171,
-	231, 169, -151, 135, -137, -38, -137, 65, -7, -3,
-	-11, -10, -12, 89, -150, -150, 59, 80, 78, 79,
-	96, -50, -73, 99, 81, 97, 98, 83, 101, 100,
-	111, 104, 105, 106, 107, 108, 109, 110, 102, 103,
-	114, 89, 90, 91, 92, 93, 94, 95, -120, -211,
-	-90, -211, 122, 123, -76, -76, -76, -76, -76, -76,
-	-76, -76, -76, -76, -211, 121, -2, -85, -4, -211,
-	-211, -211, -211, -211, -211, -211, -211, -95, -50, -211,
-	-215, -82, -211, -215, -82, -215, -82, -215, -211, -215,
-	-82, -215, -82, -215, -215, -82, -211, -211, -211, -211,
-	-211, -211, -211, -99, -3, -33, -104, 20, 32, -50,
-	-100, -101, -50, -99, 39, -45, -47, -49, 43, 44,
-	71, 12, -140, -139, 23, -137, 65, 121, 12, -66,
-	27, -65, -52, -53, -54, -55, -68, -91, -211, -65,
-	-65, -59, -213, 59, 12, 57, -213, 59, 121, 59,
-	176, -114, -153, -116, -115, 245, 247, 89, -142, -137,
-	65, 30, 31, 60, 59, -65, -156, -159, -161, -160,
-	-162, -157, -158, 199, 200, 115, 203, 205, 206, 207,
-	208, 209, 210, 211, 212, 213, 214, 31, 156, 195,
-	196, 197, 198, 215, 216, 217, 218, 219, 220, 221,
-	222, 182, 201, 274, 183, 184, 185, 186, 187, 188,
-	190, 191, 192, 193, 194, -202, -151, 134, -202, 81,
-	-202, -65, -65, -151, -151, -151, 168, 168, 132, 132,
-	173, -65, 59, 135, -59, 24, 56, -65, -202, -202,
-	-144, -143, -135, -151, -126, 65, -50, -151, -151, -151,
-	-65, -151, -151, -181, 12, 99, -151, -151, 12, -122,
-	12, 99, -50, -127, 97, 56, -149, 179, 213, 362,
-	363, 364, -50, -50, -50, -50, -83, 74, 81, 75,
-	76, -76, -84, -87, -90, 70, 99, 97, 98, 83,
-	-76, -76, -76, -76, -76, -76, -76, -76, -76, -76,
-	-76, -76, -76, -76, -76, -152, -202, 65, -202, -75,
-	-75, -137, -46, 22, 36, -45, -138, -144, -135, -35,
-	-212, -212, -99, -45, -45, -50, -50, -92, 65, -45,
-	-92, 65, -45, -45, -40, 22, 36, -93, -94, 85,
-	-92, -137, -143, -212, -76, -137, -137, -45, -46, -46,
-	-45, -45, -103, -212, 10, 99, 59, 19, 59, -102,
-	25, 26, -103, -77, -137, 66, 69, -51, 59, 12,
-	-49, -65, -139, 106, -144, -65, -107, 162, -65, 31,
-	59, -61, -63, -62, -64, 46, 50, 52, 47, 48,
-	49, 53, -147, 23, -52, -3, -211, -146, 162, -145,
-	23, -143, 65, -107, 57, -52, -65, -52, -67, -143,
-	106, -114, -116, 59, 246, 248, 249, 56, 77, -50,
-	-168, 114, -187, -188, -189, -138, 65, 66, -176, -177,
-	-178, -190, 148, -195, 139, 141, 138, -179, 149, 133,
-	29, 60, -130, 74, 81, -172, 227, -163, 58, -163,
-	-163, -163, -163, -167, 202, -167, -167, -167, 58, 58,
-	-163, -163, -163, -169, 58, -169, -169, -170, 58, -170,
-	-141, 57, -65, -151, 24, -151, -131, 129, 126, 127,
-	-198, 125, 224, 202, 72, 30, 16, 264, 162, 279,
-	-202, 163, -65, -65, -65, -65, -65, 129, 126, -65,
-	-65, -65, -151, -65, -65, -126, -143, -143, 65, -65,
-	-137, 74, 75, 76, -84, -76, -76, -76, -44, 157,
-	80, -212, -212, -45, -45, -211, 121, -5, -103, -212,
-	-212, 59, 57, 23, 12, 12, -212, 12, 12, -212,
-	-212, -45, -96, -94, 87, -50, -212, 121, -212, 59,
-	59, -212, -212, -212, -212, -212, -104, 41, -50, -50,
-	-101, -104, -118, 20, 12, 37, 37, -70, 13, -47,
-	-52, -49, 121, -70, -74, 31, 37, -3, -211, -211,
-	-110, -113, -92, -53, -54, -54, -53, -54, 46, 46,
-	46, 51, 46, 51, 46, -62, -143, -212, -212, -3,
-	-69, 54, 136, 55, -211, -145, -70, -52, -70, -70,
-	121, -115, -117, 250, 247, 253, -202, 65, 59, -189,
-	89, 58, -202, 29, -179, -179, -182, -202, -182, 29,
-	-165, 30, 74, -173, 228, 66, -167, -167, -168, 31,
-	-168, -168, -168, -175, 65, -175, 66, 66, 56, -137,
-	-151, -150, -205, 144, 140, 148, 149, 142, 61, 62,
-	63, 133, 29, 139, 141, 162, 138, -205, -132, -133,
-	135, 23, 133, 29, 162, -204, 57, 168, 224, 168,
-	135, -151, -122, -122, -44, 80, -76, -76, -212, -212,
-	-46, -138, -99, -104, -155, 115, 199, 156, 197, 193,
-	213, 204, 226, 195, 227, -152, -155, -76, -76, -76,
-	-76, 273, -99, 88, -50, 86, -138, -76, -76, 42,
-	-65, -97, 14, -50, 106, -103, -109, 56, -110, -86,
-	-88, -87, -211, -105, -137, -108, -137, -70, 59, 89,
-	-57, -56, 56, 57, -58, 56, -56, 46, 46, -212,
-	133, 133, 133, -108, -99, -70, 247, 251, 252, -188,
-	-189, -192, -191, -137, -195, -182, -182, 58, -166, 56,
-	-76, 60, -168, -168, -202, 115, 60, 59, 60, 59,
-	60, 59, -65, -150, -150, -65, -150, -137, -201, 276,
-	-203, -202, -137, -137, -137, -65, -126, -126, -76, -212,
-	-103, -212, -163, -163, -163, -170, -163, 187, -163, 187,
-	-212, -212, 20, 20, 20, 20, -211, -43, 269, -50,
-	59, 59, -98, 15, 17, 28, -109, 59, -212, -212,
-	59, 121, -212, 59, -99, -113, -50, -50, 58, -50,
-	-211, -211, -211, -212, -103, 60, 59, -163, -106, -137,
-	-171, 224, 10, -167, 65, -167, 66, 66, -151, 27,
-	-200, -199, -138, 58, 57, -104, -167, -202, -76, -76,
-	-76, -76, -76, -103, 65, -76, -76, -50, -85, 29,
-	-88, 37, -3, -137, -137, -137, -103, -106, -106, -212,
-	-106, -106, -146, -194, -193, 57, 143, 72, -191, 60,
-	59, -174, 139, 29, 138, -79, -168, -168, 60, 60,
-	-211, 59, 89, -106, -65, -212, -212, -212, -212, -42,
-	99, 276, -212, -212, -212, 10, -86, 121, 60, -212,
-	-212, -212, -69, -193, -202, -183, 89, 65, 151, -137,
-	-164, 72, 29, 29, -196, -197, 162, -199, -189, 60,
-	-212, 274, 53, 277, -110, -137, 66, -65, 65, -212,
-	59, -137, -204, 42, 275, 278, 58, -197, 37, -201,
-	42, -106, 164, 276, 60, 165, 277, -207, -208, 56,
-	-211, 278, -208, 56, 11, 10, -76, 161, -206, 152,
-	147, 150, 31, -206, -212, -212, 146, 30, 74,
+	-1000, -274, -1, -3, -8, -9, -10, -11, -12, -13,
+	-14, -15, -16, -17, -18, -19, -41, -42, -43, -45,
+	-46, -47, -48, -49, -6, -44, -20, -21, -50, -51,
+	-52, -53, -4, -276, 6, 7, 8, -61, 10, 11,
+	31, -23, -33, 153, -34, -24, 154, -35, 156, 155,
+	191, 157, 184, 71, 226, 227, 229, 230, 231, 232,
+	-62, 189, 190, 159, 35, 42, 32, 33, 36, 81,
+	9, 328, 186, 185, 26, -275, 468, -69, 5, -137,
+	16, -3, -54, -279, -54, -54, -54, -54, -54, -54,
+	-234, -236, 81, 126, 81, -70, -184, 164, 173, 172,
+	169, -262, 107, 219, 319, 162, -39, -38, -37, -36,
+	-40, 30, -30, -31, -254, -29, -26, 158, 155, 199,
+	102, 103, 191, 192, 193, 157, 175, 190, 194, 189,
+	208, -25, 77, 32, 341, 344, -241, 154, 160, 161,
+	329, 105, 104, 72, 156, -238, 276, 445, -40, 447,
+	95, 97, 446, 41, 164, 448, 449, 450, 451, 174,
+	452, 453, 454, 455, 461, 462, 463, 464, 106, 5,
+	163, -262, -79, 286, 77, -261, -258, 84, 85, 86,
+	163, -184, 164, 165, -262, 163, -100, -194, -258, -188,
+	338, 177, 372, 373, 224, 77, 276, 445, 226, 240,
+	234, 261, 253, 339, 374, 178, 212, 442, 251, 254,
+	306, 447, 375, 192, 298, 281, 289, 95, 229, 315,
+	460, 376, 458, 97, 446, 76, 48, 41, 187, 249,
+	245, 448, 213, 377, 349, 206, 105, 102, 467, 243,
+	47, 28, 457, 104, 46, 449, 378, 450, 291, 266,
+	436, 45, 303, 193, 379, 80, 343, 444, 293, 244,
+	290, 223, 456, 159, 380, 428, 300, 437, 381, 267,
+	271, 382, 307, 49, 383, 384, 438, 103, 385, 75,
+	451, 238, 239, 386, 221, 176, 309, 265, 174, 34,
+	294, 340, 225, 55, 200, 310, 43, 269, 42, 432,
+	387, 435, 264, 260, 50, 388, 389, 390, 391, 452,
+	263, 237, 259, 466, 218, 453, 59, 161, 273, 272,
+	274, 207, 305, 256, 392, 393, 394, 181, 78, 395,
+	246, 19, 396, 397, 301, 214, 398, 53, 399, 400,
+	313, 190, 401, 51, 454, 38, 195, 455, 402, 403,
+	404, 405, 406, 299, 407, 292, 268, 270, 202, 288,
+	342, 408, 242, 194, 459, 409, 182, 443, 196, 199,
+	189, 314, 183, 410, 411, 412, 413, 414, 415, 416,
+	230, 461, 40, 417, 418, 419, 420, 222, 217, 308,
+	317, 58, 79, 278, 421, 441, 236, 215, 422, 227,
+	52, 462, 463, 464, 209, 465, 284, 106, 219, 220,
+	44, 257, 201, 423, 424, 247, 248, 262, 235, 258,
+	228, 429, 203, 302, 191, 425, 316, 216, 279, 346,
+	208, 304, 440, 345, 255, 252, 210, 426, 165, 204,
+	205, 427, 430, 295, 285, 296, 297, 286, 211, 344,
+	250, 280, 163, -165, 281, -185, 282, 283, 294, 295,
+	300, -177, 301, 299, 202, -273, 307, 163, 302, 153,
+	144, 291, 292, 285, 286, 211, -269, -258, 450, 465,
+	306, 254, 287, 293, 308, 432, 297, 296, -194, 228,
+	-199, 233, -189, -258, -188, 231, -100, -60, 428, 157,
+	-201, -201, -71, 432, 434, -120, -84, -106, 110, -111,
+	30, 24, -110, -107, -128, -125, -126, 144, 145, 147,
+	146, 148, 133, 134, 141, 111, 149, -115, -113, -114,
+	-116, 88, 87, 96, 89, 90, 91, 92, 98, 99,
+	100, -189, -194, -123, -276, 65, 66, 329, 330, 331,
+	332, 337, 333, 113, 54, 318, 327, 326, 325, 322,
+	323, 320, 321, 335, 336, 168, 319, 162, 139, 328,
+	-258, -188, 41, 284, 284, -100, -5, -4, -276, 6,
+	21, 22, -141, 18, 17, -277, 83, -63, -76, 60,
+	61, -78, 22, 37, 64, 62, -55, -75, 135, -84,
+	-194, -75, -174, 167, -174, -174, -164, -204, 228, -168,
+	308, 307, -190, -166, -189, -187, -165, 305, 158, 347,
+	109, 23, 25, 112, 144, 17, 113, 36, 160, 175,
+	143, 171, 329, 153, 69, 348, 320, 321, 318, 324,
+	331, 332, 319, 282, 30, 11, 350, 26, 185, 22,
+	37, 137, 155, 116, 117, 188, 24, 186, 100, 353,
+	20, 72, 180, 12, 173, 14, 354, 355, 15, 168,
+	167, 128, 164, 67, 9, 149, 27, 125, 63, 356,
+	29, 357, 358, 359, 360, 65, 126, 18, 322, 323,
+	32, 433, 361, 337, 197, 139, 70, 56, 434, 110,
+	362, 363, 98, 364, 101, 73, 439, 107, 16, 68,
+	39, 365, 198, 366, 170, 367, 311, 368, 127, 156,
+	328, 66, 369, 162, 283, 6, 334, 31, 184, 172,
+	64, 370, 163, 115, 335, 336, 166, 99, 5, 169,
+	33, 10, 71, 74, 325, 326, 327, 54, 341, 114,
+	13, 371, 312, 108, 306, 254, -235, 126, -222, -226,
+	-189, 179, -251, 175, -100, -244, -243, -189, -79, 163,
+	-258, 164, 164, 164, -182, 168, 328, -36, -37, -165,
+	143, 196, 82, 82, -226, -225, -224, -263, 198, 179,
+	-250, -242, 171, 180, -232, 172, 173, -227, 164, 29,
+	-263, -227, 170, 180, 198, 198, 106, 198, 106, 198,
+	198, 198, 198, 198, 198, 198, 198, 198, 195, -233,
+	118, -233, 345, 345, -238, -263, -263, -263, 166, 34,
+	34, -186, -227, 166, 23, -233, -233, -165, 143, -233,
+	-233, -233, -233, 206, 206, -233, -233, -233, -233, -233,
+	-233, -233, -233, -233, -233, -233, -233, -233, -233, -233,
+	-100, -82, 213, 153, 155, 158, 73, 118, -38, 208,
+	-22, -100, 163, -258, -181, 168, -181, -100, 150, -100,
+	-179, 126, 13, -179, -176, 284, 288, 289, 290, -179,
+	-179, -179, -179, 209, 298, -228, 164, 34, 176, 284,
+	209, 298, 209, 210, 209, 210, 209, -175, 12, 128,
+	319, 303, 300, 202, 163, 203, 165, 304, -258, 435,
+	210, 284, 205, -179, -202, -276, -190, -202, -202, 31,
+	166, -189, -56, -189, 88, -7, -3, -11, -10, -12,
+	118, -77, 284, -65, 144, 450, 436, 437, 438, 435,
+	299, 443, 441, 439, 209, 440, 82, 109, 107, 108,
+	125, -84, -108, 128, 110, 126, 127, 112, 130, 129,
+	140, 133, 134, 135, 136, 137, 138, 139, 131, 132,
+	143, 118, 119, 120, 121, 122, 123, 124, -173, -276,
+	-126, -276, 151, 152, -111, -111, -111, -111, -111, -111,
+	-111, -111, -111, -111, -276, 150, -2, -120, -4, -276,
+	-276, -276, -276, -276, -276, -276, -276, -133, -84, -276,
+	-280, -117, -276, -280, -117, -280, -117, -280, -276, -280,
+	-117, -280, -117, -280, -280, -117, -276, -276, -276, -276,
+	-276, -276, -276, -201, -270, -271, -103, -100, -276, -137,
+	-3, -54, -156, 20, 32, -84, -138, -139, -84, -137,
+	56, -73, -75, -78, 60, 61, 94, 12, -192, -191,
+	23, -189, 88, 150, 12, -101, 27, -100, -86, -87,
+	-88, -89, -103, -127, -276, 12, -93, -94, -100, -102,
+	-194, 82, 228, -168, -204, -170, -169, 309, 311, 118,
+	-193, -189, 88, 30, 83, 82, -100, -206, -209, -211,
+	-210, -212, -207, -208, 251, 252, 144, 255, 257, 258,
+	259, 260, 261, 262, 263, 264, 265, 266, 31, 187,
+	247, 248, 249, 250, 267, 268, 269, 270, 271, 272,
+	273, 274, 234, 253, 339, 235, 236, 237, 238, 239,
+	240, 242, 243, 244, 245, 246, -261, -258, 81, 83,
+	82, -213, 81, -82, -182, -249, -246, 74, -258, -258,
+	-258, -258, 110, -233, -233, 195, -29, -26, -254, 16,
+	-25, -26, 158, 102, 103, 155, 81, -222, 81, -231,
+	-261, -258, 81, 29, 170, 169, -230, -227, -230, -231,
+	-258, -128, -189, -194, -258, 29, 29, -161, -189, -161,
+	-161, 21, -161, 21, -161, 21, 89, -189, -161, 21,
+	-161, 21, -161, 21, -161, 21, -161, 21, 30, 75,
+	76, 30, 78, 79, 80, -128, -128, -222, -165, -100,
+	-258, 89, 89, -233, -233, 89, 88, 88, 88, -233,
+	-233, 89, 88, -258, 88, -264, 181, 223, 225, 89,
+	89, 89, 89, 30, 88, -265, 30, 457, 456, 458,
+	459, 460, 89, 30, 89, 30, 89, -189, 81, -81,
+	215, 118, 204, 204, 163, 163, 217, -100, 216, 218,
+	220, 41, 82, 166, -181, 73, -95, -100, 24, -258,
+	-195, -194, -187, 88, -84, -229, 12, 128, -175, -175,
+	-179, -100, -229, -175, -179, -100, -179, -179, -179, -179,
+	-175, -179, -194, -194, -100, -100, -100, -100, -100, -100,
+	-100, -202, -202, -202, -180, 126, 73, -200, 231, 265,
+	429, 430, 431, 82, 341, -93, 435, 435, 435, 435,
+	435, 435, -84, -84, -84, -84, -118, 98, 110, 99,
+	100, -111, -119, -123, -126, 93, 128, 126, 127, 112,
+	-111, -111, -111, -111, -111, -111, -111, -111, -111, -111,
+	-111, -111, -111, -111, -111, -203, -258, 88, 144, -258,
+	-110, -110, -189, -74, 22, 37, -73, -190, -195, -187,
+	-69, -277, -277, -137, -73, -73, -84, -84, -128, 88,
+	-73, -128, 88, -73, -73, -68, 22, 37, -131, -132,
+	114, -128, -277, -111, -189, -189, -73, -74, -74, -73,
+	-73, 82, -272, 311, 312, 433, -197, 198, -196, 23,
+	-194, 88, -121, -120, -141, -277, -142, 27, 10, 128,
+	82, 19, 82, -140, 25, 26, -141, -112, -189, 89,
+	92, -85, 82, 12, -78, -100, -191, 135, -195, -100,
+	-160, 198, -100, 31, 82, -96, -98, -97, -99, 63,
+	67, 69, 64, 65, 66, 70, -198, 23, -86, -3,
+	-276, -100, -93, -278, 82, 12, 74, -278, 82, 150,
+	-168, -170, 82, 310, 312, 313, 73, 101, -84, -215,
+	143, -240, -239, -238, -222, -224, -225, -226, 83, -143,
+	-218, 279, -213, -213, -213, -213, -213, -214, -165, -214,
+	-214, -214, 81, 81, -213, -213, -213, -213, -216, 81,
+	-216, -216, -217, 81, -217, -251, -84, -248, -247, -245,
+	-246, 174, 95, 341, -243, -140, 89, -81, -100, 73,
+	-189, -249, -249, -249, 24, -258, 88, -258, 88, 82,
+	17, -223, -222, -129, 223, -253, 198, -250, -244, 81,
+	29, -230, -231, -231, 150, -258, 82, 27, 106, 106,
+	106, 106, 341, 155, 31, -222, -129, -203, 166, -203,
+	-203, 88, 88, -178, 465, -93, 165, 222, -83, 324,
+	88, 84, -100, -100, -100, -100, -100, 158, 155, 206,
+	-100, -100, -93, -100, 82, -59, 183, 178, -100, -179,
+	-179, -100, -179, -179, 88, -100, -189, -65, 311, 341,
+	20, -66, 20, 98, 99, 100, -119, -111, -111, -111,
+	-72, 188, 109, -277, -277, -73, -73, -276, 150, -5,
+	-141, -277, -277, 82, 74, 23, 12, 12, -277, 12,
+	12, -277, -277, -73, -134, -132, 116, -84, -277, -277,
+	82, 82, -277, -277, -277, -277, -277, -271, 432, 312,
+	-104, 71, 167, 72, -276, -196, -277, -156, 39, 47,
+	58, -84, -84, -139, -156, -172, 20, 12, 54, 54,
+	-105, 13, -75, -86, -78, 150, -105, -109, 31, 54,
+	-3, -276, -276, -163, -167, -128, -87, -88, -88, -87,
+	-88, 63, 63, 63, 68, 63, 68, 63, -97, -194,
+	-277, -277, -3, -160, 74, -86, -100, -86, -102, -194,
+	135, -169, -171, 314, 311, 317, -258, 88, 82, -238,
+	-226, 98, 110, 30, 73, 276, 95, 170, 29, 169,
+	-219, 280, -214, -214, -215, -258, 144, -215, -215, -215,
+	-221, 88, -221, 89, 89, 83, -32, -27, -28, 32,
+	77, -245, -233, 88, 38, 83, 165, -100, 73, 73,
+	73, 16, -158, -189, 82, 83, -130, 224, -128, 83,
+	-189, 83, -158, -231, -190, -189, -276, 163, 30, 30,
+	-129, -130, -215, -258, 467, 466, 83, -100, -80, 213,
+	221, 81, 85, -260, 74, 204, 276, 204, 207, 166,
+	-59, -32, -100, -175, -175, 32, 311, 444, 442, -72,
+	109, -111, -111, -277, -277, -74, -190, -137, -156, -205,
+	144, 251, 187, 249, 245, 265, 256, 278, 247, 279,
+	-203, -205, -111, -111, -111, -111, 338, -137, 117, -84,
+	115, -111, -111, 164, 164, 164, -161, 40, 88, 88,
+	59, -100, -135, 14, -84, 135, -141, -162, 73, -163,
+	-122, -124, -123, -276, -157, -277, -189, -161, -105, 82,
+	118, -91, -90, 73, 74, -92, 73, -90, 63, 63,
+	-277, -105, -86, -105, -105, 150, 311, 315, 316, -238,
+	98, -111, 10, 88, 29, 29, -215, -215, 83, 82,
+	83, 82, 83, 82, -183, 378, 110, -28, -27, -233,
+	-233, 89, -258, -100, -100, -100, -100, 17, 82, -222,
+	-128, 54, -248, 83, -252, -253, -100, -110, -130, -159,
+	81, 83, -257, 341, -259, -258, -189, -189, -189, -100,
+	-179, -179, 32, -258, -111, -277, -141, -277, -213, -213,
+	-213, -217, -213, 239, -213, 239, -277, -277, 20, 20,
+	20, 20, -276, -64, 334, -84, 82, 82, -276, -276,
+	-276, -277, 88, -214, -136, 15, 17, 28, -162, 82,
+	-277, -277, 82, 54, 150, -277, -137, -167, -84, -84,
+	81, -84, -137, -105, -114, -214, 88, -214, 89, 89,
+	378, 30, 78, 79, 80, 30, 75, 76, -159, -158,
+	-189, 200, 182, -277, 82, -220, 341, 344, 23, -158,
+	-256, -255, -190, 81, 74, -156, -214, -258, -111, -111,
+	-111, -111, -111, -141, 88, -111, -111, -158, -277, -158,
+	-158, -197, -214, -145, -150, -176, -84, -120, 29, -124,
+	54, -3, -189, -122, -189, -141, -158, -141, -215, -215,
+	83, 83, 23, 201, -100, -253, 345, 345, -3, 83,
+	82, 118, -158, -100, -277, -277, -277, -277, -67, 128,
+	341, -277, -277, -277, -277, -277, -277, -104, -148, 428,
+	-151, 43, -152, 44, 10, -122, 150, 83, -3, -276,
+	81, -57, 341, -255, -237, -190, 88, 89, 83, -277,
+	339, 70, 342, -145, 48, 257, -153, 52, -154, -149,
+	53, 17, -163, -189, -57, -111, 197, -158, -58, 212,
+	432, -260, 59, 340, 343, -146, 50, -144, 49, -144,
+	-152, 17, -155, 45, 46, 88, -277, -277, 83, 175,
+	-257, 59, -147, 51, 73, 101, 88, 17, 17, -267,
+	-268, 73, 214, 341, 73, 101, 88, 88, -268, 73,
+	11, 10, 342, -266, 183, 178, 181, 31, -266, 343,
+	177, 30, 98,
 }
+
 var yyDef = [...]int{
-
-	29, -2, 2, 4, 5, 6, 7, 8, 9, 10,
+	33, -2, 2, 4, 5, 6, 7, 8, 9, 10,
 	11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-	21, 22, 23, 24, 25, 26, 27, 28, 619, 0,
-	360, 360, 360, 360, 360, 360, 360, 0, 689, 672,
-	0, 0, 0, 0, -2, 325, 326, 0, 328, -2,
-	0, 0, 337, 998, 998, 0, 0, 998, 0, 996,
-	47, 48, 343, 344, 345, 1, 3, 0, 364, 627,
-	0, 0, -2, 362, 0, 0, 672, 672, 0, 0,
-	76, 77, 0, 0, 0, 984, 0, 670, 670, 670,
-	690, 691, 694, 695, 30, 31, 32, 821, 822, 823,
-	824, 825, 826, 827, 828, 829, 830, 831, 832, 833,
-	834, 835, 836, 837, 838, 839, 840, 841, 842, 843,
-	844, 845, 846, 847, 848, 849, 850, 851, 852, 853,
-	854, 855, 856, 857, 858, 859, 860, 861, 862, 863,
-	864, 865, 866, 867, 868, 869, 870, 871, 872, 873,
-	874, 875, 876, 877, 878, 879, 880, 881, 882, 883,
-	884, 885, 886, 887, 888, 889, 890, 891, 892, 893,
-	894, 895, 896, 897, 898, 899, 900, 901, 902, 903,
-	904, 905, 906, 907, 908, 909, 910, 911, 912, 913,
-	914, 915, 916, 917, 918, 919, 920, 921, 922, 923,
-	924, 925, 926, 927, 928, 929, 930, 931, 932, 933,
-	934, 935, 936, 937, 938, 939, 940, 941, 942, 943,
-	944, 945, 946, 947, 948, 949, 950, 951, 952, 953,
-	954, 955, 956, 957, 958, 959, 960, 961, 962, 963,
-	964, 965, 966, 967, 968, 969, 970, 971, 972, 973,
-	974, 975, 976, 977, 978, 979, 980, 981, 982, 983,
-	985, 986, 987, 988, 989, 990, 991, 992, 993, 994,
-	995, 0, 0, 0, 0, 0, 673, 0, 668, 0,
-	668, 668, 668, 0, 276, 442, 698, 699, 984, 0,
-	0, 0, 316, 0, 999, 288, 0, 290, 999, 0,
-	999, 0, 297, 0, 0, 303, 999, 308, 322, 323,
-	310, 324, 327, 0, 332, 335, 0, 350, 0, 862,
-	342, 355, 356, 998, 998, 359, 33, 493, 452, 0,
-	458, 460, 0, 495, 496, 497, 498, 499, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 525, 526,
-	527, 528, 604, 605, 606, 607, 608, 609, 610, 611,
-	462, 463, 601, 0, 649, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 592, 0, 562, 562, 562, 562,
-	562, 562, 562, 562, 0, 0, 0, 0, 0, 0,
-	0, -2, -2, 619, 43, 0, 360, 365, 366, 631,
-	0, 0, 619, 997, 0, 0, -2, -2, 376, 382,
-	383, 384, 385, 361, 0, 388, 392, 0, 0, 0,
-	0, 0, 0, 0, 56, 58, 442, 62, 0, 972,
-	653, -2, -2, 0, 0, 696, 697, -2, 834, -2,
-	702, 703, 704, 705, 706, 707, 708, 709, 710, 711,
-	712, 713, 714, 715, 716, 717, 718, 719, 720, 721,
-	722, 723, 724, 725, 726, 727, 728, 729, 730, 731,
-	732, 733, 734, 735, 736, 737, 738, 739, 740, 741,
-	742, 743, 744, 745, 746, 747, 748, 749, 750, 751,
-	752, 753, 754, 755, 756, 757, 758, 759, 760, 761,
-	762, 763, 764, 765, 766, 767, 768, 769, 770, 771,
-	772, 773, 774, 775, 776, 777, 778, 779, 780, 781,
-	782, 783, 784, 785, 786, 787, 788, 789, 790, 791,
-	792, 793, 794, 795, 796, 797, 798, 799, 800, 801,
-	802, 803, 804, 805, 806, 807, 808, 809, 810, 811,
-	812, 813, 814, 815, 816, 817, 818, 819, 820, 0,
-	0, 95, 0, 93, 0, 999, 0, 0, 0, 0,
-	0, 0, 999, 999, 999, 0, 0, 0, 0, 267,
-	0, 0, 0, 0, 0, 0, 0, 275, 0, 277,
-	999, 316, 280, 0, 0, 999, 999, 999, 0, 999,
-	999, 287, 1000, 1001, 0, 197, 198, 199, 291, 999,
-	999, 293, 0, 313, 311, 312, 305, 306, 0, 319,
-	300, 301, 304, 333, 336, 353, 351, 352, 354, 346,
-	347, 348, 349, 0, 357, 358, 0, 0, 0, 0,
-	0, 456, 0, 0, 0, 0, 0, 0, 0, 0,
+	21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+	31, 32, 811, 0, 549, 549, 549, 549, 549, 549,
+	549, 0, 0, -2, -2, -2, 835, 37, 0, 923,
+	0, 0, -2, 483, 484, 0, 486, -2, 0, 0,
+	495, 1348, 1348, 544, 0, 0, 0, 0, 0, 1346,
+	54, 55, 501, 502, 503, 1, 3, 0, 553, 819,
+	0, 0, -2, 551, 0, 0, 929, 929, 929, 0,
+	85, 86, 0, 0, 0, 835, 0, 0, 0, 0,
+	0, 927, 0, 924, 108, 109, 89, -2, 113, 114,
+	0, 118, 366, 327, 369, 325, 355, -2, 318, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 480, 481, 482, 483, 484, 485, 486, 459, 0,
-	473, 0, 0, 0, 515, 516, 517, 518, 519, 520,
-	521, 522, 523, 0, 373, 0, 0, 0, 619, 0,
-	0, 0, 0, 0, 0, 0, 370, 0, 593, 0,
-	546, 554, 0, 547, 555, 548, 556, 549, 0, 550,
-	557, 551, 558, 552, 553, 559, 0, 0, 0, 373,
-	373, 0, 0, 627, 0, 375, 34, 0, 0, 628,
-	620, 621, 624, 627, 0, 397, 386, 377, 380, 381,
-	363, 0, 389, 393, 0, 395, 396, 0, 0, 60,
-	0, 441, 0, 399, 401, 402, 403, 423, 0, 425,
-	-2, 0, 0, 0, 54, 55, 0, 0, 0, 0,
-	972, 659, 0, 64, 65, 0, 0, 0, 173, 663,
-	664, 665, 661, 222, 0, 0, 161, 157, 101, 102,
-	103, 150, 105, 150, 150, 150, 150, 170, 170, 170,
-	170, 133, 134, 135, 136, 137, 0, 0, 120, 150,
-	150, 150, 124, 140, 141, 142, 143, 144, 145, 146,
-	147, 106, 107, 108, 109, 110, 111, 112, 113, 114,
-	152, 152, 152, 154, 154, 692, 79, 0, 999, 0,
-	999, 91, 0, 236, 238, 239, 0, 0, 0, 0,
-	0, 0, 0, 0, 270, 669, 0, 999, 273, 274,
-	443, 700, 701, 278, 279, 317, 318, 281, 282, 283,
-	284, 285, 286, 0, 200, 201, 292, 296, 0, 316,
-	0, 0, 298, 299, 0, 0, 0, 334, 338, 339,
-	340, 341, 494, 453, 454, 455, 457, 474, 0, 476,
-	478, 464, 465, 489, 490, 491, 0, 0, 0, 0,
-	487, 469, 0, 500, 501, 502, 503, 504, 505, 506,
-	507, 508, 509, 510, 511, 514, 577, 578, 0, 512,
-	513, 524, 0, 0, 0, 374, 602, 0, -2, 0,
-	492, 648, 627, 0, 0, 0, 0, 497, 604, 0,
-	497, 604, 0, 0, 0, 371, 372, 599, 596, 0,
-	0, 601, 0, 563, 0, 0, 0, 0, 0, 0,
-	0, 0, 631, 44, 632, 0, 0, 0, 0, 623,
-	625, 626, 631, 0, 612, 0, 0, 450, 0, 0,
-	378, 40, 394, 390, 0, 450, 0, 0, 440, 0,
-	0, 0, 0, 0, 0, 430, 0, 0, 433, 0,
-	0, 0, 0, 424, 0, 0, 0, 445, 916, 426,
-	0, 428, 429, 450, 0, 450, 57, 450, 59, 0,
-	444, 654, 63, 0, 0, 68, 69, 655, 656, 657,
-	658, 0, 92, 223, 225, 228, 229, 230, 96, 97,
-	98, 0, 0, 210, 0, 0, 204, 204, 0, 202,
-	203, 94, 164, 162, 0, 159, 158, 104, 0, 170,
-	170, 127, 128, 173, 0, 173, 173, 173, 0, 0,
-	121, 122, 123, 115, 0, 116, 117, 118, 0, 119,
-	0, 0, 999, 81, 671, 82, 998, 0, 0, 684,
-	237, 674, 675, 676, 677, 678, 679, 680, 681, 682,
-	683, 0, 83, 241, 243, 242, 246, 0, 0, 0,
-	268, 999, 272, 313, 313, 295, 314, 315, 320, 302,
-	330, 475, 477, 479, 466, 487, 470, 0, 467, 0,
-	0, 461, 529, 0, 0, 373, 0, 619, 631, 533,
-	534, 0, 0, 0, 0, 0, 570, 0, 0, 571,
-	0, 619, 0, 597, 0, 0, 545, 0, 564, 0,
-	0, 565, 566, 567, 568, 569, 36, 0, 629, 630,
-	622, 35, 0, 666, 667, 613, 614, 615, 0, 387,
-	398, 379, 0, 627, 642, 0, 0, 635, 0, 0,
-	450, 650, 0, 400, 419, 421, 0, 416, 431, 432,
-	434, 0, 436, 0, 438, 439, 404, 405, 406, 0,
-	407, 0, 0, 0, 0, 427, 619, 450, 52, 53,
-	0, 66, 67, 0, 0, 73, 174, 175, 0, 226,
-	0, 0, 0, 192, 204, 204, 195, 205, 196, 0,
-	166, 0, 163, 100, 160, 0, 173, 173, 129, 0,
-	130, 131, 132, 0, 148, 0, 0, 0, 0, 693,
-	80, 231, 998, 248, 249, 250, 251, 252, 253, 254,
-	255, 256, 257, 258, 259, 260, 261, 998, 0, 998,
-	685, 686, 687, 688, 0, 86, 0, 0, 0, 0,
-	0, 271, 316, 316, 468, 0, 488, 471, 530, 531,
-	0, 603, 627, 38, 0, 150, 150, 582, 150, 154,
-	585, 150, 587, 150, 590, 0, 0, 0, 0, 0,
-	0, 0, 594, 544, 600, 0, 602, 0, 0, 633,
-	37, 617, 0, 451, 391, 41, 45, 0, 642, 634,
-	644, 646, 0, 0, 638, 0, 411, 619, 0, 0,
-	413, 420, 0, 0, 414, 0, 415, 435, 437, -2,
-	0, 0, 0, 0, 627, 51, 70, 71, 72, 224,
-	227, 0, 206, 150, 209, 193, 194, 0, 168, 0,
-	165, 151, 125, 126, 171, 172, 170, 0, 170, 0,
-	155, 0, 999, 232, 233, 234, 235, 0, 240, 0,
-	84, 85, 0, 0, 245, 269, 289, 294, 472, 532,
-	631, 535, 579, 170, 583, 584, 586, 588, 589, 591,
-	537, 536, 0, 0, 0, 0, 0, 627, 0, 598,
-	0, 0, 42, 0, 0, 0, 46, 0, 647, 0,
-	0, 0, 61, 0, 627, 651, 652, 417, 0, 422,
-	0, 0, 0, 425, 50, 184, 0, 208, 0, 409,
-	176, 169, 0, 173, 149, 173, 0, 0, 78, 0,
-	87, 88, 0, 0, 0, 39, 580, 581, 0, 0,
-	0, 0, 572, 0, 595, 0, 0, 618, 616, 0,
-	645, 0, 637, 640, 639, 412, 49, 0, 0, 447,
-	0, 0, 445, 183, 185, 0, 190, 0, 207, 0,
-	0, 181, 0, 178, 180, 167, 138, 139, 153, 156,
-	0, 0, 0, 0, 247, 538, 540, 539, 541, 0,
-	0, 0, 543, 560, 561, 0, 636, 0, 418, 446,
-	448, 449, 408, 186, 187, 0, 191, 189, 0, 410,
-	99, 0, 177, 179, 0, 263, 0, 89, 90, 83,
-	542, 0, 0, 0, 643, 641, 188, 0, 182, 262,
-	0, 0, 86, 573, 0, 576, 0, 264, 0, 244,
-	574, 0, 0, 0, 211, 0, 0, 212, 213, 0,
-	0, 575, 214, 0, 0, 0, 0, 0, 215, 217,
-	218, 0, 0, 216, 265, 266, 219, 220, 221,
+	0, 330, 222, 222, 0, 0, -2, 318, 318, 318,
+	0, 0, 0, 352, 931, 272, 222, 222, 0, 222,
+	222, 222, 222, 0, 0, 222, 222, 222, 222, 222,
+	222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+	0, 107, 848, 0, 0, 117, 38, 34, 35, 36,
+	0, 0, 0, 925, 925, 0, 418, 633, 944, 945,
+	1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093,
+	1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103,
+	1104, 1105, 1106, 1107, 1108, 1109, 1110, 1111, 1112, 1113,
+	1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121, 1122, 1123,
+	1124, 1125, 1126, 1127, 1128, 1129, 1130, 1131, 1132, 1133,
+	1134, 1135, 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143,
+	1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153,
+	1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
+	1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173,
+	1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183,
+	1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191, 1192, 1193,
+	1194, 1195, 1196, 1197, 1198, 1199, 1200, 1201, 1202, 1203,
+	1204, 1205, 1206, 1207, 1208, 1209, 1210, 1211, 1212, 1213,
+	1214, 1215, 1216, 1217, 1218, 1219, 1220, 1221, 1222, 1223,
+	1224, 1225, 1226, 1227, 1228, 1229, 1230, 1231, 1232, 1233,
+	1234, 1235, 1236, 1237, 1238, 1239, 1240, 1241, 1242, 1243,
+	1244, 1245, 1246, 1247, 1248, 1249, 1250, 1251, 1252, 1253,
+	1254, 1255, 1256, 1257, 1258, 1259, 1260, 1261, 1262, 1263,
+	1264, 1265, 1266, 1267, 1268, 1269, 1270, 1271, 1272, 1273,
+	1274, 1275, 1276, 1277, 1278, 1279, 1280, 1281, 1282, 1283,
+	1284, 1285, 1286, 1287, 1288, 1289, 1290, 1291, 1292, 1293,
+	1294, 1295, 1296, 1297, 1298, 1299, 1300, 1301, 1302, 1303,
+	1304, 1305, 1306, 1307, 1308, 1309, 1310, 1311, 1312, 1313,
+	1314, 1315, 1316, 1317, 1318, 1319, 1320, 1321, 1322, 1323,
+	1324, 1325, 1326, 1327, 1328, 1329, 1330, 1331, 1332, 1333,
+	1334, 1335, 1336, 1337, 1338, 1339, 1340, 1341, 1342, 1343,
+	1344, 1345, 0, 474, 474, 0, 474, 474, 474, 474,
+	0, 0, 0, 430, 0, 0, 0, 0, 471, 0,
+	0, 449, 451, 0, 0, 458, 474, 1349, 1349, 1349,
+	914, 0, 468, 466, 480, 481, 463, 464, 482, 485,
+	0, 490, 493, 940, 941, 0, 508, 0, 1159, 500,
+	513, 514, 0, 545, 546, 39, 684, 643, 0, 649,
+	651, 0, 686, 687, 688, 689, 690, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 716, 717, 718,
+	719, 796, 797, 798, 799, 800, 801, 802, 803, 653,
+	654, 793, 0, 903, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 784, 0, 753, 753, 753, 753, 753,
+	753, 753, 753, 0, 0, 0, 0, 0, 0, 0,
+	-2, -2, 1348, 0, 523, 0, 811, 50, 0, 549,
+	554, 555, 854, 0, 0, 811, 1347, 0, 0, -2,
+	-2, 565, 571, 572, 573, 574, 550, 0, 577, 581,
+	0, 0, 0, 930, 0, 0, 71, 0, 1314, 907,
+	-2, -2, 0, 0, 942, 943, 916, -2, 948, 949,
+	950, 951, 952, 953, 954, 955, 956, 957, 958, 959,
+	960, 961, 962, 963, 964, 965, 966, 967, 968, 969,
+	970, 971, 972, 973, 974, 975, 976, 977, 978, 979,
+	980, 981, 982, 983, 984, 985, 986, 987, 988, 989,
+	990, 991, 992, 993, 994, 995, 996, 997, 998, 999,
+	1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009,
+	1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019,
+	1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029,
+	1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039,
+	1040, 1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049,
+	1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059,
+	1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069,
+	1070, 1071, 1072, 1073, 1074, 1075, 1076, 1077, 1078, 1079,
+	1080, 1081, 1082, 1083, -2, 1103, 0, 0, 127, 128,
+	0, 37, 248, 0, 123, 0, 242, 196, 848, 927,
+	937, 0, 0, 0, 0, 0, 91, 115, 116, 222,
+	222, 0, 117, 117, 334, 335, 336, 0, 0, -2,
+	246, 0, 319, 0, 0, 236, 236, 240, 238, 239,
+	0, 0, 0, 0, 0, 0, 346, 0, 347, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 402, 0,
+	223, 0, 364, 365, 273, 0, 0, 0, 0, 344,
+	345, 0, 0, 932, 933, 0, 0, 222, 222, 0,
+	0, 0, 0, 222, 222, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	101, 839, 0, 0, 0, 0, 0, 0, -2, 0,
+	410, 0, 925, 0, 0, 0, 0, 417, 0, 419,
+	420, 0, 0, 421, 0, 471, 471, 469, 470, 423,
+	424, 425, 426, 474, 0, 0, 231, 232, 233, 471,
+	474, 0, 474, 474, 474, 474, 471, 474, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 1349, 1349, 1349,
+	477, 455, 456, 459, 460, 1350, 1351, 461, 462, 915,
+	491, 494, 511, 509, 510, 512, 504, 505, 506, 507,
+	0, 524, 525, 530, 0, 0, 0, 0, 536, 537,
+	538, 0, 0, 541, 542, 543, 0, 0, 0, 0,
+	0, 647, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 671, 672, 673, 674, 675, 676, 677, 650, 0,
+	664, 0, 0, 0, 706, 707, 708, 709, 710, 711,
+	712, 713, 714, 0, 562, 0, 0, 0, 811, 0,
+	0, 0, 0, 0, 0, 0, 559, 0, 785, 0,
+	737, 745, 0, 738, 746, 739, 747, 740, 0, 741,
+	748, 742, 749, 743, 744, 750, 0, 0, 0, 562,
+	562, 0, 0, 40, 515, 516, 0, 616, 935, 819,
+	0, 564, 857, 0, 0, 820, 812, 813, 816, 819,
+	0, 586, 575, 566, 569, 570, 552, 0, 578, 582,
+	0, 584, 585, 0, 0, 69, 0, 632, 0, 588,
+	590, 591, 592, 614, 0, 0, 0, 0, 65, 67,
+	633, 0, 1314, 913, 0, 73, 74, 0, 0, 0,
+	210, 918, 919, 920, -2, 229, 0, 135, 203, 147,
+	148, 149, 196, 151, 196, 196, 196, 196, 207, 207,
+	207, 207, 179, 180, 181, 182, 183, 0, 0, 166,
+	196, 196, 196, 196, 186, 187, 188, 189, 190, 191,
+	192, 193, 152, 153, 154, 155, 156, 157, 158, 159,
+	160, 198, 198, 198, 200, 200, 0, 38, 0, 214,
+	0, 816, 0, 839, 0, 0, 938, 0, 937, 937,
+	937, 106, 0, 0, 0, 367, 328, 356, 368, 0,
+	331, 332, -2, 0, 0, 318, 0, 320, 0, 230,
+	0, -2, 0, 0, 0, 236, 240, 237, 240, 228,
+	241, 348, 793, 0, 349, 350, 0, 382, 602, 0,
+	0, 0, 0, 0, 388, 389, 390, 0, 392, 393,
+	394, 395, 396, 397, 398, 399, 400, 401, 357, 358,
+	359, 360, 361, 362, 363, 0, 0, 320, 0, 353,
+	0, 274, 275, 0, 0, 278, 279, 280, 281, 0,
+	0, 284, 285, 286, 287, 288, 312, 313, 314, 289,
+	290, 291, 292, 293, 294, 295, 306, 307, 308, 309,
+	310, 311, 296, 297, 298, 299, 300, 303, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 836, 837,
+	838, 0, 0, 0, 0, 0, 261, 63, 926, 416,
+	634, 946, 947, 475, 476, 0, 234, 235, 474, 474,
+	427, 450, 0, 474, 431, 452, 432, 434, 433, 435,
+	474, 438, 472, 473, 439, 440, 441, 442, 443, 444,
+	445, 446, 447, 448, 454, 0, 0, 0, 492, 496,
+	497, 498, 499, 0, 0, 527, 532, 533, 534, 535,
+	547, 540, 685, 644, 645, 646, 648, 665, 0, 667,
+	669, 655, 656, 680, 681, 682, 0, 0, 0, 0,
+	678, 660, 0, 691, 692, 693, 694, 695, 696, 697,
+	698, 699, 700, 701, 702, 705, 768, 769, 770, 0,
+	703, 704, 715, 0, 0, 0, 563, 794, 0, -2,
+	0, 683, 902, 819, 0, 0, 0, 0, 688, 796,
+	0, 688, 796, 0, 0, 0, 560, 561, 791, 788,
+	0, 0, 754, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 518, 519, 521, 0, 636, 0, 617, 0,
+	619, 620, 0, 936, 854, 51, 41, 0, 855, 0,
+	0, 0, 0, 815, 817, 818, 854, 0, 804, 0,
+	0, 641, 0, 0, 567, 47, 583, 579, 0, 641,
+	0, 0, 631, 0, 0, 0, 0, 0, 0, 621,
+	0, 0, 624, 0, 0, 0, 0, 615, 0, 0,
+	0, -2, 0, 0, 0, 61, 62, 0, 0, 0,
+	908, 72, 0, 0, 77, 78, 909, 910, 911, 912,
+	0, 110, -2, 269, 129, 131, 132, 133, 124, 134,
+	205, 204, 150, 207, 207, 173, 174, 210, 0, 210,
+	210, 210, 0, 0, 167, 168, 169, 170, 161, 0,
+	162, 163, 164, 0, 165, 247, 0, 823, 215, 216,
+	218, 222, 0, 0, 243, 244, 0, 0, 100, 0,
+	939, 0, 0, 0, 928, 119, 120, 121, 122, 117,
+	0, 0, 125, 322, 0, 0, 0, 245, 0, 0,
+	224, 240, 225, 226, 0, 351, 0, 0, 384, 385,
+	386, 387, 0, 0, 0, 320, 322, 210, 0, 276,
+	277, 282, 283, 301, 0, 0, 0, 0, 849, 850,
+	0, 853, 92, 374, 376, 375, 379, 0, 0, 0,
+	0, 411, 261, 823, 0, 415, 262, 263, 471, 437,
+	453, 471, 429, 436, 478, 457, 488, 531, 0, 0,
+	0, 539, 0, 666, 668, 670, 657, 678, 661, 0,
+	658, 0, 0, 652, 720, 0, 0, 562, 0, 811,
+	854, 724, 725, 0, 0, 0, 0, 0, 761, 0,
+	0, 762, 0, 811, 0, 789, 0, 0, 736, 755,
+	0, 0, 756, 757, 758, 759, 760, 517, 520, 522,
+	596, 0, 0, 0, 0, 618, 934, 43, 0, 0,
+	0, 821, 822, 814, 42, 0, 921, 922, 805, 806,
+	807, 0, 576, 587, 568, 0, 819, 896, 0, 0,
+	888, 0, 0, 641, 904, 0, 589, 610, 612, 0,
+	607, 622, 623, 625, 0, 627, 0, 629, 630, 593,
+	594, 595, 0, 641, 0, 641, 66, 641, 68, 0,
+	635, 75, 76, 0, 0, 82, 211, 212, 117, 271,
+	130, 136, 0, 0, 0, 140, 0, 0, 143, 145,
+	146, 206, 210, 210, 175, 208, 209, 176, 177, 178,
+	0, 194, 0, 0, 0, 264, 87, 827, 826, 222,
+	222, 217, 0, 220, 0, 197, 0, 102, 0, 0,
+	0, 0, 326, 600, 0, 337, 338, 0, 321, 381,
+	0, 214, 0, 227, 794, 603, 0, 0, 339, 0,
+	322, 342, 343, 354, 304, 305, 302, 598, 840, 841,
+	842, 0, 852, 95, 0, 0, 0, 0, 372, 0,
+	413, 414, 64, 474, 474, 526, 0, 529, 0, 659,
+	0, 679, 662, 721, 722, 0, 795, 819, 45, 0,
+	196, 196, 774, 196, 200, 777, 196, 779, 196, 782,
+	0, 0, 0, 0, 0, 0, 0, 786, 735, 792,
+	0, 0, 0, 0, 0, 0, 0, 0, 207, 859,
+	856, 44, 809, 0, 642, 580, 48, 52, 0, 896,
+	887, 898, 900, 0, 0, 0, 892, 0, 811, 0,
+	0, 604, 611, 0, 0, 605, 0, 606, 626, 628,
+	-2, 811, 641, 59, 60, 0, 79, 80, 81, 270,
+	137, 138, 0, 141, 142, 144, 171, 172, 207, 0,
+	207, 0, 201, 0, 253, 265, 0, 824, 825, 0,
+	0, 219, 221, 598, 103, 104, 105, 0, 0, 126,
+	323, 0, 213, 0, 0, 406, 403, 340, 341, 0,
+	0, 851, 373, 0, 93, 94, 0, 0, 378, 412,
+	422, 428, 528, 548, 663, 723, 854, 726, 771, 207,
+	775, 776, 778, 780, 781, 783, 728, 727, 0, 0,
+	0, 0, 0, 819, 0, 790, 0, 0, 0, 0,
+	0, 616, 207, 879, 49, 0, 0, 0, 53, 0,
+	901, 0, 0, 0, 0, 70, 819, 905, 906, 608,
+	0, 613, 819, 58, 139, 210, 195, 210, 0, 0,
+	266, 828, 829, 830, 831, 832, 833, 834, 0, 329,
+	601, 0, 0, 383, 0, 391, 0, 0, 0, 0,
+	96, 97, 0, 0, 0, 46, 772, 773, 0, 0,
+	0, 0, 763, 0, 787, 0, 0, 0, 638, 0,
+	0, 636, 861, 860, 873, 877, 810, 808, 0, 899,
+	0, 891, 894, 890, 893, 56, 0, 57, 184, 185,
+	199, 202, 0, 0, 0, 407, 404, 405, 843, 599,
+	0, 0, 0, 380, 729, 731, 730, 732, 0, 0,
+	0, 734, 751, 752, 637, 639, 640, 597, 879, 0,
+	872, 875, -2, 0, 0, 889, 0, 609, 843, 0,
+	0, 370, 845, 98, 99, 315, 316, 317, 92, 733,
+	0, 0, 0, 866, 864, 864, 877, 0, 881, 0,
+	886, 0, 897, 895, 88, 0, 0, 0, 0, 846,
+	847, 95, 764, 0, 767, 869, 0, 862, 865, 863,
+	874, 0, 880, 0, 0, 878, 408, 409, 249, 0,
+	377, 765, 858, 0, 867, 868, 876, 0, 0, 250,
+	251, 0, 844, 0, 870, 871, 882, 884, 252, 0,
+	0, 0, 0, 254, 256, 257, 0, 0, 255, 766,
+	258, 259, 260,
 }
-var yyTok1 = [...]int{
 
+var yyTok1 = [...]int{
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 82, 3, 3, 3, 109, 101, 3,
-	58, 60, 106, 104, 59, 105, 121, 107, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 365,
-	90, 89, 91, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 111, 3, 3, 3, 138, 130, 3,
+	81, 83, 135, 133, 82, 134, 150, 136, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 468,
+	119, 118, 120, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 111, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 140, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 100, 3, 112,
+	3, 3, 3, 3, 129, 3, 141,
 }
-var yyTok2 = [...]int{
 
+var yyTok2 = [...]int{
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
 	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
 	42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-	52, 53, 54, 55, 56, 57, 61, 62, 63, 64,
-	65, 66, 67, 68, 69, 70, 71, 72, 73, 74,
-	75, 76, 77, 78, 79, 80, 81, 83, 84, 85,
-	86, 87, 88, 92, 93, 94, 95, 96, 97, 98,
-	99, 102, 103, 108, 110, 113, 114, 115, 116, 117,
-	118, 119, 120, 122, 123, 124, 125, 126, 127, 128,
-	129, 130, 131, 132, 133, 134, 135, 136, 137, 138,
-	139, 140, 141, 142, 143, 144, 145, 146, 147, 148,
-	149, 150, 151, 152, 153, 154, 155, 156, 157, 158,
+	52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+	62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
+	72, 73, 74, 75, 76, 77, 78, 79, 80, 84,
+	85, 86, 87, 88, 89, 90, 91, 92, 93, 94,
+	95, 96, 97, 98, 99, 100, 101, 102, 103, 104,
+	105, 106, 107, 108, 109, 110, 112, 113, 114, 115,
+	116, 117, 121, 122, 123, 124, 125, 126, 127, 128,
+	131, 132, 137, 139, 142, 143, 144, 145, 146, 147,
+	148, 149, 151, 152, 153, 154, 155, 156, 157, 158,
 	159, 160, 161, 162, 163, 164, 165, 166, 167, 168,
 	169, 170, 171, 172, 173, 174, 175, 176, 177, 178,
 	179, 180, 181, 182, 183, 184, 185, 186, 187, 188,
@@ -3451,6 +5011,7 @@ var yyTok2 = [...]int{
 	259, 260, 261, 262, 263, 264, 265, 266, 267, 268,
 	269, 270, 271, 272, 273, 274,
 }
+
 var yyTok3 = [...]int{
 	57600, 275, 57601, 276, 57602, 277, 57603, 278, 57604, 279,
 	57605, 280, 57606, 281, 57607, 282, 57608, 283, 57609, 284,
@@ -3470,7 +5031,27 @@ var yyTok3 = [...]int{
 	57675, 350, 57676, 351, 57677, 352, 57678, 353, 57679, 354,
 	57680, 355, 57681, 356, 57682, 357, 57683, 358, 57684, 359,
 	57685, 360, 57686, 361, 57687, 362, 57688, 363, 57689, 364,
-	0,
+	57690, 365, 57691, 366, 57692, 367, 57693, 368, 57694, 369,
+	57695, 370, 57696, 371, 57697, 372, 57698, 373, 57699, 374,
+	57700, 375, 57701, 376, 57702, 377, 57703, 378, 57704, 379,
+	57705, 380, 57706, 381, 57707, 382, 57708, 383, 57709, 384,
+	57710, 385, 57711, 386, 57712, 387, 57713, 388, 57714, 389,
+	57715, 390, 57716, 391, 57717, 392, 57718, 393, 57719, 394,
+	57720, 395, 57721, 396, 57722, 397, 57723, 398, 57724, 399,
+	57725, 400, 57726, 401, 57727, 402, 57728, 403, 57729, 404,
+	57730, 405, 57731, 406, 57732, 407, 57733, 408, 57734, 409,
+	57735, 410, 57736, 411, 57737, 412, 57738, 413, 57739, 414,
+	57740, 415, 57741, 416, 57742, 417, 57743, 418, 57744, 419,
+	57745, 420, 57746, 421, 57747, 422, 57748, 423, 57749, 424,
+	57750, 425, 57751, 426, 57752, 427, 57753, 428, 57754, 429,
+	57755, 430, 57756, 431, 57757, 432, 57758, 433, 57759, 434,
+	57760, 435, 57761, 436, 57762, 437, 57763, 438, 57764, 439,
+	57765, 440, 57766, 441, 57767, 442, 57768, 443, 57769, 444,
+	57770, 445, 57771, 446, 57772, 447, 57773, 448, 57774, 449,
+	57775, 450, 57776, 451, 57777, 452, 57778, 453, 57779, 454,
+	57780, 455, 57781, 456, 57782, 457, 57783, 458, 57784, 459,
+	57785, 460, 57786, 461, 57787, 462, 57788, 463, 57789, 464,
+	57790, 465, 57791, 466, 57792, 467, 0,
 }
 
 var yyErrorMessages = [...]struct {
@@ -3812,147 +5393,166 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:337
+//line sql.y:409
 		{
 			setParseTree(yylex, yyDollar[1].statement)
 		}
 	case 2:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:342
+//line sql.y:414
 		{
 		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:343
+//line sql.y:415
 		{
 		}
 	case 4:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:347
+//line sql.y:419
 		{
 			yyVAL.statement = yyDollar[1].selStmt
 		}
-	case 29:
+	case 33:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:375
+//line sql.y:451
 		{
 			setParseTree(yylex, nil)
 		}
-	case 30:
+	case 34:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:381
+//line sql.y:457
 		{
 			yyVAL.colIdent = NewColIdentWithAt(string(yyDollar[1].bytes), NoAt)
 		}
-	case 31:
+	case 35:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:385
+//line sql.y:461
 		{
 			yyVAL.colIdent = NewColIdentWithAt(string(yyDollar[1].bytes), SingleAt)
 		}
-	case 32:
+	case 36:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:389
+//line sql.y:465
 		{
 			yyVAL.colIdent = NewColIdentWithAt(string(yyDollar[1].bytes), DoubleAt)
 		}
-	case 33:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:395
-		{
-			yyVAL.statement = &OtherAdmin{}
-		}
-	case 34:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:401
-		{
-			sel := yyDollar[1].selStmt.(*Select)
-			sel.OrderBy = yyDollar[2].orderBy
-			sel.Limit = yyDollar[3].limit
-			sel.Lock = yyDollar[4].str
-			yyVAL.selStmt = sel
-		}
-	case 35:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:409
-		{
-			yyVAL.selStmt = &Union{FirstStatement: &ParenSelect{Select: yyDollar[2].selStmt}, OrderBy: yyDollar[4].orderBy, Limit: yyDollar[5].limit, Lock: yyDollar[6].str}
-		}
-	case 36:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:413
-		{
-			yyVAL.selStmt = Unionize(yyDollar[1].selStmt, yyDollar[3].selStmt, yyDollar[2].str, yyDollar[4].orderBy, yyDollar[5].limit, yyDollar[6].str)
-		}
 	case 37:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:417
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:470
 		{
-			yyVAL.selStmt = NewSelect(Comments(yyDollar[2].bytes2), SelectExprs{Nextval{Expr: yyDollar[5].expr}}, []string{yyDollar[3].str} /*options*/, TableExprs{&AliasedTableExpr{Expr: yyDollar[7].tableName}}, nil /*where*/, nil /*groupBy*/, nil /*having*/)
+			yyVAL.colIdent = NewColIdentWithAt("", NoAt)
 		}
 	case 38:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:440
-		{
-			sel := yyDollar[1].selStmt.(*Select)
-			sel.OrderBy = yyDollar[2].orderBy
-			sel.Limit = yyDollar[3].limit
-			sel.Lock = yyDollar[4].str
-			yyVAL.selStmt = sel
-		}
-	case 39:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:448
-		{
-			yyVAL.selStmt = Unionize(yyDollar[1].selStmt, yyDollar[3].selStmt, yyDollar[2].str, yyDollar[4].orderBy, yyDollar[5].limit, yyDollar[6].str)
-		}
-	case 40:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:454
-		{
-			yyVAL.statement = &Stream{Comments: Comments(yyDollar[2].bytes2), SelectExpr: yyDollar[3].selectExpr, Table: yyDollar[5].tableName}
-		}
-	case 41:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:460
-		{
-			yyVAL.statement = &VStream{Comments: Comments(yyDollar[2].bytes2), SelectExpr: yyDollar[3].selectExpr, Table: yyDollar[5].tableName, Where: NewWhere(WhereStr, yyDollar[6].expr), Limit: yyDollar[7].limit}
-		}
-	case 42:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:468
-		{
-			yyVAL.selStmt = NewSelect(Comments(yyDollar[2].bytes2), yyDollar[4].selectExprs /*SelectExprs*/, yyDollar[3].strs /*options*/, yyDollar[5].tableExprs /*from*/, NewWhere(WhereStr, yyDollar[6].expr), GroupBy(yyDollar[7].exprs), NewWhere(HavingStr, yyDollar[8].expr))
-		}
-	case 43:
 		yyDollar = yyS[yypt-1 : yypt+1]
 //line sql.y:474
 		{
-			yyVAL.selStmt = yyDollar[1].selStmt
+			yyVAL.colIdent = yyDollar[1].colIdent
+		}
+	case 39:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:480
+		{
+			yyVAL.statement = &OtherAdmin{}
+		}
+	case 40:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:486
+		{
+			yyVAL.statement = &Load{}
+		}
+	case 41:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:492
+		{
+			sel := yyDollar[1].selStmt.(*Select)
+			sel.OrderBy = yyDollar[2].orderBy
+			sel.Limit = yyDollar[3].limit
+			sel.Lock = yyDollar[4].lock
+			sel.Into = yyDollar[5].selectInto
+			yyVAL.selStmt = sel
+		}
+	case 42:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:501
+		{
+			yyVAL.selStmt = &Union{FirstStatement: &ParenSelect{Select: yyDollar[2].selStmt}, OrderBy: yyDollar[4].orderBy, Limit: yyDollar[5].limit, Lock: yyDollar[6].lock}
+		}
+	case 43:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:505
+		{
+			yyVAL.selStmt = Unionize(yyDollar[1].selStmt, yyDollar[3].selStmt, yyDollar[2].boolean, yyDollar[4].orderBy, yyDollar[5].limit, yyDollar[6].lock)
 		}
 	case 44:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:509
+		{
+			yyVAL.selStmt = NewSelect(Comments(yyDollar[2].bytes2), SelectExprs{Nextval{Expr: yyDollar[5].expr}}, []string{yyDollar[3].str} /*options*/, TableExprs{&AliasedTableExpr{Expr: yyDollar[7].tableName}}, nil /*where*/, nil /*groupBy*/, nil /*having*/)
+		}
+	case 45:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:532
+		{
+			sel := yyDollar[1].selStmt.(*Select)
+			sel.OrderBy = yyDollar[2].orderBy
+			sel.Limit = yyDollar[3].limit
+			sel.Lock = yyDollar[4].lock
+			yyVAL.selStmt = sel
+		}
+	case 46:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:540
+		{
+			yyVAL.selStmt = Unionize(yyDollar[1].selStmt, yyDollar[3].selStmt, yyDollar[2].boolean, yyDollar[4].orderBy, yyDollar[5].limit, yyDollar[6].lock)
+		}
+	case 47:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:546
+		{
+			yyVAL.statement = &Stream{Comments: Comments(yyDollar[2].bytes2), SelectExpr: yyDollar[3].selectExpr, Table: yyDollar[5].tableName}
+		}
+	case 48:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:552
+		{
+			yyVAL.statement = &VStream{Comments: Comments(yyDollar[2].bytes2), SelectExpr: yyDollar[3].selectExpr, Table: yyDollar[5].tableName, Where: NewWhere(WhereClause, yyDollar[6].expr), Limit: yyDollar[7].limit}
+		}
+	case 49:
+		yyDollar = yyS[yypt-8 : yypt+1]
+//line sql.y:560
+		{
+			yyVAL.selStmt = NewSelect(Comments(yyDollar[2].bytes2), yyDollar[4].selectExprs /*SelectExprs*/, yyDollar[3].strs /*options*/, yyDollar[5].tableExprs /*from*/, NewWhere(WhereClause, yyDollar[6].expr), GroupBy(yyDollar[7].exprs), NewWhere(HavingClause, yyDollar[8].expr))
+		}
+	case 50:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:566
+		{
+			yyVAL.selStmt = yyDollar[1].selStmt
+		}
+	case 51:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:478
+//line sql.y:570
 		{
 			yyVAL.selStmt = &ParenSelect{Select: yyDollar[2].selStmt}
 		}
-	case 45:
+	case 52:
 		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:485
+//line sql.y:577
 		{
 			// insert_data returns a *Insert pre-filled with Columns & Values
 			ins := yyDollar[6].ins
-			ins.Action = yyDollar[1].str
+			ins.Action = yyDollar[1].insertAction
 			ins.Comments = yyDollar[2].bytes2
-			ins.Ignore = yyDollar[3].str
+			ins.Ignore = yyDollar[3].ignore
 			ins.Table = yyDollar[4].tableName
 			ins.Partitions = yyDollar[5].partitions
 			ins.OnDup = OnDup(yyDollar[7].updateExprs)
 			yyVAL.statement = ins
 		}
-	case 46:
+	case 53:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:497
+//line sql.y:589
 		{
 			cols := make(Columns, 0, len(yyDollar[7].updateExprs))
 			vals := make(ValTuple, 0, len(yyDollar[8].updateExprs))
@@ -3960,1192 +5560,1912 @@ yydefault:
 				cols = append(cols, updateList.Name.Name)
 				vals = append(vals, updateList.Expr)
 			}
-			yyVAL.statement = &Insert{Action: yyDollar[1].str, Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].str, Table: yyDollar[4].tableName, Partitions: yyDollar[5].partitions, Columns: cols, Rows: Values{vals}, OnDup: OnDup(yyDollar[8].updateExprs)}
-		}
-	case 47:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:509
-		{
-			yyVAL.str = InsertStr
-		}
-	case 48:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:513
-		{
-			yyVAL.str = ReplaceStr
-		}
-	case 49:
-		yyDollar = yyS[yypt-9 : yypt+1]
-//line sql.y:519
-		{
-			yyVAL.statement = &Update{Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].str, TableExprs: yyDollar[4].tableExprs, Exprs: yyDollar[6].updateExprs, Where: NewWhere(WhereStr, yyDollar[7].expr), OrderBy: yyDollar[8].orderBy, Limit: yyDollar[9].limit}
-		}
-	case 50:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:525
-		{
-			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), TableExprs: TableExprs{&AliasedTableExpr{Expr: yyDollar[4].tableName}}, Partitions: yyDollar[5].partitions, Where: NewWhere(WhereStr, yyDollar[6].expr), OrderBy: yyDollar[7].orderBy, Limit: yyDollar[8].limit}
-		}
-	case 51:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:529
-		{
-			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), Targets: yyDollar[4].tableNames, TableExprs: yyDollar[6].tableExprs, Where: NewWhere(WhereStr, yyDollar[7].expr)}
-		}
-	case 52:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:533
-		{
-			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), Targets: yyDollar[3].tableNames, TableExprs: yyDollar[5].tableExprs, Where: NewWhere(WhereStr, yyDollar[6].expr)}
-		}
-	case 53:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:537
-		{
-			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), Targets: yyDollar[3].tableNames, TableExprs: yyDollar[5].tableExprs, Where: NewWhere(WhereStr, yyDollar[6].expr)}
+			yyVAL.statement = &Insert{Action: yyDollar[1].insertAction, Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].ignore, Table: yyDollar[4].tableName, Partitions: yyDollar[5].partitions, Columns: cols, Rows: Values{vals}, OnDup: OnDup(yyDollar[8].updateExprs)}
 		}
 	case 54:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:542
+//line sql.y:601
 		{
+			yyVAL.insertAction = InsertAct
 		}
 	case 55:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:543
+//line sql.y:605
 		{
+			yyVAL.insertAction = ReplaceAct
 		}
 	case 56:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:547
+		yyDollar = yyS[yypt-9 : yypt+1]
+//line sql.y:611
 		{
-			yyVAL.tableNames = TableNames{yyDollar[1].tableName}
+			yyVAL.statement = &Update{Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].ignore, TableExprs: yyDollar[4].tableExprs, Exprs: yyDollar[6].updateExprs, Where: NewWhere(WhereClause, yyDollar[7].expr), OrderBy: yyDollar[8].orderBy, Limit: yyDollar[9].limit}
 		}
 	case 57:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:551
+		yyDollar = yyS[yypt-9 : yypt+1]
+//line sql.y:617
 		{
-			yyVAL.tableNames = append(yyVAL.tableNames, yyDollar[3].tableName)
+			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].ignore, TableExprs: TableExprs{&AliasedTableExpr{Expr: yyDollar[5].tableName}}, Partitions: yyDollar[6].partitions, Where: NewWhere(WhereClause, yyDollar[7].expr), OrderBy: yyDollar[8].orderBy, Limit: yyDollar[9].limit}
 		}
 	case 58:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:557
+		yyDollar = yyS[yypt-8 : yypt+1]
+//line sql.y:621
 		{
-			yyVAL.tableNames = TableNames{yyDollar[1].tableName}
+			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].ignore, Targets: yyDollar[5].tableNames, TableExprs: yyDollar[7].tableExprs, Where: NewWhere(WhereClause, yyDollar[8].expr)}
 		}
 	case 59:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:561
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:625
 		{
-			yyVAL.tableNames = append(yyVAL.tableNames, yyDollar[3].tableName)
+			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].ignore, Targets: yyDollar[4].tableNames, TableExprs: yyDollar[6].tableExprs, Where: NewWhere(WhereClause, yyDollar[7].expr)}
 		}
 	case 60:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:566
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:629
 		{
-			yyVAL.partitions = nil
+			yyVAL.statement = &Delete{Comments: Comments(yyDollar[2].bytes2), Ignore: yyDollar[3].ignore, Targets: yyDollar[4].tableNames, TableExprs: yyDollar[6].tableExprs, Where: NewWhere(WhereClause, yyDollar[7].expr)}
 		}
 	case 61:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:570
-		{
-			yyVAL.partitions = yyDollar[3].partitions
-		}
-	case 62:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:576
-		{
-			yyVAL.statement = &Set{Comments: Comments(yyDollar[2].bytes2), Exprs: yyDollar[3].setExprs}
-		}
-	case 63:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:582
-		{
-			yyVAL.statement = &SetTransaction{Comments: Comments(yyDollar[2].bytes2), Scope: yyDollar[3].str, Characteristics: yyDollar[5].characteristics}
-		}
-	case 64:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:586
-		{
-			yyVAL.statement = &SetTransaction{Comments: Comments(yyDollar[2].bytes2), Characteristics: yyDollar[4].characteristics}
-		}
-	case 65:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:592
-		{
-			yyVAL.characteristics = []Characteristic{yyDollar[1].characteristic}
-		}
-	case 66:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:596
-		{
-			yyVAL.characteristics = append(yyVAL.characteristics, yyDollar[3].characteristic)
-		}
-	case 67:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:602
-		{
-			yyVAL.characteristic = &IsolationLevel{Level: string(yyDollar[3].str)}
-		}
-	case 68:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:606
-		{
-			yyVAL.characteristic = &AccessMode{Mode: TxReadWrite}
-		}
-	case 69:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:610
-		{
-			yyVAL.characteristic = &AccessMode{Mode: TxReadOnly}
-		}
-	case 70:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:616
-		{
-			yyVAL.str = RepeatableRead
-		}
-	case 71:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:620
-		{
-			yyVAL.str = ReadCommitted
-		}
-	case 72:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:624
-		{
-			yyVAL.str = ReadUncommitted
-		}
-	case 73:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:628
-		{
-			yyVAL.str = Serializable
-		}
-	case 74:
 		yyDollar = yyS[yypt-1 : yypt+1]
 //line sql.y:634
 		{
-			yyVAL.str = SessionStr
+		}
+	case 62:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:635
+		{
+		}
+	case 63:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:639
+		{
+			yyVAL.tableNames = TableNames{yyDollar[1].tableName.ToViewName()}
+		}
+	case 64:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:643
+		{
+			yyVAL.tableNames = append(yyVAL.tableNames, yyDollar[3].tableName.ToViewName())
+		}
+	case 65:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:649
+		{
+			yyVAL.tableNames = TableNames{yyDollar[1].tableName}
+		}
+	case 66:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:653
+		{
+			yyVAL.tableNames = append(yyVAL.tableNames, yyDollar[3].tableName)
+		}
+	case 67:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:659
+		{
+			yyVAL.tableNames = TableNames{yyDollar[1].tableName}
+		}
+	case 68:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:663
+		{
+			yyVAL.tableNames = append(yyVAL.tableNames, yyDollar[3].tableName)
+		}
+	case 69:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:668
+		{
+			yyVAL.partitions = nil
+		}
+	case 70:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:672
+		{
+			yyVAL.partitions = yyDollar[3].partitions
+		}
+	case 71:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:678
+		{
+			yyVAL.statement = &Set{Comments: Comments(yyDollar[2].bytes2), Exprs: yyDollar[3].setExprs}
+		}
+	case 72:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:684
+		{
+			yyVAL.statement = &SetTransaction{Comments: Comments(yyDollar[2].bytes2), Scope: yyDollar[3].scope, Characteristics: yyDollar[5].characteristics}
+		}
+	case 73:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:688
+		{
+			yyVAL.statement = &SetTransaction{Comments: Comments(yyDollar[2].bytes2), Characteristics: yyDollar[4].characteristics, Scope: ImplicitScope}
+		}
+	case 74:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:694
+		{
+			yyVAL.characteristics = []Characteristic{yyDollar[1].characteristic}
 		}
 	case 75:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:638
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:698
 		{
-			yyVAL.str = GlobalStr
+			yyVAL.characteristics = append(yyVAL.characteristics, yyDollar[3].characteristic)
 		}
 	case 76:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:644
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:704
 		{
-			yyDollar[1].ddl.TableSpec = yyDollar[2].TableSpec
-			yyVAL.statement = yyDollar[1].ddl
+			yyVAL.characteristic = yyDollar[3].isolationLevel
 		}
 	case 77:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:649
+//line sql.y:708
 		{
-			// Create table [name] like [name]
-			yyDollar[1].ddl.OptLike = yyDollar[2].optLike
-			yyVAL.statement = yyDollar[1].ddl
+			yyVAL.characteristic = ReadWrite
 		}
 	case 78:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:655
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:712
 		{
-			// Change this to an alter statement
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[7].tableName}
+			yyVAL.characteristic = ReadOnly
 		}
 	case 79:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:660
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:718
 		{
-			yyVAL.statement = &DDL{Action: CreateStr, Table: yyDollar[3].tableName.ToViewName()}
+			yyVAL.isolationLevel = RepeatableRead
 		}
 	case 80:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:664
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:722
 		{
-			yyVAL.statement = &DDL{Action: CreateStr, Table: yyDollar[5].tableName.ToViewName()}
+			yyVAL.isolationLevel = ReadCommitted
 		}
 	case 81:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:668
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:726
 		{
-			yyVAL.statement = &DBDDL{Action: CreateStr, DBName: string(yyDollar[4].colIdent.String()), IfNotExists: yyDollar[3].boolean}
+			yyVAL.isolationLevel = ReadUncommitted
 		}
 	case 82:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:672
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:730
 		{
-			yyVAL.statement = &DBDDL{Action: CreateStr, DBName: string(yyDollar[4].colIdent.String()), IfNotExists: yyDollar[3].boolean}
+			yyVAL.isolationLevel = Serializable
 		}
 	case 83:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:736
+		{
+			yyVAL.scope = SessionScope
+		}
+	case 84:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:740
+		{
+			yyVAL.scope = GlobalScope
+		}
+	case 85:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:746
+		{
+			yyDollar[1].createTable.TableSpec = yyDollar[2].TableSpec
+			yyDollar[1].createTable.FullyParsed = true
+			yyVAL.statement = yyDollar[1].createTable
+		}
+	case 86:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:752
+		{
+			// Create table [name] like [name]
+			yyDollar[1].createTable.OptLike = yyDollar[2].optLike
+			yyDollar[1].createTable.FullyParsed = true
+			yyVAL.statement = yyDollar[1].createTable
+		}
+	case 87:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:759
+		{
+			indexDef := yyDollar[1].alterTable.AlterOptions[0].(*AddIndexDefinition).IndexDefinition
+			indexDef.Columns = yyDollar[3].indexColumns
+			indexDef.Options = append(indexDef.Options, yyDollar[5].indexOptions...)
+			yyDollar[1].alterTable.AlterOptions = append(yyDollar[1].alterTable.AlterOptions, yyDollar[6].alterOptions...)
+			yyDollar[1].alterTable.FullyParsed = true
+			yyVAL.statement = yyDollar[1].alterTable
+		}
+	case 88:
+		yyDollar = yyS[yypt-11 : yypt+1]
+//line sql.y:768
+		{
+			yyVAL.statement = &CreateView{ViewName: yyDollar[7].tableName.ToViewName(), IsReplace: yyDollar[2].boolean, Algorithm: yyDollar[3].str, Definer: yyDollar[4].str, Security: yyDollar[5].str, Columns: yyDollar[8].columns, Select: yyDollar[10].selStmt, CheckOption: yyDollar[11].str}
+		}
+	case 89:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:772
+		{
+			yyDollar[1].createDatabase.FullyParsed = true
+			yyDollar[1].createDatabase.CreateOptions = yyDollar[2].collateAndCharsets
+			yyVAL.statement = yyDollar[1].createDatabase
+		}
+	case 90:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:677
+//line sql.y:779
+		{
+			yyVAL.boolean = false
+		}
+	case 91:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:783
+		{
+			yyVAL.boolean = true
+		}
+	case 92:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:788
 		{
 			yyVAL.colIdent = NewColIdent("")
 		}
-	case 84:
+	case 93:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:681
+//line sql.y:792
 		{
 			yyVAL.colIdent = yyDollar[2].colIdent
 		}
-	case 85:
+	case 94:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:687
+//line sql.y:798
 		{
 			yyVAL.colIdent = yyDollar[1].colIdent
 		}
-	case 86:
+	case 95:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:692
+//line sql.y:803
 		{
 			var v []VindexParam
 			yyVAL.vindexParams = v
 		}
-	case 87:
+	case 96:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:697
+//line sql.y:808
 		{
 			yyVAL.vindexParams = yyDollar[2].vindexParams
 		}
-	case 88:
+	case 97:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:703
+//line sql.y:814
 		{
 			yyVAL.vindexParams = make([]VindexParam, 0, 4)
 			yyVAL.vindexParams = append(yyVAL.vindexParams, yyDollar[1].vindexParam)
 		}
-	case 89:
+	case 98:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:708
+//line sql.y:819
 		{
 			yyVAL.vindexParams = append(yyVAL.vindexParams, yyDollar[3].vindexParam)
 		}
-	case 90:
+	case 99:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:714
+//line sql.y:825
 		{
 			yyVAL.vindexParam = VindexParam{Key: yyDollar[1].colIdent, Val: yyDollar[3].str}
 		}
-	case 91:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:720
+	case 100:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:831
 		{
-			yyVAL.ddl = &DDL{Action: CreateStr, Table: yyDollar[4].tableName}
-			setDDL(yylex, yyVAL.ddl)
+			yyVAL.createTable = &CreateTable{Table: yyDollar[5].tableName, IfNotExists: yyDollar[4].boolean, Temp: yyDollar[2].boolean}
+			setDDL(yylex, yyVAL.createTable)
 		}
-	case 92:
+	case 101:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:838
+		{
+			yyVAL.alterTable = &AlterTable{Table: yyDollar[3].tableName}
+			setDDL(yylex, yyVAL.alterTable)
+		}
+	case 102:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:845
+		{
+			yyVAL.alterTable = &AlterTable{Table: yyDollar[6].tableName, AlterOptions: []AlterOption{&AddIndexDefinition{IndexDefinition: &IndexDefinition{Info: &IndexInfo{Name: yyDollar[3].colIdent, Type: string(yyDollar[2].bytes)}, Options: yyDollar[4].indexOptions}}}}
+			setDDL(yylex, yyVAL.alterTable)
+		}
+	case 103:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:850
+		{
+			yyVAL.alterTable = &AlterTable{Table: yyDollar[7].tableName, AlterOptions: []AlterOption{&AddIndexDefinition{IndexDefinition: &IndexDefinition{Info: &IndexInfo{Name: yyDollar[4].colIdent, Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Fulltext: true}, Options: yyDollar[5].indexOptions}}}}
+			setDDL(yylex, yyVAL.alterTable)
+		}
+	case 104:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:855
+		{
+			yyVAL.alterTable = &AlterTable{Table: yyDollar[7].tableName, AlterOptions: []AlterOption{&AddIndexDefinition{IndexDefinition: &IndexDefinition{Info: &IndexInfo{Name: yyDollar[4].colIdent, Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Spatial: true}, Options: yyDollar[5].indexOptions}}}}
+			setDDL(yylex, yyVAL.alterTable)
+		}
+	case 105:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:860
+		{
+			yyVAL.alterTable = &AlterTable{Table: yyDollar[7].tableName, AlterOptions: []AlterOption{&AddIndexDefinition{IndexDefinition: &IndexDefinition{Info: &IndexInfo{Name: yyDollar[4].colIdent, Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Unique: true}, Options: yyDollar[5].indexOptions}}}}
+			setDDL(yylex, yyVAL.alterTable)
+		}
+	case 106:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:727
+//line sql.y:867
+		{
+			yyVAL.createDatabase = &CreateDatabase{DBName: string(yyDollar[4].colIdent.String()), IfNotExists: yyDollar[3].boolean}
+			setDDL(yylex, yyVAL.createDatabase)
+		}
+	case 107:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:874
+		{
+			yyVAL.alterDatabase = &AlterDatabase{}
+			setDDL(yylex, yyVAL.alterDatabase)
+		}
+	case 110:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:885
 		{
 			yyVAL.TableSpec = yyDollar[2].TableSpec
-			yyVAL.TableSpec.Options = yyDollar[4].str
+			yyVAL.TableSpec.Options = yyDollar[4].tableOptions
 		}
-	case 93:
+	case 111:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:891
+		{
+			yyVAL.collateAndCharsets = nil
+		}
+	case 112:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:895
+		{
+			yyVAL.collateAndCharsets = yyDollar[1].collateAndCharsets
+		}
+	case 113:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:901
+		{
+			yyVAL.collateAndCharsets = []CollateAndCharset{yyDollar[1].collateAndCharset}
+		}
+	case 114:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:905
+		{
+			yyVAL.collateAndCharsets = []CollateAndCharset{yyDollar[1].collateAndCharset}
+		}
+	case 115:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:734
+//line sql.y:909
+		{
+			yyVAL.collateAndCharsets = append(yyDollar[1].collateAndCharsets, yyDollar[2].collateAndCharset)
+		}
+	case 116:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:913
+		{
+			yyVAL.collateAndCharsets = append(yyDollar[1].collateAndCharsets, yyDollar[2].collateAndCharset)
+		}
+	case 117:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:918
+		{
+			yyVAL.boolean = false
+		}
+	case 118:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:922
+		{
+			yyVAL.boolean = true
+		}
+	case 119:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:928
+		{
+			yyVAL.collateAndCharset = CollateAndCharset{Type: CharacterSetType, Value: (yyDollar[4].colIdent.String()), IsDefault: yyDollar[1].boolean}
+		}
+	case 120:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:932
+		{
+			yyVAL.collateAndCharset = CollateAndCharset{Type: CharacterSetType, Value: ("'" + string(yyDollar[4].bytes) + "'"), IsDefault: yyDollar[1].boolean}
+		}
+	case 121:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:938
+		{
+			yyVAL.collateAndCharset = CollateAndCharset{Type: CollateType, Value: (yyDollar[4].colIdent.String()), IsDefault: yyDollar[1].boolean}
+		}
+	case 122:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:942
+		{
+			yyVAL.collateAndCharset = CollateAndCharset{Type: CollateType, Value: ("'" + string(yyDollar[4].bytes) + "'"), IsDefault: yyDollar[1].boolean}
+		}
+	case 123:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:949
 		{
 			yyVAL.optLike = &OptLike{LikeTable: yyDollar[2].tableName}
 		}
-	case 94:
+	case 124:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:738
+//line sql.y:953
 		{
 			yyVAL.optLike = &OptLike{LikeTable: yyDollar[3].tableName}
 		}
-	case 95:
+	case 125:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:744
+//line sql.y:959
+		{
+			yyVAL.columnDefinitions = []*ColumnDefinition{yyDollar[1].columnDefinition}
+		}
+	case 126:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:963
+		{
+			yyVAL.columnDefinitions = append(yyDollar[1].columnDefinitions, yyDollar[3].columnDefinition)
+		}
+	case 127:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:969
 		{
 			yyVAL.TableSpec = &TableSpec{}
 			yyVAL.TableSpec.AddColumn(yyDollar[1].columnDefinition)
 		}
-	case 96:
+	case 128:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:974
+		{
+			yyVAL.TableSpec = &TableSpec{}
+			yyVAL.TableSpec.AddConstraint(yyDollar[1].constraintDefinition)
+		}
+	case 129:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:749
+//line sql.y:979
 		{
 			yyVAL.TableSpec.AddColumn(yyDollar[3].columnDefinition)
 		}
-	case 97:
+	case 130:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:983
+		{
+			yyVAL.TableSpec.AddColumn(yyDollar[3].columnDefinition)
+			yyVAL.TableSpec.AddConstraint(yyDollar[4].constraintDefinition)
+		}
+	case 131:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:753
+//line sql.y:988
 		{
 			yyVAL.TableSpec.AddIndex(yyDollar[3].indexDefinition)
 		}
-	case 98:
+	case 132:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:757
+//line sql.y:992
 		{
 			yyVAL.TableSpec.AddConstraint(yyDollar[3].constraintDefinition)
 		}
-	case 99:
-		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:763
+	case 133:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:996
 		{
-			yyDollar[2].columnType.NotNull = yyDollar[3].boolean
-			yyDollar[2].columnType.Default = yyDollar[4].optVal
-			yyDollar[2].columnType.OnUpdate = yyDollar[5].optVal
-			yyDollar[2].columnType.Autoincrement = yyDollar[6].boolean
-			yyDollar[2].columnType.KeyOpt = yyDollar[7].colKeyOpt
-			yyDollar[2].columnType.Comment = yyDollar[8].literal
+			yyVAL.TableSpec.AddConstraint(yyDollar[3].constraintDefinition)
+		}
+	case 134:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1002
+		{
+			yyDollar[2].columnType.Options = yyDollar[3].columnTypeOptions
 			yyVAL.columnDefinition = &ColumnDefinition{Name: yyDollar[1].colIdent, Type: yyDollar[2].columnType}
 		}
-	case 100:
+	case 135:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1012
+		{
+			yyVAL.columnTypeOptions = &ColumnTypeOptions{NotNull: false, Default: nil, OnUpdate: nil, Autoincrement: false, KeyOpt: colKeyNone, Comment: nil}
+		}
+	case 136:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1016
+		{
+			yyDollar[1].columnTypeOptions.NotNull = false
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 137:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:774
+//line sql.y:1021
+		{
+			yyDollar[1].columnTypeOptions.NotNull = true
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 138:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1026
+		{
+			yyDollar[1].columnTypeOptions.Default = yyDollar[3].expr
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 139:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1031
+		{
+			yyDollar[1].columnTypeOptions.OnUpdate = yyDollar[4].expr
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 140:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1036
+		{
+			yyDollar[1].columnTypeOptions.Autoincrement = true
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 141:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1041
+		{
+			yyDollar[1].columnTypeOptions.Comment = NewStrLiteral(yyDollar[3].bytes)
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 142:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1046
+		{
+			yyDollar[1].columnTypeOptions.KeyOpt = colKeyPrimary
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 143:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1051
+		{
+			yyDollar[1].columnTypeOptions.KeyOpt = colKey
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 144:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1056
+		{
+			yyDollar[1].columnTypeOptions.KeyOpt = colKeyUniqueKey
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 145:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1061
+		{
+			yyDollar[1].columnTypeOptions.KeyOpt = colKeyUnique
+			yyVAL.columnTypeOptions = yyDollar[1].columnTypeOptions
+		}
+	case 146:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1068
 		{
 			yyVAL.columnType = yyDollar[1].columnType
 			yyVAL.columnType.Unsigned = yyDollar[2].boolean
 			yyVAL.columnType.Zerofill = yyDollar[3].boolean
 		}
-	case 104:
+	case 150:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:785
+//line sql.y:1079
 		{
 			yyVAL.columnType = yyDollar[1].columnType
 			yyVAL.columnType.Length = yyDollar[2].literal
 		}
-	case 105:
+	case 151:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:790
+//line sql.y:1084
 		{
 			yyVAL.columnType = yyDollar[1].columnType
 		}
-	case 106:
+	case 152:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:796
+//line sql.y:1090
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 107:
+	case 153:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:800
+//line sql.y:1094
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 108:
+	case 154:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:804
+//line sql.y:1098
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 109:
+	case 155:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:808
+//line sql.y:1102
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 110:
+	case 156:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:812
+//line sql.y:1106
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 111:
+	case 157:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:816
+//line sql.y:1110
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 112:
+	case 158:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:820
+//line sql.y:1114
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 113:
+	case 159:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:824
+//line sql.y:1118
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 114:
+	case 160:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:828
+//line sql.y:1122
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 115:
+	case 161:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:834
+//line sql.y:1128
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 			yyVAL.columnType.Length = yyDollar[2].LengthScaleOption.Length
 			yyVAL.columnType.Scale = yyDollar[2].LengthScaleOption.Scale
 		}
-	case 116:
+	case 162:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:840
+//line sql.y:1134
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 			yyVAL.columnType.Length = yyDollar[2].LengthScaleOption.Length
 			yyVAL.columnType.Scale = yyDollar[2].LengthScaleOption.Scale
 		}
-	case 117:
+	case 163:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:846
+//line sql.y:1140
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 			yyVAL.columnType.Length = yyDollar[2].LengthScaleOption.Length
 			yyVAL.columnType.Scale = yyDollar[2].LengthScaleOption.Scale
 		}
-	case 118:
+	case 164:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:852
+//line sql.y:1146
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 			yyVAL.columnType.Length = yyDollar[2].LengthScaleOption.Length
 			yyVAL.columnType.Scale = yyDollar[2].LengthScaleOption.Scale
 		}
-	case 119:
+	case 165:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:858
+//line sql.y:1152
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 			yyVAL.columnType.Length = yyDollar[2].LengthScaleOption.Length
 			yyVAL.columnType.Scale = yyDollar[2].LengthScaleOption.Scale
 		}
-	case 120:
+	case 166:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:866
+//line sql.y:1160
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 121:
+	case 167:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:870
+//line sql.y:1164
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 122:
+	case 168:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:874
+//line sql.y:1168
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 123:
+	case 169:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:878
+//line sql.y:1172
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 124:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:882
+	case 170:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1176
 		{
-			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
+			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 125:
+	case 171:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:888
+//line sql.y:1182
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal, Charset: yyDollar[3].str, Collate: yyDollar[4].str}
 		}
-	case 126:
+	case 172:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:892
+//line sql.y:1186
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal, Charset: yyDollar[3].str, Collate: yyDollar[4].str}
 		}
-	case 127:
+	case 173:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:896
+//line sql.y:1190
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 128:
+	case 174:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:900
+//line sql.y:1194
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 129:
+	case 175:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:904
+//line sql.y:1198
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Charset: yyDollar[2].str, Collate: yyDollar[3].str}
 		}
-	case 130:
+	case 176:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:908
+//line sql.y:1202
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Charset: yyDollar[2].str, Collate: yyDollar[3].str}
 		}
-	case 131:
+	case 177:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:912
+//line sql.y:1206
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Charset: yyDollar[2].str, Collate: yyDollar[3].str}
 		}
-	case 132:
+	case 178:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:916
+//line sql.y:1210
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), Charset: yyDollar[2].str, Collate: yyDollar[3].str}
 		}
-	case 133:
+	case 179:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:920
+//line sql.y:1214
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 134:
+	case 180:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:924
+//line sql.y:1218
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 135:
+	case 181:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:928
+//line sql.y:1222
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 136:
+	case 182:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:932
+//line sql.y:1226
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 137:
+	case 183:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:936
+//line sql.y:1230
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 138:
+	case 184:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:940
+//line sql.y:1234
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), EnumValues: yyDollar[3].strs, Charset: yyDollar[5].str, Collate: yyDollar[6].str}
 		}
-	case 139:
+	case 185:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:945
+//line sql.y:1239
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes), EnumValues: yyDollar[3].strs, Charset: yyDollar[5].str, Collate: yyDollar[6].str}
 		}
-	case 140:
+	case 186:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:951
+//line sql.y:1245
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 141:
+	case 187:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:955
+//line sql.y:1249
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 142:
+	case 188:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:959
+//line sql.y:1253
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 143:
+	case 189:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:963
+//line sql.y:1257
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 144:
+	case 190:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:967
+//line sql.y:1261
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 145:
+	case 191:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:971
+//line sql.y:1265
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 146:
+	case 192:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:975
+//line sql.y:1269
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 147:
+	case 193:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:979
+//line sql.y:1273
 		{
 			yyVAL.columnType = ColumnType{Type: string(yyDollar[1].bytes)}
 		}
-	case 148:
+	case 194:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:985
+//line sql.y:1279
 		{
 			yyVAL.strs = make([]string, 0, 4)
 			yyVAL.strs = append(yyVAL.strs, "'"+string(yyDollar[1].bytes)+"'")
 		}
-	case 149:
+	case 195:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:990
+//line sql.y:1284
 		{
 			yyVAL.strs = append(yyDollar[1].strs, "'"+string(yyDollar[3].bytes)+"'")
 		}
-	case 150:
+	case 196:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:995
+//line sql.y:1289
 		{
 			yyVAL.literal = nil
 		}
-	case 151:
+	case 197:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:999
+//line sql.y:1293
 		{
 			yyVAL.literal = NewIntLiteral(yyDollar[2].bytes)
 		}
-	case 152:
+	case 198:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1004
+//line sql.y:1298
 		{
 			yyVAL.LengthScaleOption = LengthScaleOption{}
 		}
-	case 153:
+	case 199:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1008
+//line sql.y:1302
 		{
 			yyVAL.LengthScaleOption = LengthScaleOption{
 				Length: NewIntLiteral(yyDollar[2].bytes),
 				Scale:  NewIntLiteral(yyDollar[4].bytes),
 			}
 		}
-	case 154:
+	case 200:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1016
+//line sql.y:1310
 		{
 			yyVAL.LengthScaleOption = LengthScaleOption{}
 		}
-	case 155:
+	case 201:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1020
+//line sql.y:1314
 		{
 			yyVAL.LengthScaleOption = LengthScaleOption{
 				Length: NewIntLiteral(yyDollar[2].bytes),
 			}
 		}
-	case 156:
+	case 202:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1026
+//line sql.y:1320
 		{
 			yyVAL.LengthScaleOption = LengthScaleOption{
 				Length: NewIntLiteral(yyDollar[2].bytes),
 				Scale:  NewIntLiteral(yyDollar[4].bytes),
 			}
 		}
-	case 157:
+	case 203:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1034
+//line sql.y:1328
 		{
 			yyVAL.boolean = false
 		}
-	case 158:
+	case 204:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1038
+//line sql.y:1332
 		{
 			yyVAL.boolean = true
 		}
-	case 159:
+	case 205:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1043
+//line sql.y:1337
 		{
 			yyVAL.boolean = false
 		}
-	case 160:
+	case 206:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1047
+//line sql.y:1341
 		{
 			yyVAL.boolean = true
 		}
-	case 161:
+	case 207:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1053
-		{
-			yyVAL.boolean = false
-		}
-	case 162:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1057
-		{
-			yyVAL.boolean = false
-		}
-	case 163:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1061
-		{
-			yyVAL.boolean = true
-		}
-	case 164:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1066
-		{
-			yyVAL.optVal = nil
-		}
-	case 165:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1070
-		{
-			yyVAL.optVal = yyDollar[2].expr
-		}
-	case 166:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1075
-		{
-			yyVAL.optVal = nil
-		}
-	case 167:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1079
-		{
-			yyVAL.optVal = yyDollar[3].expr
-		}
-	case 168:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1084
-		{
-			yyVAL.boolean = false
-		}
-	case 169:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1088
-		{
-			yyVAL.boolean = true
-		}
-	case 170:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1093
+//line sql.y:1346
 		{
 			yyVAL.str = ""
 		}
-	case 171:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1097
-		{
-			yyVAL.str = string(yyDollar[3].colIdent.String())
-		}
-	case 172:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1101
-		{
-			yyVAL.str = string(yyDollar[3].bytes)
-		}
-	case 173:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1106
-		{
-			yyVAL.str = ""
-		}
-	case 174:
+	case 208:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1110
+//line sql.y:1350
 		{
 			yyVAL.str = string(yyDollar[2].colIdent.String())
 		}
-	case 175:
+	case 209:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1114
+//line sql.y:1354
 		{
 			yyVAL.str = string(yyDollar[2].bytes)
 		}
-	case 176:
+	case 210:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1119
+//line sql.y:1359
 		{
-			yyVAL.colKeyOpt = colKeyNone
+			yyVAL.str = ""
 		}
-	case 177:
+	case 211:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1123
+//line sql.y:1363
 		{
-			yyVAL.colKeyOpt = colKeyPrimary
+			yyVAL.str = string(yyDollar[2].colIdent.String())
 		}
-	case 178:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1127
-		{
-			yyVAL.colKeyOpt = colKey
-		}
-	case 179:
+	case 212:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1131
+//line sql.y:1367
 		{
-			yyVAL.colKeyOpt = colKeyUniqueKey
+			yyVAL.str = string(yyDollar[2].bytes)
 		}
-	case 180:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1135
-		{
-			yyVAL.colKeyOpt = colKeyUnique
-		}
-	case 181:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1140
-		{
-			yyVAL.literal = nil
-		}
-	case 182:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1144
-		{
-			yyVAL.literal = NewStrLiteral(yyDollar[2].bytes)
-		}
-	case 183:
+	case 213:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1150
+//line sql.y:1374
 		{
 			yyVAL.indexDefinition = &IndexDefinition{Info: yyDollar[1].indexInfo, Columns: yyDollar[3].indexColumns, Options: yyDollar[5].indexOptions}
 		}
-	case 184:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1154
+	case 214:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1379
 		{
-			yyVAL.indexDefinition = &IndexDefinition{Info: yyDollar[1].indexInfo, Columns: yyDollar[3].indexColumns}
+			yyVAL.indexOptions = nil
 		}
-	case 185:
+	case 215:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1160
+//line sql.y:1383
+		{
+			yyVAL.indexOptions = yyDollar[1].indexOptions
+		}
+	case 216:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1389
 		{
 			yyVAL.indexOptions = []*IndexOption{yyDollar[1].indexOption}
 		}
-	case 186:
+	case 217:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1164
+//line sql.y:1393
 		{
 			yyVAL.indexOptions = append(yyVAL.indexOptions, yyDollar[2].indexOption)
 		}
-	case 187:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1170
+	case 218:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1399
 		{
-			yyVAL.indexOption = &IndexOption{Name: string(yyDollar[1].bytes), Using: string(yyDollar[2].colIdent.String())}
+			yyVAL.indexOption = yyDollar[1].indexOption
 		}
-	case 188:
+	case 219:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1174
+//line sql.y:1403
 		{
 			// should not be string
 			yyVAL.indexOption = &IndexOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
 		}
-	case 189:
+	case 220:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1179
+//line sql.y:1408
 		{
 			yyVAL.indexOption = &IndexOption{Name: string(yyDollar[1].bytes), Value: NewStrLiteral(yyDollar[2].bytes)}
 		}
-	case 190:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1185
-		{
-			yyVAL.str = ""
-		}
-	case 191:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1189
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 192:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1195
-		{
-			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes), Name: NewColIdent("PRIMARY"), Primary: true, Unique: true}
-		}
-	case 193:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1199
-		{
-			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].bytes) + " " + string(yyDollar[2].str), Name: NewColIdent(yyDollar[3].str), Spatial: true, Unique: false}
-		}
-	case 194:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1203
-		{
-			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].bytes) + " " + string(yyDollar[2].str), Name: NewColIdent(yyDollar[3].str), Unique: true}
-		}
-	case 195:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1207
-		{
-			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].bytes), Name: NewColIdent(yyDollar[2].str), Unique: true}
-		}
-	case 196:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1211
-		{
-			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].str), Name: NewColIdent(yyDollar[2].str), Unique: false}
-		}
-	case 197:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1217
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 198:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1221
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 199:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1225
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 200:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1232
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 201:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1236
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 202:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1242
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 203:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1246
-		{
-			yyVAL.str = string(yyDollar[1].bytes)
-		}
-	case 204:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1251
-		{
-			yyVAL.str = ""
-		}
-	case 205:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1255
-		{
-			yyVAL.str = string(yyDollar[1].colIdent.String())
-		}
-	case 206:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1261
-		{
-			yyVAL.indexColumns = []*IndexColumn{yyDollar[1].indexColumn}
-		}
-	case 207:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1265
-		{
-			yyVAL.indexColumns = append(yyVAL.indexColumns, yyDollar[3].indexColumn)
-		}
-	case 208:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1271
-		{
-			yyVAL.indexColumn = &IndexColumn{Column: yyDollar[1].colIdent, Length: yyDollar[2].literal}
-		}
-	case 209:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1277
-		{
-			yyVAL.constraintDefinition = &ConstraintDefinition{Name: string(yyDollar[2].colIdent.String()), Details: yyDollar[3].constraintInfo}
-		}
-	case 210:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1281
-		{
-			yyVAL.constraintDefinition = &ConstraintDefinition{Details: yyDollar[1].constraintInfo}
-		}
-	case 211:
-		yyDollar = yyS[yypt-10 : yypt+1]
-//line sql.y:1288
-		{
-			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns}
-		}
-	case 212:
-		yyDollar = yyS[yypt-11 : yypt+1]
-//line sql.y:1292
-		{
-			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns, OnDelete: yyDollar[11].ReferenceAction}
-		}
-	case 213:
-		yyDollar = yyS[yypt-11 : yypt+1]
-//line sql.y:1296
-		{
-			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns, OnUpdate: yyDollar[11].ReferenceAction}
-		}
-	case 214:
-		yyDollar = yyS[yypt-12 : yypt+1]
-//line sql.y:1300
-		{
-			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns, OnDelete: yyDollar[11].ReferenceAction, OnUpdate: yyDollar[12].ReferenceAction}
-		}
-	case 215:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1306
-		{
-			yyVAL.ReferenceAction = yyDollar[3].ReferenceAction
-		}
-	case 216:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1312
-		{
-			yyVAL.ReferenceAction = yyDollar[3].ReferenceAction
-		}
-	case 217:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1318
-		{
-			yyVAL.ReferenceAction = Restrict
-		}
-	case 218:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1322
-		{
-			yyVAL.ReferenceAction = Cascade
-		}
-	case 219:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1326
-		{
-			yyVAL.ReferenceAction = NoAction
-		}
-	case 220:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1330
-		{
-			yyVAL.ReferenceAction = SetDefault
-		}
 	case 221:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1334
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1412
 		{
-			yyVAL.ReferenceAction = SetNull
+			yyVAL.indexOption = &IndexOption{Name: string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes), String: yyDollar[3].colIdent.String()}
 		}
 	case 222:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1339
+//line sql.y:1418
 		{
 			yyVAL.str = ""
 		}
 	case 223:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1343
-		{
-			yyVAL.str = " " + string(yyDollar[1].str)
-		}
-	case 224:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1347
-		{
-			yyVAL.str = string(yyDollar[1].str) + ", " + string(yyDollar[3].str)
-		}
-	case 225:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1355
-		{
-			yyVAL.str = yyDollar[1].str
-		}
-	case 226:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1359
-		{
-			yyVAL.str = yyDollar[1].str + " " + yyDollar[2].str
-		}
-	case 227:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1363
-		{
-			yyVAL.str = yyDollar[1].str + "=" + yyDollar[3].str
-		}
-	case 228:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1369
-		{
-			yyVAL.str = yyDollar[1].colIdent.String()
-		}
-	case 229:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1373
-		{
-			yyVAL.str = "'" + string(yyDollar[1].bytes) + "'"
-		}
-	case 230:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1377
+//line sql.y:1422
 		{
 			yyVAL.str = string(yyDollar[1].bytes)
 		}
-	case 231:
-		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:1383
+	case 224:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1428
 		{
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[4].tableName}
+			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), ConstraintName: NewColIdent(yyDollar[1].str), Name: NewColIdent("PRIMARY"), Primary: true, Unique: true}
+		}
+	case 225:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1432
+		{
+			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].bytes) + " " + string(yyDollar[2].str), Name: NewColIdent(yyDollar[3].str), Spatial: true, Unique: false}
+		}
+	case 226:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1436
+		{
+			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].bytes) + " " + string(yyDollar[2].str), Name: NewColIdent(yyDollar[3].str), Fulltext: true, Unique: false}
+		}
+	case 227:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1440
+		{
+			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].str), ConstraintName: NewColIdent(yyDollar[1].str), Name: NewColIdent(yyDollar[4].str), Unique: true}
+		}
+	case 228:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1444
+		{
+			yyVAL.indexInfo = &IndexInfo{Type: string(yyDollar[1].str), Name: NewColIdent(yyDollar[2].str), Unique: false}
+		}
+	case 229:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1449
+		{
+			yyVAL.str = ""
+		}
+	case 230:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1453
+		{
+			yyVAL.str = yyDollar[2].str
+		}
+	case 231:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1459
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
 		}
 	case 232:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1387
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1463
 		{
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[4].tableName}
+			yyVAL.str = string(yyDollar[1].bytes)
 		}
 	case 233:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1391
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1467
 		{
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[4].tableName}
+			yyVAL.str = string(yyDollar[1].bytes)
 		}
 	case 234:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1395
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1474
 		{
-			// Change this to a rename statement
-			yyVAL.statement = &DDL{Action: RenameStr, FromTables: TableNames{yyDollar[4].tableName}, ToTables: TableNames{yyDollar[7].tableName}}
+			yyVAL.str = string(yyDollar[1].bytes)
 		}
 	case 235:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1400
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1478
 		{
-			// Rename an index can just be an alter
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[4].tableName}
+			yyVAL.str = string(yyDollar[1].bytes)
 		}
 	case 236:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1405
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1483
 		{
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[3].tableName.ToViewName()}
+			yyVAL.str = "key"
 		}
 	case 237:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1409
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1487
 		{
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[4].tableName, PartitionSpec: yyDollar[5].partSpec}
+			yyVAL.str = yyDollar[1].str
 		}
 	case 238:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1413
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1493
 		{
-			yyVAL.statement = &DBDDL{Action: AlterStr, DBName: string(yyDollar[3].colIdent.String())}
+			yyVAL.str = string(yyDollar[1].bytes)
 		}
 	case 239:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1417
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1497
 		{
-			yyVAL.statement = &DBDDL{Action: AlterStr, DBName: string(yyDollar[3].colIdent.String())}
+			yyVAL.str = string(yyDollar[1].bytes)
 		}
 	case 240:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1421
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1502
 		{
-			yyVAL.statement = &DDL{
-				Action: CreateVindexStr,
+			yyVAL.str = ""
+		}
+	case 241:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1506
+		{
+			yyVAL.str = string(yyDollar[1].colIdent.String())
+		}
+	case 242:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1512
+		{
+			yyVAL.indexColumns = []*IndexColumn{yyDollar[1].indexColumn}
+		}
+	case 243:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1516
+		{
+			yyVAL.indexColumns = append(yyVAL.indexColumns, yyDollar[3].indexColumn)
+		}
+	case 244:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1522
+		{
+			yyVAL.indexColumn = &IndexColumn{Column: yyDollar[1].colIdent, Length: yyDollar[2].literal, Direction: yyDollar[3].orderDirection}
+		}
+	case 245:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1528
+		{
+			yyVAL.constraintDefinition = &ConstraintDefinition{Name: string(yyDollar[2].colIdent.String()), Details: yyDollar[3].constraintInfo}
+		}
+	case 246:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1532
+		{
+			yyVAL.constraintDefinition = &ConstraintDefinition{Details: yyDollar[1].constraintInfo}
+		}
+	case 247:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1538
+		{
+			yyVAL.constraintDefinition = &ConstraintDefinition{Name: string(yyDollar[2].colIdent.String()), Details: yyDollar[3].constraintInfo}
+		}
+	case 248:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1542
+		{
+			yyVAL.constraintDefinition = &ConstraintDefinition{Details: yyDollar[1].constraintInfo}
+		}
+	case 249:
+		yyDollar = yyS[yypt-10 : yypt+1]
+//line sql.y:1548
+		{
+			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns}
+		}
+	case 250:
+		yyDollar = yyS[yypt-11 : yypt+1]
+//line sql.y:1552
+		{
+			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns, OnDelete: yyDollar[11].ReferenceAction}
+		}
+	case 251:
+		yyDollar = yyS[yypt-11 : yypt+1]
+//line sql.y:1556
+		{
+			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns, OnUpdate: yyDollar[11].ReferenceAction}
+		}
+	case 252:
+		yyDollar = yyS[yypt-12 : yypt+1]
+//line sql.y:1560
+		{
+			yyVAL.constraintInfo = &ForeignKeyDefinition{Source: yyDollar[4].columns, ReferencedTable: yyDollar[7].tableName, ReferencedColumns: yyDollar[9].columns, OnDelete: yyDollar[11].ReferenceAction, OnUpdate: yyDollar[12].ReferenceAction}
+		}
+	case 253:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1566
+		{
+			yyVAL.constraintInfo = &CheckConstraintDefinition{Expr: yyDollar[3].expr, Enforced: yyDollar[5].boolean}
+		}
+	case 254:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1572
+		{
+			yyVAL.ReferenceAction = yyDollar[3].ReferenceAction
+		}
+	case 255:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1578
+		{
+			yyVAL.ReferenceAction = yyDollar[3].ReferenceAction
+		}
+	case 256:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1584
+		{
+			yyVAL.ReferenceAction = Restrict
+		}
+	case 257:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1588
+		{
+			yyVAL.ReferenceAction = Cascade
+		}
+	case 258:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1592
+		{
+			yyVAL.ReferenceAction = NoAction
+		}
+	case 259:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1596
+		{
+			yyVAL.ReferenceAction = SetDefault
+		}
+	case 260:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1600
+		{
+			yyVAL.ReferenceAction = SetNull
+		}
+	case 261:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1605
+		{
+			yyVAL.str = ""
+		}
+	case 262:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1609
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 263:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1613
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 264:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1618
+		{
+			yyVAL.boolean = true
+		}
+	case 265:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1622
+		{
+			yyVAL.boolean = true
+		}
+	case 266:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1626
+		{
+			yyVAL.boolean = false
+		}
+	case 267:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1631
+		{
+			yyVAL.tableOptions = nil
+		}
+	case 268:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1635
+		{
+			yyVAL.tableOptions = yyDollar[1].tableOptions
+		}
+	case 269:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1641
+		{
+			yyVAL.tableOptions = TableOptions{yyDollar[1].tableOption}
+		}
+	case 270:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1645
+		{
+			yyVAL.tableOptions = append(yyDollar[1].tableOptions, yyDollar[3].tableOption)
+		}
+	case 271:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1649
+		{
+			yyVAL.tableOptions = append(yyDollar[1].tableOptions, yyDollar[2].tableOption)
+		}
+	case 272:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1655
+		{
+			yyVAL.tableOptions = TableOptions{yyDollar[1].tableOption}
+		}
+	case 273:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1659
+		{
+			yyVAL.tableOptions = append(yyDollar[1].tableOptions, yyDollar[2].tableOption)
+		}
+	case 274:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1665
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 275:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1669
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 276:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1673
+		{
+			yyVAL.tableOption = &TableOption{Name: (string(yyDollar[2].bytes)), String: yyDollar[4].str}
+		}
+	case 277:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1677
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[2].bytes), String: yyDollar[4].str}
+		}
+	case 278:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1681
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 279:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1685
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewStrLiteral(yyDollar[3].bytes)}
+		}
+	case 280:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1689
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewStrLiteral(yyDollar[3].bytes)}
+		}
+	case 281:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1693
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewStrLiteral(yyDollar[3].bytes)}
+		}
+	case 282:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1697
+		{
+			yyVAL.tableOption = &TableOption{Name: (string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)), Value: NewStrLiteral(yyDollar[4].bytes)}
+		}
+	case 283:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1701
+		{
+			yyVAL.tableOption = &TableOption{Name: (string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)), Value: NewStrLiteral(yyDollar[4].bytes)}
+		}
+	case 284:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1705
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 285:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1709
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewStrLiteral(yyDollar[3].bytes)}
+		}
+	case 286:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1713
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), String: yyDollar[3].colIdent.String()}
+		}
+	case 287:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1717
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewStrLiteral(yyDollar[3].bytes)}
+		}
+	case 288:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1721
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), String: string(yyDollar[3].bytes)}
+		}
+	case 289:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1725
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 290:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1729
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 291:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1733
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 292:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1737
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 293:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1741
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), String: string(yyDollar[3].bytes)}
+		}
+	case 294:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1745
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewStrLiteral(yyDollar[3].bytes)}
+		}
+	case 295:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1749
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), String: string(yyDollar[3].bytes)}
+		}
+	case 296:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1753
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 297:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1757
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), String: string(yyDollar[3].bytes)}
+		}
+	case 298:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1761
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 299:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1765
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), String: string(yyDollar[3].bytes)}
+		}
+	case 300:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1769
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Value: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 301:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1773
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), String: (yyDollar[3].colIdent.String() + yyDollar[4].str)}
+		}
+	case 302:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1777
+		{
+			yyVAL.tableOption = &TableOption{Name: string(yyDollar[1].bytes), Tables: yyDollar[4].tableNames}
+		}
+	case 303:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1782
+		{
+			yyVAL.str = ""
+		}
+	case 304:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1786
+		{
+			yyVAL.str = " " + string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)
+		}
+	case 305:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1790
+		{
+			yyVAL.str = " " + string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)
+		}
+	case 315:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1809
+		{
+			yyVAL.str = yyDollar[1].colIdent.String()
+		}
+	case 316:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1813
+		{
+			yyVAL.str = "'" + string(yyDollar[1].bytes) + "'"
+		}
+	case 317:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1817
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 318:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1822
+		{
+			yyVAL.bytes = []byte("")
+		}
+	case 320:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1828
+		{
+			yyVAL.colName = nil
+		}
+	case 321:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1832
+		{
+			yyVAL.colName = yyDollar[2].colName
+		}
+	case 322:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1837
+		{
+			yyVAL.colName = nil
+		}
+	case 323:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1841
+		{
+			yyVAL.colName = yyDollar[2].colName
+		}
+	case 324:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:1846
+		{
+			yyVAL.alterOptions = nil
+		}
+	case 325:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1850
+		{
+			yyVAL.alterOptions = yyDollar[1].alterOptions
+		}
+	case 326:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1854
+		{
+			yyVAL.alterOptions = append(yyDollar[1].alterOptions, &OrderByOption{Cols: yyDollar[5].columns})
+		}
+	case 327:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1858
+		{
+			yyVAL.alterOptions = yyDollar[1].alterOptions
+		}
+	case 328:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1862
+		{
+			yyVAL.alterOptions = append(yyDollar[1].alterOptions, yyDollar[3].alterOptions...)
+		}
+	case 329:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:1866
+		{
+			yyVAL.alterOptions = append(append(yyDollar[1].alterOptions, yyDollar[3].alterOptions...), &OrderByOption{Cols: yyDollar[7].columns})
+		}
+	case 330:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1872
+		{
+			yyVAL.alterOptions = []AlterOption{yyDollar[1].alterOption}
+		}
+	case 331:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1876
+		{
+			yyVAL.alterOptions = append(yyDollar[1].alterOptions, yyDollar[3].alterOption)
+		}
+	case 332:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1880
+		{
+			yyVAL.alterOptions = append(yyDollar[1].alterOptions, yyDollar[3].alterOption)
+		}
+	case 333:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1886
+		{
+			yyVAL.alterOption = yyDollar[1].tableOptions
+		}
+	case 334:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1890
+		{
+			yyVAL.alterOption = &AddConstraintDefinition{ConstraintDefinition: yyDollar[2].constraintDefinition}
+		}
+	case 335:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1894
+		{
+			yyVAL.alterOption = &AddConstraintDefinition{ConstraintDefinition: yyDollar[2].constraintDefinition}
+		}
+	case 336:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1898
+		{
+			yyVAL.alterOption = &AddIndexDefinition{IndexDefinition: yyDollar[2].indexDefinition}
+		}
+	case 337:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1902
+		{
+			yyVAL.alterOption = &AddColumns{Columns: yyDollar[4].columnDefinitions}
+		}
+	case 338:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1906
+		{
+			yyVAL.alterOption = &AddColumns{Columns: []*ColumnDefinition{yyDollar[3].columnDefinition}, First: yyDollar[4].colName, After: yyDollar[5].colName}
+		}
+	case 339:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1910
+		{
+			yyVAL.alterOption = &AlterColumn{Column: yyDollar[3].colName, DropDefault: true}
+		}
+	case 340:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:1914
+		{
+			yyVAL.alterOption = &AlterColumn{Column: yyDollar[3].colName, DropDefault: false, DefaultVal: yyDollar[6].expr}
+		}
+	case 341:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:1918
+		{
+			yyVAL.alterOption = &ChangeColumn{OldColumn: yyDollar[3].colName, NewColDefinition: yyDollar[4].columnDefinition, First: yyDollar[5].colName, After: yyDollar[6].colName}
+		}
+	case 342:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1922
+		{
+			yyVAL.alterOption = &ModifyColumn{NewColDefinition: yyDollar[3].columnDefinition, First: yyDollar[4].colName, After: yyDollar[5].colName}
+		}
+	case 343:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1926
+		{
+			yyVAL.alterOption = &AlterCharset{CharacterSet: yyDollar[4].str, Collate: yyDollar[5].str}
+		}
+	case 344:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1930
+		{
+			yyVAL.alterOption = &KeyState{Enable: false}
+		}
+	case 345:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1934
+		{
+			yyVAL.alterOption = &KeyState{Enable: true}
+		}
+	case 346:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1938
+		{
+			yyVAL.alterOption = &TablespaceOperation{Import: false}
+		}
+	case 347:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:1942
+		{
+			yyVAL.alterOption = &TablespaceOperation{Import: true}
+		}
+	case 348:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1946
+		{
+			yyVAL.alterOption = &DropColumn{Name: yyDollar[3].colName}
+		}
+	case 349:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1950
+		{
+			yyVAL.alterOption = &DropKey{Type: NormalKeyType, Name: yyDollar[3].colIdent.String()}
+		}
+	case 350:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1954
+		{
+			yyVAL.alterOption = &DropKey{Type: PrimaryKeyType}
+		}
+	case 351:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:1958
+		{
+			yyVAL.alterOption = &DropKey{Type: ForeignKeyType, Name: yyDollar[4].colIdent.String()}
+		}
+	case 352:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1962
+		{
+			yyVAL.alterOption = &Force{}
+		}
+	case 353:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1966
+		{
+			yyVAL.alterOption = &RenameTableName{Table: yyDollar[3].tableName}
+		}
+	case 354:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:1970
+		{
+			yyVAL.alterOption = &RenameIndex{OldName: yyDollar[3].colIdent.String(), NewName: yyDollar[5].colIdent.String()}
+		}
+	case 355:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:1976
+		{
+			yyVAL.alterOptions = []AlterOption{yyDollar[1].alterOption}
+		}
+	case 356:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1980
+		{
+			yyVAL.alterOptions = append(yyDollar[1].alterOptions, yyDollar[3].alterOption)
+		}
+	case 357:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1986
+		{
+			yyVAL.alterOption = AlgorithmValue(string(yyDollar[3].bytes))
+		}
+	case 358:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1990
+		{
+			yyVAL.alterOption = AlgorithmValue(string(yyDollar[3].bytes))
+		}
+	case 359:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1994
+		{
+			yyVAL.alterOption = AlgorithmValue(string(yyDollar[3].bytes))
+		}
+	case 360:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:1998
+		{
+			yyVAL.alterOption = &LockOption{Type: DefaultType}
+		}
+	case 361:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2002
+		{
+			yyVAL.alterOption = &LockOption{Type: NoneType}
+		}
+	case 362:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2006
+		{
+			yyVAL.alterOption = &LockOption{Type: SharedType}
+		}
+	case 363:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2010
+		{
+			yyVAL.alterOption = &LockOption{Type: ExclusiveType}
+		}
+	case 364:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2014
+		{
+			yyVAL.alterOption = &Validation{With: true}
+		}
+	case 365:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2018
+		{
+			yyVAL.alterOption = &Validation{With: false}
+		}
+	case 366:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2024
+		{
+			yyDollar[1].alterTable.FullyParsed = true
+			yyDollar[1].alterTable.AlterOptions = yyDollar[2].alterOptions
+			yyVAL.statement = yyDollar[1].alterTable
+		}
+	case 367:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2030
+		{
+			yyDollar[1].alterTable.FullyParsed = true
+			yyDollar[1].alterTable.AlterOptions = yyDollar[2].alterOptions
+			yyDollar[1].alterTable.PartitionSpec = &PartitionSpec{Action: RemoveAction}
+			yyVAL.statement = yyDollar[1].alterTable
+		}
+	case 368:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2037
+		{
+			yyDollar[1].alterTable.FullyParsed = true
+			yyDollar[1].alterTable.AlterOptions = yyDollar[2].alterOptions
+			yyDollar[1].alterTable.PartitionSpec = yyDollar[4].partSpec
+			yyVAL.statement = yyDollar[1].alterTable
+		}
+	case 369:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2044
+		{
+			yyDollar[1].alterTable.FullyParsed = true
+			yyDollar[1].alterTable.PartitionSpec = yyDollar[2].partSpec
+			yyVAL.statement = yyDollar[1].alterTable
+		}
+	case 370:
+		yyDollar = yyS[yypt-10 : yypt+1]
+//line sql.y:2050
+		{
+			yyVAL.statement = &AlterView{ViewName: yyDollar[6].tableName.ToViewName(), Algorithm: yyDollar[2].str, Definer: yyDollar[3].str, Security: yyDollar[4].str, Columns: yyDollar[7].columns, Select: yyDollar[9].selStmt, CheckOption: yyDollar[10].str}
+		}
+	case 371:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2054
+		{
+			yyDollar[1].alterDatabase.FullyParsed = true
+			yyDollar[1].alterDatabase.DBName = yyDollar[2].colIdent.String()
+			yyDollar[1].alterDatabase.AlterOptions = yyDollar[3].collateAndCharsets
+			yyVAL.statement = yyDollar[1].alterDatabase
+		}
+	case 372:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:2061
+		{
+			yyDollar[1].alterDatabase.FullyParsed = true
+			yyDollar[1].alterDatabase.DBName = yyDollar[2].colIdent.String()
+			yyDollar[1].alterDatabase.UpdateDataDirectory = true
+			yyVAL.statement = yyDollar[1].alterDatabase
+		}
+	case 373:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:2068
+		{
+			yyVAL.statement = &AlterVschema{
+				Action: CreateVindexDDLAction,
 				Table:  yyDollar[5].tableName,
 				VindexSpec: &VindexSpec{
 					Name:   NewColIdent(yyDollar[5].tableName.Name.String()),
@@ -5154,36 +7474,36 @@ yydefault:
 				},
 			}
 		}
-	case 241:
+	case 374:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1433
+//line sql.y:2080
 		{
-			yyVAL.statement = &DDL{
-				Action: DropVindexStr,
+			yyVAL.statement = &AlterVschema{
+				Action: DropVindexDDLAction,
 				Table:  yyDollar[5].tableName,
 				VindexSpec: &VindexSpec{
 					Name: NewColIdent(yyDollar[5].tableName.Name.String()),
 				},
 			}
 		}
-	case 242:
+	case 375:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1443
+//line sql.y:2090
 		{
-			yyVAL.statement = &DDL{Action: AddVschemaTableStr, Table: yyDollar[5].tableName}
+			yyVAL.statement = &AlterVschema{Action: AddVschemaTableDDLAction, Table: yyDollar[5].tableName}
 		}
-	case 243:
+	case 376:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1447
+//line sql.y:2094
 		{
-			yyVAL.statement = &DDL{Action: DropVschemaTableStr, Table: yyDollar[5].tableName}
+			yyVAL.statement = &AlterVschema{Action: DropVschemaTableDDLAction, Table: yyDollar[5].tableName}
 		}
-	case 244:
+	case 377:
 		yyDollar = yyS[yypt-12 : yypt+1]
-//line sql.y:1451
+//line sql.y:2098
 		{
-			yyVAL.statement = &DDL{
-				Action: AddColVindexStr,
+			yyVAL.statement = &AlterVschema{
+				Action: AddColVindexDDLAction,
 				Table:  yyDollar[4].tableName,
 				VindexSpec: &VindexSpec{
 					Name:   yyDollar[7].colIdent,
@@ -5193,30 +7513,30 @@ yydefault:
 				VindexCols: yyDollar[9].columns,
 			}
 		}
-	case 245:
+	case 378:
 		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1464
+//line sql.y:2111
 		{
-			yyVAL.statement = &DDL{
-				Action: DropColVindexStr,
+			yyVAL.statement = &AlterVschema{
+				Action: DropColVindexDDLAction,
 				Table:  yyDollar[4].tableName,
 				VindexSpec: &VindexSpec{
 					Name: yyDollar[7].colIdent,
 				},
 			}
 		}
-	case 246:
+	case 379:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1474
+//line sql.y:2121
 		{
-			yyVAL.statement = &DDL{Action: AddSequenceStr, Table: yyDollar[5].tableName}
+			yyVAL.statement = &AlterVschema{Action: AddSequenceDDLAction, Table: yyDollar[5].tableName}
 		}
-	case 247:
+	case 380:
 		yyDollar = yyS[yypt-9 : yypt+1]
-//line sql.y:1478
+//line sql.y:2125
 		{
-			yyVAL.statement = &DDL{
-				Action: AddAutoIncStr,
+			yyVAL.statement = &AlterVschema{
+				Action: AddAutoIncDDLAction,
 				Table:  yyDollar[4].tableName,
 				AutoIncSpec: &AutoIncSpec{
 					Column:   yyDollar[7].colIdent,
@@ -5224,1562 +7544,1989 @@ yydefault:
 				},
 			}
 		}
-	case 262:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1507
+	case 381:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:2138
 		{
-			yyVAL.partSpec = &PartitionSpec{Action: ReorganizeStr, Name: yyDollar[3].colIdent, Definitions: yyDollar[6].partDefs}
+			yyVAL.partSpec = &PartitionSpec{Action: AddAction, Definitions: []*PartitionDefinition{yyDollar[4].partDef}}
 		}
-	case 263:
+	case 382:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2142
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: DropAction, Names: yyDollar[3].partitions}
+		}
+	case 383:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:2146
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: ReorganizeAction, Names: yyDollar[3].partitions, Definitions: yyDollar[6].partDefs}
+		}
+	case 384:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2150
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: DiscardAction, Names: yyDollar[3].partitions}
+		}
+	case 385:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2154
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: DiscardAction, IsAll: true}
+		}
+	case 386:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2158
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: ImportAction, Names: yyDollar[3].partitions}
+		}
+	case 387:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2162
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: ImportAction, IsAll: true}
+		}
+	case 388:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2166
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: TruncateAction, Names: yyDollar[3].partitions}
+		}
+	case 389:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2170
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: TruncateAction, IsAll: true}
+		}
+	case 390:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2174
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: CoalesceAction, Number: NewIntLiteral(yyDollar[3].bytes)}
+		}
+	case 391:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:2178
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: ExchangeAction, Names: Partitions{yyDollar[3].colIdent}, TableName: yyDollar[6].tableName, WithoutValidation: yyDollar[7].boolean}
+		}
+	case 392:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2182
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: AnalyzeAction, Names: yyDollar[3].partitions}
+		}
+	case 393:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2186
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: AnalyzeAction, IsAll: true}
+		}
+	case 394:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2190
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: CheckAction, Names: yyDollar[3].partitions}
+		}
+	case 395:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2194
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: CheckAction, IsAll: true}
+		}
+	case 396:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2198
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: OptimizeAction, Names: yyDollar[3].partitions}
+		}
+	case 397:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2202
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: OptimizeAction, IsAll: true}
+		}
+	case 398:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2206
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: RebuildAction, Names: yyDollar[3].partitions}
+		}
+	case 399:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2210
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: RebuildAction, IsAll: true}
+		}
+	case 400:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2214
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: RepairAction, Names: yyDollar[3].partitions}
+		}
+	case 401:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2218
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: RepairAction, IsAll: true}
+		}
+	case 402:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2222
+		{
+			yyVAL.partSpec = &PartitionSpec{Action: UpgradeAction}
+		}
+	case 403:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:2227
+		{
+			yyVAL.boolean = false
+		}
+	case 404:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2231
+		{
+			yyVAL.boolean = false
+		}
+	case 405:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2235
+		{
+			yyVAL.boolean = true
+		}
+	case 406:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1513
+//line sql.y:2242
 		{
 			yyVAL.partDefs = []*PartitionDefinition{yyDollar[1].partDef}
 		}
-	case 264:
+	case 407:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1517
+//line sql.y:2246
 		{
 			yyVAL.partDefs = append(yyDollar[1].partDefs, yyDollar[3].partDef)
 		}
-	case 265:
+	case 408:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:1523
+//line sql.y:2252
 		{
 			yyVAL.partDef = &PartitionDefinition{Name: yyDollar[2].colIdent, Limit: yyDollar[7].expr}
 		}
-	case 266:
+	case 409:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:1527
+//line sql.y:2256
 		{
 			yyVAL.partDef = &PartitionDefinition{Name: yyDollar[2].colIdent, Maxvalue: true}
 		}
-	case 267:
+	case 410:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1533
+//line sql.y:2262
 		{
-			yyVAL.statement = yyDollar[3].ddl
+			yyVAL.statement = &RenameTable{TablePairs: yyDollar[3].renameTablePairs}
 		}
-	case 268:
+	case 411:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1539
+//line sql.y:2268
 		{
-			yyVAL.ddl = &DDL{Action: RenameStr, FromTables: TableNames{yyDollar[1].tableName}, ToTables: TableNames{yyDollar[3].tableName}}
+			yyVAL.renameTablePairs = []*RenameTablePair{{FromTable: yyDollar[1].tableName, ToTable: yyDollar[3].tableName}}
 		}
-	case 269:
+	case 412:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1543
+//line sql.y:2272
 		{
-			yyVAL.ddl = yyDollar[1].ddl
-			yyVAL.ddl.FromTables = append(yyVAL.ddl.FromTables, yyDollar[3].tableName)
-			yyVAL.ddl.ToTables = append(yyVAL.ddl.ToTables, yyDollar[5].tableName)
+			yyVAL.renameTablePairs = append(yyDollar[1].renameTablePairs, &RenameTablePair{FromTable: yyDollar[3].tableName, ToTable: yyDollar[5].tableName})
 		}
-	case 270:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1551
-		{
-			yyVAL.statement = &DDL{Action: DropStr, FromTables: yyDollar[4].tableNames, IfExists: yyDollar[3].boolean}
-		}
-	case 271:
+	case 413:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:1555
+//line sql.y:2278
+		{
+			yyVAL.statement = &DropTable{FromTables: yyDollar[5].tableNames, IfExists: yyDollar[4].boolean, Temp: yyDollar[2].boolean}
+		}
+	case 414:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:2282
 		{
 			// Change this to an alter statement
-			yyVAL.statement = &DDL{Action: AlterStr, Table: yyDollar[5].tableName}
+			if yyDollar[3].colIdent.Lowered() == "primary" {
+				yyVAL.statement = &AlterTable{Table: yyDollar[5].tableName, AlterOptions: append([]AlterOption{&DropKey{Type: PrimaryKeyType}}, yyDollar[6].alterOptions...)}
+			} else {
+				yyVAL.statement = &AlterTable{Table: yyDollar[5].tableName, AlterOptions: append([]AlterOption{&DropKey{Type: NormalKeyType, Name: yyDollar[3].colIdent.String()}}, yyDollar[6].alterOptions...)}
+			}
 		}
-	case 272:
+	case 415:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1560
+//line sql.y:2291
 		{
-			yyVAL.statement = &DDL{Action: DropStr, FromTables: TableNames{yyDollar[4].tableName.ToViewName()}, IfExists: yyDollar[3].boolean}
+			yyVAL.statement = &DropView{FromTables: yyDollar[4].tableNames, IfExists: yyDollar[3].boolean}
 		}
-	case 273:
+	case 416:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1564
+//line sql.y:2295
 		{
-			yyVAL.statement = &DBDDL{Action: DropStr, DBName: string(yyDollar[4].colIdent.String()), IfExists: yyDollar[3].boolean}
+			yyVAL.statement = &DropDatabase{DBName: string(yyDollar[4].colIdent.String()), IfExists: yyDollar[3].boolean}
 		}
-	case 274:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1568
-		{
-			yyVAL.statement = &DBDDL{Action: DropStr, DBName: string(yyDollar[4].colIdent.String()), IfExists: yyDollar[3].boolean}
-		}
-	case 275:
+	case 417:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1574
+//line sql.y:2301
 		{
-			yyVAL.statement = &DDL{Action: TruncateStr, Table: yyDollar[3].tableName}
+			yyVAL.statement = &TruncateTable{Table: yyDollar[3].tableName}
 		}
-	case 276:
+	case 418:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1578
+//line sql.y:2305
 		{
-			yyVAL.statement = &DDL{Action: TruncateStr, Table: yyDollar[2].tableName}
+			yyVAL.statement = &TruncateTable{Table: yyDollar[2].tableName}
 		}
-	case 277:
+	case 419:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1583
+//line sql.y:2310
 		{
 			yyVAL.statement = &OtherRead{}
 		}
-	case 278:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1589
+	case 420:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2316
 		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].colIdent.String())}
+			yyVAL.statement = &Show{&ShowBasic{Command: Charset, Filter: yyDollar[3].showFilter}}
 		}
-	case 279:
+	case 421:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2320
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Collation, Filter: yyDollar[3].showFilter}}
+		}
+	case 422:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:2324
+		{
+			yyVAL.statement = &Show{&ShowBasic{Full: yyDollar[2].boolean, Command: Column, Tbl: yyDollar[5].tableName, DbName: yyDollar[6].str, Filter: yyDollar[7].showFilter}}
+		}
+	case 423:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2328
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Database, Filter: yyDollar[3].showFilter}}
+		}
+	case 424:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2332
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Database, Filter: yyDollar[3].showFilter}}
+		}
+	case 425:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2336
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Keyspace, Filter: yyDollar[3].showFilter}}
+		}
+	case 426:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2340
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Keyspace, Filter: yyDollar[3].showFilter}}
+		}
+	case 427:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1594
+//line sql.y:2344
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Function, Filter: yyDollar[4].showFilter}}
+		}
+	case 428:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:2348
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Index, Tbl: yyDollar[5].tableName, DbName: yyDollar[6].str, Filter: yyDollar[7].showFilter}}
+		}
+	case 429:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:2352
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: OpenTable, DbName: yyDollar[4].str, Filter: yyDollar[5].showFilter}}
+		}
+	case 430:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2356
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Privilege}}
+		}
+	case 431:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2360
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Procedure, Filter: yyDollar[4].showFilter}}
+		}
+	case 432:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2364
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: StatusSession, Filter: yyDollar[4].showFilter}}
+		}
+	case 433:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2368
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: StatusGlobal, Filter: yyDollar[4].showFilter}}
+		}
+	case 434:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2372
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: VariableSession, Filter: yyDollar[4].showFilter}}
+		}
+	case 435:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2376
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: VariableGlobal, Filter: yyDollar[4].showFilter}}
+		}
+	case 436:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:2380
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: TableStatus, DbName: yyDollar[4].str, Filter: yyDollar[5].showFilter}}
+		}
+	case 437:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:2384
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Table, Full: yyDollar[2].boolean, DbName: yyDollar[4].str, Filter: yyDollar[5].showFilter}}
+		}
+	case 438:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2388
+		{
+			yyVAL.statement = &Show{&ShowBasic{Command: Trigger, DbName: yyDollar[3].str, Filter: yyDollar[4].showFilter}}
+		}
+	case 439:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2392
+		{
+			yyVAL.statement = &Show{&ShowCreate{Command: CreateDb, Op: yyDollar[4].tableName}}
+		}
+	case 440:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2396
+		{
+			yyVAL.statement = &Show{&ShowCreate{Command: CreateE, Op: yyDollar[4].tableName}}
+		}
+	case 441:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2400
+		{
+			yyVAL.statement = &Show{&ShowCreate{Command: CreateF, Op: yyDollar[4].tableName}}
+		}
+	case 442:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2404
+		{
+			yyVAL.statement = &Show{&ShowCreate{Command: CreateProc, Op: yyDollar[4].tableName}}
+		}
+	case 443:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2408
+		{
+			yyVAL.statement = &Show{&ShowCreate{Command: CreateTbl, Op: yyDollar[4].tableName}}
+		}
+	case 444:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2412
+		{
+			yyVAL.statement = &Show{&ShowCreate{Command: CreateTr, Op: yyDollar[4].tableName}}
+		}
+	case 445:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2416
+		{
+			yyVAL.statement = &Show{&ShowCreate{Command: CreateV, Op: yyDollar[4].tableName}}
+		}
+	case 446:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2420
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Scope: ImplicitScope}}
+		}
+	case 447:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2424
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].colIdent.String()), Scope: ImplicitScope}}
+		}
+	case 448:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2428
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Scope: ImplicitScope}}
+		}
+	case 449:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2432
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes), Scope: ImplicitScope}}
+		}
+	case 450:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2436
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Table: yyDollar[4].tableName, Scope: ImplicitScope}}
+		}
+	case 451:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2440
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes), Scope: ImplicitScope}}
+		}
+	case 452:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2444
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Table: yyDollar[4].tableName, Scope: ImplicitScope}}
+		}
+	case 453:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:2448
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[3].bytes), Scope: ImplicitScope}}
+		}
+	case 454:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2452
 		{
 			showTablesOpt := &ShowTablesOpt{Filter: yyDollar[4].showFilter}
-			yyVAL.statement = &Show{Type: CharsetStr, ShowTablesOpt: showTablesOpt}
+			yyVAL.statement = &Show{&ShowLegacy{Scope: VitessMetadataScope, Type: string(yyDollar[3].bytes), ShowTablesOpt: showTablesOpt}}
 		}
-	case 280:
+	case 455:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1599
+//line sql.y:2457
 		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Scope: ImplicitScope}}
+		}
+	case 456:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2461
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Scope: ImplicitScope}}
+		}
+	case 457:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:2465
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), OnTable: yyDollar[5].tableName, Scope: ImplicitScope}}
+		}
+	case 458:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2469
+		{
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes), Scope: ImplicitScope}}
+		}
+	case 459:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2474
+		{
+			// This should probably be a different type (ShowVitessTopoOpt), but
+			// just getting the thing working for now
 			showTablesOpt := &ShowTablesOpt{Filter: yyDollar[3].showFilter}
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes), ShowTablesOpt: showTablesOpt}
+			yyVAL.statement = &Show{&ShowLegacy{Type: yyDollar[2].str, ShowTablesOpt: showTablesOpt}}
 		}
-	case 281:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1604
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes)}
-		}
-	case 282:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1609
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].colIdent.String())}
-		}
-	case 283:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1613
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes)}
-		}
-	case 284:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1617
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), Table: yyDollar[4].tableName}
-		}
-	case 285:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1621
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes)}
-		}
-	case 286:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1625
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes)}
-		}
-	case 287:
+	case 460:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1629
+//line sql.y:2488
 		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes)}
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].colIdent.String()), Scope: ImplicitScope}}
 		}
-	case 288:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1633
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes)}
-		}
-	case 289:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1637
-		{
-			showTablesOpt := &ShowTablesOpt{DbName: yyDollar[6].str, Filter: yyDollar[7].showFilter}
-			yyVAL.statement = &Show{Extended: string(yyDollar[2].str), Type: string(yyDollar[3].str), ShowTablesOpt: showTablesOpt, OnTable: yyDollar[5].tableName}
-		}
-	case 290:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1642
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes)}
-		}
-	case 291:
+	case 461:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1646
+//line sql.y:2492
 		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes)}
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes), Scope: ImplicitScope}}
 		}
-	case 292:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1650
-		{
-			yyVAL.statement = &Show{Scope: yyDollar[2].str, Type: string(yyDollar[3].bytes)}
-		}
-	case 293:
+	case 462:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1654
+//line sql.y:2496
 		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes)}
+			yyVAL.statement = &Show{&ShowLegacy{Type: string(yyDollar[2].bytes), Scope: ImplicitScope}}
 		}
-	case 294:
-		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:1658
-		{
-			showTablesOpt := &ShowTablesOpt{Full: yyDollar[2].str, DbName: yyDollar[6].str, Filter: yyDollar[7].showFilter}
-			yyVAL.statement = &Show{Type: string(yyDollar[3].str), ShowTablesOpt: showTablesOpt, OnTable: yyDollar[5].tableName}
-		}
-	case 295:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1663
-		{
-			// this is ugly, but I couldn't find a better way for now
-			if yyDollar[3].str == "processlist" {
-				yyVAL.statement = &Show{Type: yyDollar[3].str}
-			} else {
-				showTablesOpt := &ShowTablesOpt{Full: yyDollar[2].str, DbName: yyDollar[4].str, Filter: yyDollar[5].showFilter}
-				yyVAL.statement = &Show{Type: yyDollar[3].str, ShowTablesOpt: showTablesOpt}
-			}
-		}
-	case 296:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1673
-		{
-			yyVAL.statement = &Show{Scope: yyDollar[2].str, Type: string(yyDollar[3].bytes)}
-		}
-	case 297:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1677
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes)}
-		}
-	case 298:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1681
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes), ShowCollationFilterOpt: yyDollar[4].expr}
-		}
-	case 299:
-		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:1685
-		{
-			showTablesOpt := &ShowTablesOpt{Filter: yyDollar[4].showFilter}
-			yyVAL.statement = &Show{Scope: string(yyDollar[2].bytes), Type: string(yyDollar[3].bytes), ShowTablesOpt: showTablesOpt}
-		}
-	case 300:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1690
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes)}
-		}
-	case 301:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1694
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes)}
-		}
-	case 302:
-		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1698
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes) + " " + string(yyDollar[3].bytes), OnTable: yyDollar[5].tableName}
-		}
-	case 303:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1702
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].bytes)}
-		}
-	case 304:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1716
-		{
-			yyVAL.statement = &Show{Type: string(yyDollar[2].colIdent.String())}
-		}
-	case 305:
+	case 463:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1722
+//line sql.y:2502
 		{
 			yyVAL.str = string(yyDollar[1].bytes)
 		}
-	case 306:
+	case 464:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1726
+//line sql.y:2506
 		{
 			yyVAL.str = string(yyDollar[1].bytes)
 		}
-	case 307:
+	case 465:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1732
+//line sql.y:2512
 		{
 			yyVAL.str = ""
 		}
-	case 308:
+	case 466:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1736
+//line sql.y:2516
 		{
 			yyVAL.str = "extended "
 		}
-	case 309:
+	case 467:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1742
+//line sql.y:2522
 		{
-			yyVAL.str = ""
+			yyVAL.boolean = false
 		}
-	case 310:
+	case 468:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1746
+//line sql.y:2526
 		{
-			yyVAL.str = "full "
+			yyVAL.boolean = true
 		}
-	case 311:
+	case 469:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1752
+//line sql.y:2532
 		{
 			yyVAL.str = string(yyDollar[1].bytes)
 		}
-	case 312:
+	case 470:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1756
+//line sql.y:2536
 		{
 			yyVAL.str = string(yyDollar[1].bytes)
 		}
-	case 313:
+	case 471:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1762
+//line sql.y:2542
 		{
 			yyVAL.str = ""
 		}
-	case 314:
+	case 472:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1766
+//line sql.y:2546
 		{
 			yyVAL.str = yyDollar[2].tableIdent.v
 		}
-	case 315:
+	case 473:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1770
+//line sql.y:2550
 		{
 			yyVAL.str = yyDollar[2].tableIdent.v
 		}
-	case 316:
+	case 474:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1776
+//line sql.y:2556
 		{
 			yyVAL.showFilter = nil
 		}
-	case 317:
+	case 475:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1780
+//line sql.y:2560
 		{
 			yyVAL.showFilter = &ShowFilter{Like: string(yyDollar[2].bytes)}
 		}
-	case 318:
+	case 476:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1784
+//line sql.y:2564
 		{
 			yyVAL.showFilter = &ShowFilter{Filter: yyDollar[2].expr}
 		}
-	case 319:
+	case 477:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1790
+//line sql.y:2570
 		{
 			yyVAL.showFilter = nil
 		}
-	case 320:
+	case 478:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1794
+//line sql.y:2574
 		{
 			yyVAL.showFilter = &ShowFilter{Like: string(yyDollar[2].bytes)}
 		}
-	case 321:
+	case 479:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1800
+//line sql.y:2580
 		{
-			yyVAL.str = ""
+			yyVAL.empty = struct{}{}
 		}
-	case 322:
+	case 480:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1804
+//line sql.y:2584
 		{
-			yyVAL.str = SessionStr
+			yyVAL.empty = struct{}{}
 		}
-	case 323:
+	case 481:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1808
+//line sql.y:2588
 		{
-			yyVAL.str = GlobalStr
+			yyVAL.empty = struct{}{}
 		}
-	case 324:
+	case 482:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1814
+//line sql.y:2594
 		{
 			yyVAL.statement = &Use{DBName: yyDollar[2].tableIdent}
 		}
-	case 325:
+	case 483:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1818
+//line sql.y:2598
 		{
 			yyVAL.statement = &Use{DBName: TableIdent{v: ""}}
 		}
-	case 326:
+	case 484:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1824
+//line sql.y:2604
 		{
 			yyVAL.statement = &Begin{}
 		}
-	case 327:
+	case 485:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1828
+//line sql.y:2608
 		{
 			yyVAL.statement = &Begin{}
 		}
-	case 328:
+	case 486:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1834
+//line sql.y:2614
 		{
 			yyVAL.statement = &Commit{}
 		}
-	case 329:
+	case 487:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1840
+//line sql.y:2620
 		{
 			yyVAL.statement = &Rollback{}
 		}
-	case 330:
+	case 488:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:1844
+//line sql.y:2624
 		{
 			yyVAL.statement = &SRollback{Name: yyDollar[5].colIdent}
 		}
-	case 331:
+	case 489:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1849
+//line sql.y:2629
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 332:
+	case 490:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1851
+//line sql.y:2631
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 333:
+	case 491:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1854
+//line sql.y:2634
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 334:
+	case 492:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1856
+//line sql.y:2636
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 335:
+	case 493:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1861
+//line sql.y:2641
 		{
 			yyVAL.statement = &Savepoint{Name: yyDollar[2].colIdent}
 		}
-	case 336:
+	case 494:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1867
+//line sql.y:2647
 		{
 			yyVAL.statement = &Release{Name: yyDollar[3].colIdent}
 		}
-	case 337:
+	case 495:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1872
+//line sql.y:2652
 		{
-			yyVAL.str = ""
+			yyVAL.explainType = EmptyType
 		}
-	case 338:
+	case 496:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1876
+//line sql.y:2656
 		{
-			yyVAL.str = JSONStr
+			yyVAL.explainType = JSONType
 		}
-	case 339:
+	case 497:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1880
+//line sql.y:2660
 		{
-			yyVAL.str = TreeStr
+			yyVAL.explainType = TreeType
 		}
-	case 340:
+	case 498:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1884
+//line sql.y:2664
 		{
-			yyVAL.str = VitessStr
+			yyVAL.explainType = VitessType
 		}
-	case 341:
+	case 499:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1888
+//line sql.y:2668
 		{
-			yyVAL.str = TraditionalStr
+			yyVAL.explainType = TraditionalType
 		}
-	case 342:
+	case 500:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1892
+//line sql.y:2672
 		{
-			yyVAL.str = AnalyzeStr
+			yyVAL.explainType = AnalyzeType
 		}
-	case 343:
+	case 501:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1898
+//line sql.y:2678
 		{
 			yyVAL.bytes = yyDollar[1].bytes
 		}
-	case 344:
+	case 502:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1902
+//line sql.y:2682
 		{
 			yyVAL.bytes = yyDollar[1].bytes
 		}
-	case 345:
+	case 503:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1906
+//line sql.y:2686
 		{
 			yyVAL.bytes = yyDollar[1].bytes
 		}
-	case 346:
+	case 504:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1912
+//line sql.y:2692
 		{
 			yyVAL.statement = yyDollar[1].selStmt
 		}
-	case 347:
+	case 505:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1916
+//line sql.y:2696
 		{
 			yyVAL.statement = yyDollar[1].statement
 		}
-	case 348:
+	case 506:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1920
+//line sql.y:2700
 		{
 			yyVAL.statement = yyDollar[1].statement
 		}
-	case 349:
+	case 507:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1924
+//line sql.y:2704
 		{
 			yyVAL.statement = yyDollar[1].statement
 		}
-	case 350:
+	case 508:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1929
+//line sql.y:2709
 		{
 			yyVAL.str = ""
 		}
-	case 351:
+	case 509:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1933
+//line sql.y:2713
 		{
-			yyVAL.str = ""
+			yyVAL.str = yyDollar[1].colIdent.val
 		}
-	case 352:
+	case 510:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1937
+//line sql.y:2717
 		{
-			yyVAL.str = ""
+			yyVAL.str = "'" + string(yyDollar[1].bytes) + "'"
 		}
-	case 353:
+	case 511:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1943
+//line sql.y:2723
 		{
-			yyVAL.statement = &OtherRead{}
+			yyVAL.statement = &ExplainTab{Table: yyDollar[2].tableName, Wild: yyDollar[3].str}
 		}
-	case 354:
+	case 512:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1947
+//line sql.y:2727
 		{
-			yyVAL.statement = &Explain{Type: yyDollar[2].str, Statement: yyDollar[3].statement}
+			yyVAL.statement = &ExplainStmt{Type: yyDollar[2].explainType, Statement: yyDollar[3].statement}
 		}
-	case 355:
+	case 513:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1953
+//line sql.y:2733
 		{
 			yyVAL.statement = &OtherAdmin{}
 		}
-	case 356:
+	case 514:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1957
+//line sql.y:2737
 		{
 			yyVAL.statement = &OtherAdmin{}
 		}
-	case 357:
+	case 515:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1961
+//line sql.y:2743
 		{
-			yyVAL.statement = &OtherAdmin{}
+			yyVAL.statement = &LockTables{Tables: yyDollar[3].tableAndLockTypes}
 		}
-	case 358:
+	case 516:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2749
+		{
+			yyVAL.tableAndLockTypes = TableAndLockTypes{yyDollar[1].tableAndLockType}
+		}
+	case 517:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:1965
+//line sql.y:2753
 		{
-			yyVAL.statement = &OtherAdmin{}
+			yyVAL.tableAndLockTypes = append(yyDollar[1].tableAndLockTypes, yyDollar[3].tableAndLockType)
 		}
-	case 359:
+	case 518:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1971
+//line sql.y:2759
 		{
-			yyVAL.statement = &DDL{Action: FlushStr}
+			yyVAL.tableAndLockType = &TableAndLockType{Table: yyDollar[1].aliasedTableName, Lock: yyDollar[2].lockType}
 		}
-	case 360:
+	case 519:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2765
+		{
+			yyVAL.lockType = Read
+		}
+	case 520:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2769
+		{
+			yyVAL.lockType = ReadLocal
+		}
+	case 521:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2773
+		{
+			yyVAL.lockType = Write
+		}
+	case 522:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2777
+		{
+			yyVAL.lockType = LowPriorityWrite
+		}
+	case 523:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2783
+		{
+			yyVAL.statement = &UnlockTables{}
+		}
+	case 524:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2789
+		{
+			yyVAL.statement = &Flush{IsLocal: yyDollar[2].boolean, FlushOptions: yyDollar[3].strs}
+		}
+	case 525:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2793
+		{
+			yyVAL.statement = &Flush{IsLocal: yyDollar[2].boolean}
+		}
+	case 526:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:2797
+		{
+			yyVAL.statement = &Flush{IsLocal: yyDollar[2].boolean, WithLock: true}
+		}
+	case 527:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:2801
+		{
+			yyVAL.statement = &Flush{IsLocal: yyDollar[2].boolean, TableNames: yyDollar[4].tableNames}
+		}
+	case 528:
+		yyDollar = yyS[yypt-7 : yypt+1]
+//line sql.y:2805
+		{
+			yyVAL.statement = &Flush{IsLocal: yyDollar[2].boolean, TableNames: yyDollar[4].tableNames, WithLock: true}
+		}
+	case 529:
+		yyDollar = yyS[yypt-6 : yypt+1]
+//line sql.y:2809
+		{
+			yyVAL.statement = &Flush{IsLocal: yyDollar[2].boolean, TableNames: yyDollar[4].tableNames, ForExport: true}
+		}
+	case 530:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2815
+		{
+			yyVAL.strs = []string{yyDollar[1].str}
+		}
+	case 531:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2819
+		{
+			yyVAL.strs = append(yyDollar[1].strs, yyDollar[3].str)
+		}
+	case 532:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2825
+		{
+			yyVAL.str = string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)
+		}
+	case 533:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2829
+		{
+			yyVAL.str = string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)
+		}
+	case 534:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2833
+		{
+			yyVAL.str = string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)
+		}
+	case 535:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2837
+		{
+			yyVAL.str = string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)
+		}
+	case 536:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2841
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 537:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2845
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 538:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2849
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 539:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2853
+		{
+			yyVAL.str = string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes) + yyDollar[3].str
+		}
+	case 540:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:2857
+		{
+			yyVAL.str = string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes)
+		}
+	case 541:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2861
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 542:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2865
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 543:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2869
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 544:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1975
+//line sql.y:2874
+		{
+			yyVAL.boolean = false
+		}
+	case 545:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2878
+		{
+			yyVAL.boolean = true
+		}
+	case 546:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:2882
+		{
+			yyVAL.boolean = true
+		}
+	case 547:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:2887
+		{
+			yyVAL.str = ""
+		}
+	case 548:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:2891
+		{
+			yyVAL.str = " " + string(yyDollar[1].bytes) + " " + string(yyDollar[2].bytes) + " " + yyDollar[3].colIdent.String()
+		}
+	case 549:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:2896
 		{
 			setAllowComments(yylex, true)
 		}
-	case 361:
+	case 550:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1979
+//line sql.y:2900
 		{
 			yyVAL.bytes2 = yyDollar[2].bytes2
 			setAllowComments(yylex, false)
 		}
-	case 362:
+	case 551:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:1985
+//line sql.y:2906
 		{
 			yyVAL.bytes2 = nil
 		}
-	case 363:
+	case 552:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1989
+//line sql.y:2910
 		{
 			yyVAL.bytes2 = append(yyDollar[1].bytes2, yyDollar[2].bytes)
 		}
-	case 364:
+	case 553:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:1995
+//line sql.y:2916
 		{
-			yyVAL.str = UnionStr
+			yyVAL.boolean = true
 		}
-	case 365:
+	case 554:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:1999
+//line sql.y:2920
 		{
-			yyVAL.str = UnionAllStr
+			yyVAL.boolean = false
 		}
-	case 366:
+	case 555:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2003
+//line sql.y:2924
 		{
-			yyVAL.str = UnionDistinctStr
+			yyVAL.boolean = true
 		}
-	case 367:
+	case 556:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2008
+//line sql.y:2929
 		{
 			yyVAL.str = ""
 		}
-	case 368:
+	case 557:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2012
+//line sql.y:2933
 		{
 			yyVAL.str = SQLNoCacheStr
 		}
-	case 369:
+	case 558:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2016
+//line sql.y:2937
 		{
 			yyVAL.str = SQLCacheStr
 		}
-	case 370:
+	case 559:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2021
+//line sql.y:2942
 		{
-			yyVAL.str = ""
+			yyVAL.boolean = false
 		}
-	case 371:
+	case 560:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2025
+//line sql.y:2946
 		{
-			yyVAL.str = DistinctStr
+			yyVAL.boolean = true
 		}
-	case 372:
+	case 561:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2029
+//line sql.y:2950
 		{
-			yyVAL.str = DistinctStr
+			yyVAL.boolean = true
 		}
-	case 373:
+	case 562:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2034
+//line sql.y:2955
 		{
 			yyVAL.selectExprs = nil
 		}
-	case 374:
+	case 563:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2038
+//line sql.y:2959
 		{
 			yyVAL.selectExprs = yyDollar[1].selectExprs
 		}
-	case 375:
+	case 564:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2043
+//line sql.y:2964
 		{
 			yyVAL.strs = nil
 		}
-	case 376:
+	case 565:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2047
+//line sql.y:2968
 		{
 			yyVAL.strs = []string{yyDollar[1].str}
 		}
-	case 377:
+	case 566:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2051
+//line sql.y:2972
 		{ // TODO: This is a hack since I couldn't get it to work in a nicer way. I got 'conflicts: 8 shift/reduce'
 			yyVAL.strs = []string{yyDollar[1].str, yyDollar[2].str}
 		}
-	case 378:
+	case 567:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2055
+//line sql.y:2976
 		{
 			yyVAL.strs = []string{yyDollar[1].str, yyDollar[2].str, yyDollar[3].str}
 		}
-	case 379:
+	case 568:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2059
+//line sql.y:2980
 		{
 			yyVAL.strs = []string{yyDollar[1].str, yyDollar[2].str, yyDollar[3].str, yyDollar[4].str}
 		}
-	case 380:
+	case 569:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2065
+//line sql.y:2986
 		{
 			yyVAL.str = SQLNoCacheStr
 		}
-	case 381:
+	case 570:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2069
+//line sql.y:2990
 		{
 			yyVAL.str = SQLCacheStr
 		}
-	case 382:
+	case 571:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2073
+//line sql.y:2994
 		{
 			yyVAL.str = DistinctStr
 		}
-	case 383:
+	case 572:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2077
+//line sql.y:2998
 		{
 			yyVAL.str = DistinctStr
 		}
-	case 384:
+	case 573:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2081
+//line sql.y:3002
 		{
 			yyVAL.str = StraightJoinHint
 		}
-	case 385:
+	case 574:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2085
+//line sql.y:3006
 		{
 			yyVAL.str = SQLCalcFoundRowsStr
 		}
-	case 386:
+	case 575:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2091
+//line sql.y:3012
 		{
 			yyVAL.selectExprs = SelectExprs{yyDollar[1].selectExpr}
 		}
-	case 387:
+	case 576:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2095
+//line sql.y:3016
 		{
 			yyVAL.selectExprs = append(yyVAL.selectExprs, yyDollar[3].selectExpr)
 		}
-	case 388:
+	case 577:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2101
+//line sql.y:3022
 		{
 			yyVAL.selectExpr = &StarExpr{}
 		}
-	case 389:
+	case 578:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2105
+//line sql.y:3026
 		{
 			yyVAL.selectExpr = &AliasedExpr{Expr: yyDollar[1].expr, As: yyDollar[2].colIdent}
 		}
-	case 390:
+	case 579:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2109
+//line sql.y:3030
 		{
 			yyVAL.selectExpr = &StarExpr{TableName: TableName{Name: yyDollar[1].tableIdent}}
 		}
-	case 391:
+	case 580:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2113
+//line sql.y:3034
 		{
 			yyVAL.selectExpr = &StarExpr{TableName: TableName{Qualifier: yyDollar[1].tableIdent, Name: yyDollar[3].tableIdent}}
 		}
-	case 392:
+	case 581:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2118
+//line sql.y:3039
 		{
 			yyVAL.colIdent = ColIdent{}
 		}
-	case 393:
+	case 582:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2122
+//line sql.y:3043
 		{
 			yyVAL.colIdent = yyDollar[1].colIdent
 		}
-	case 394:
+	case 583:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2126
+//line sql.y:3047
 		{
 			yyVAL.colIdent = yyDollar[2].colIdent
 		}
-	case 396:
+	case 585:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2133
+//line sql.y:3054
 		{
 			yyVAL.colIdent = NewColIdent(string(yyDollar[1].bytes))
 		}
-	case 397:
+	case 586:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2138
+//line sql.y:3059
 		{
 			yyVAL.tableExprs = TableExprs{&AliasedTableExpr{Expr: TableName{Name: NewTableIdent("dual")}}}
 		}
-	case 398:
+	case 587:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2142
+//line sql.y:3063
 		{
 			yyVAL.tableExprs = yyDollar[2].tableExprs
 		}
-	case 399:
+	case 588:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2148
+//line sql.y:3069
 		{
 			yyVAL.tableExprs = TableExprs{yyDollar[1].tableExpr}
 		}
-	case 400:
+	case 589:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2152
+//line sql.y:3073
 		{
 			yyVAL.tableExprs = append(yyVAL.tableExprs, yyDollar[3].tableExpr)
 		}
-	case 403:
+	case 592:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2162
+//line sql.y:3083
 		{
 			yyVAL.tableExpr = yyDollar[1].aliasedTableName
 		}
-	case 404:
+	case 593:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2166
+//line sql.y:3087
 		{
-			yyVAL.tableExpr = &AliasedTableExpr{Expr: yyDollar[1].subquery, As: yyDollar[3].tableIdent}
+			yyVAL.tableExpr = &AliasedTableExpr{Expr: yyDollar[1].derivedTable, As: yyDollar[3].tableIdent}
 		}
-	case 405:
+	case 594:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2170
+//line sql.y:3091
 		{
 			yyVAL.tableExpr = &ParenTableExpr{Exprs: yyDollar[2].tableExprs}
 		}
-	case 406:
+	case 595:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2176
+//line sql.y:3097
 		{
-			yyVAL.subquery = &Subquery{yyDollar[2].selStmt}
+			yyVAL.derivedTable = &DerivedTable{yyDollar[2].selStmt}
 		}
-	case 407:
+	case 596:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2182
+//line sql.y:3103
 		{
 			yyVAL.aliasedTableName = &AliasedTableExpr{Expr: yyDollar[1].tableName, As: yyDollar[2].tableIdent, Hints: yyDollar[3].indexHints}
 		}
-	case 408:
+	case 597:
 		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:2186
+//line sql.y:3107
 		{
 			yyVAL.aliasedTableName = &AliasedTableExpr{Expr: yyDollar[1].tableName, Partitions: yyDollar[4].partitions, As: yyDollar[6].tableIdent, Hints: yyDollar[7].indexHints}
 		}
-	case 409:
+	case 598:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:3112
+		{
+			yyVAL.columns = nil
+		}
+	case 599:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:3116
+		{
+			yyVAL.columns = yyDollar[2].columns
+		}
+	case 600:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2192
+//line sql.y:3122
 		{
 			yyVAL.columns = Columns{yyDollar[1].colIdent}
 		}
-	case 410:
+	case 601:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2196
+//line sql.y:3126
 		{
 			yyVAL.columns = append(yyVAL.columns, yyDollar[3].colIdent)
 		}
-	case 411:
+	case 602:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2202
+//line sql.y:3132
 		{
 			yyVAL.partitions = Partitions{yyDollar[1].colIdent}
 		}
-	case 412:
+	case 603:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2206
+//line sql.y:3136
 		{
 			yyVAL.partitions = append(yyVAL.partitions, yyDollar[3].colIdent)
 		}
-	case 413:
+	case 604:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2219
+//line sql.y:3149
 		{
-			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].str, RightExpr: yyDollar[3].tableExpr, Condition: yyDollar[4].joinCondition}
+			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].joinType, RightExpr: yyDollar[3].tableExpr, Condition: yyDollar[4].joinCondition}
 		}
-	case 414:
+	case 605:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2223
+//line sql.y:3153
 		{
-			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].str, RightExpr: yyDollar[3].tableExpr, Condition: yyDollar[4].joinCondition}
+			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].joinType, RightExpr: yyDollar[3].tableExpr, Condition: yyDollar[4].joinCondition}
 		}
-	case 415:
+	case 606:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2227
+//line sql.y:3157
 		{
-			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].str, RightExpr: yyDollar[3].tableExpr, Condition: yyDollar[4].joinCondition}
+			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].joinType, RightExpr: yyDollar[3].tableExpr, Condition: yyDollar[4].joinCondition}
 		}
-	case 416:
+	case 607:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2231
+//line sql.y:3161
 		{
-			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].str, RightExpr: yyDollar[3].tableExpr}
+			yyVAL.tableExpr = &JoinTableExpr{LeftExpr: yyDollar[1].tableExpr, Join: yyDollar[2].joinType, RightExpr: yyDollar[3].tableExpr}
 		}
-	case 417:
+	case 608:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2237
+//line sql.y:3167
 		{
 			yyVAL.joinCondition = JoinCondition{On: yyDollar[2].expr}
 		}
-	case 418:
+	case 609:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2239
+//line sql.y:3169
 		{
 			yyVAL.joinCondition = JoinCondition{Using: yyDollar[3].columns}
 		}
-	case 419:
+	case 610:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2243
+//line sql.y:3173
 		{
 			yyVAL.joinCondition = JoinCondition{}
 		}
-	case 420:
+	case 611:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2245
+//line sql.y:3175
 		{
 			yyVAL.joinCondition = yyDollar[1].joinCondition
 		}
-	case 421:
+	case 612:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2249
+//line sql.y:3179
 		{
 			yyVAL.joinCondition = JoinCondition{}
 		}
-	case 422:
+	case 613:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2251
+//line sql.y:3181
 		{
 			yyVAL.joinCondition = JoinCondition{On: yyDollar[2].expr}
 		}
-	case 423:
+	case 614:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2254
+//line sql.y:3184
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 424:
+	case 615:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2256
+//line sql.y:3186
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 425:
+	case 616:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2259
+//line sql.y:3189
 		{
 			yyVAL.tableIdent = NewTableIdent("")
 		}
-	case 426:
+	case 617:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2263
+//line sql.y:3193
 		{
 			yyVAL.tableIdent = yyDollar[1].tableIdent
 		}
-	case 427:
+	case 618:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2267
+//line sql.y:3197
 		{
 			yyVAL.tableIdent = yyDollar[2].tableIdent
 		}
-	case 429:
+	case 620:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2274
+//line sql.y:3204
 		{
 			yyVAL.tableIdent = NewTableIdent(string(yyDollar[1].bytes))
 		}
-	case 430:
+	case 621:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2280
+//line sql.y:3210
 		{
-			yyVAL.str = JoinStr
+			yyVAL.joinType = NormalJoinType
 		}
-	case 431:
+	case 622:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2284
+//line sql.y:3214
 		{
-			yyVAL.str = JoinStr
+			yyVAL.joinType = NormalJoinType
 		}
-	case 432:
+	case 623:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2288
+//line sql.y:3218
 		{
-			yyVAL.str = JoinStr
+			yyVAL.joinType = NormalJoinType
 		}
-	case 433:
+	case 624:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2294
+//line sql.y:3224
 		{
-			yyVAL.str = StraightJoinStr
+			yyVAL.joinType = StraightJoinType
 		}
-	case 434:
+	case 625:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2300
+//line sql.y:3230
 		{
-			yyVAL.str = LeftJoinStr
+			yyVAL.joinType = LeftJoinType
 		}
-	case 435:
+	case 626:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2304
+//line sql.y:3234
 		{
-			yyVAL.str = LeftJoinStr
+			yyVAL.joinType = LeftJoinType
 		}
-	case 436:
+	case 627:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2308
+//line sql.y:3238
 		{
-			yyVAL.str = RightJoinStr
+			yyVAL.joinType = RightJoinType
 		}
-	case 437:
+	case 628:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2312
+//line sql.y:3242
 		{
-			yyVAL.str = RightJoinStr
+			yyVAL.joinType = RightJoinType
 		}
-	case 438:
+	case 629:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2318
+//line sql.y:3248
 		{
-			yyVAL.str = NaturalJoinStr
+			yyVAL.joinType = NaturalJoinType
 		}
-	case 439:
+	case 630:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2322
+//line sql.y:3252
 		{
-			if yyDollar[2].str == LeftJoinStr {
-				yyVAL.str = NaturalLeftJoinStr
+			if yyDollar[2].joinType == LeftJoinType {
+				yyVAL.joinType = NaturalLeftJoinType
 			} else {
-				yyVAL.str = NaturalRightJoinStr
+				yyVAL.joinType = NaturalRightJoinType
 			}
 		}
-	case 440:
+	case 631:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2332
+//line sql.y:3262
 		{
 			yyVAL.tableName = yyDollar[2].tableName
 		}
-	case 441:
+	case 632:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2336
+//line sql.y:3266
 		{
 			yyVAL.tableName = yyDollar[1].tableName
 		}
-	case 442:
+	case 633:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2342
+//line sql.y:3272
 		{
 			yyVAL.tableName = TableName{Name: yyDollar[1].tableIdent}
 		}
-	case 443:
+	case 634:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2346
+//line sql.y:3276
 		{
 			yyVAL.tableName = TableName{Qualifier: yyDollar[1].tableIdent, Name: yyDollar[3].tableIdent}
 		}
-	case 444:
+	case 635:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2352
+//line sql.y:3282
 		{
 			yyVAL.tableName = TableName{Name: yyDollar[1].tableIdent}
 		}
-	case 445:
+	case 636:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2357
+//line sql.y:3287
 		{
 			yyVAL.indexHints = nil
 		}
-	case 446:
+	case 637:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2361
+//line sql.y:3291
 		{
-			yyVAL.indexHints = &IndexHints{Type: UseStr, Indexes: yyDollar[4].columns}
+			yyVAL.indexHints = &IndexHints{Type: UseOp, Indexes: yyDollar[4].columns}
 		}
-	case 447:
+	case 638:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2365
+//line sql.y:3295
 		{
-			yyVAL.indexHints = &IndexHints{Type: UseStr}
+			yyVAL.indexHints = &IndexHints{Type: UseOp}
 		}
-	case 448:
+	case 639:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2369
+//line sql.y:3299
 		{
-			yyVAL.indexHints = &IndexHints{Type: IgnoreStr, Indexes: yyDollar[4].columns}
+			yyVAL.indexHints = &IndexHints{Type: IgnoreOp, Indexes: yyDollar[4].columns}
 		}
-	case 449:
+	case 640:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2373
+//line sql.y:3303
 		{
-			yyVAL.indexHints = &IndexHints{Type: ForceStr, Indexes: yyDollar[4].columns}
+			yyVAL.indexHints = &IndexHints{Type: ForceOp, Indexes: yyDollar[4].columns}
 		}
-	case 450:
+	case 641:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2378
+//line sql.y:3308
 		{
 			yyVAL.expr = nil
 		}
-	case 451:
+	case 642:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2382
+//line sql.y:3312
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
-	case 452:
+	case 643:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2388
+//line sql.y:3318
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
-	case 453:
+	case 644:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2392
+//line sql.y:3322
 		{
 			yyVAL.expr = &AndExpr{Left: yyDollar[1].expr, Right: yyDollar[3].expr}
 		}
-	case 454:
+	case 645:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2396
+//line sql.y:3326
 		{
 			yyVAL.expr = &OrExpr{Left: yyDollar[1].expr, Right: yyDollar[3].expr}
 		}
-	case 455:
+	case 646:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2400
+//line sql.y:3330
 		{
 			yyVAL.expr = &XorExpr{Left: yyDollar[1].expr, Right: yyDollar[3].expr}
 		}
-	case 456:
+	case 647:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2404
+//line sql.y:3334
 		{
 			yyVAL.expr = &NotExpr{Expr: yyDollar[2].expr}
 		}
-	case 457:
+	case 648:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2408
+//line sql.y:3338
 		{
-			yyVAL.expr = &IsExpr{Operator: yyDollar[3].str, Expr: yyDollar[1].expr}
+			yyVAL.expr = &IsExpr{Operator: yyDollar[3].isExprOperator, Expr: yyDollar[1].expr}
 		}
-	case 458:
+	case 649:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2412
+//line sql.y:3342
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
-	case 459:
+	case 650:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2416
+//line sql.y:3346
 		{
 			yyVAL.expr = &Default{ColName: yyDollar[2].str}
 		}
-	case 460:
+	case 651:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2422
+//line sql.y:3352
 		{
 			yyVAL.str = ""
 		}
-	case 461:
+	case 652:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2426
+//line sql.y:3356
 		{
 			yyVAL.str = string(yyDollar[2].colIdent.String())
 		}
-	case 462:
+	case 653:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2432
+//line sql.y:3362
 		{
 			yyVAL.boolVal = BoolVal(true)
 		}
-	case 463:
+	case 654:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2436
+//line sql.y:3366
 		{
 			yyVAL.boolVal = BoolVal(false)
 		}
-	case 464:
+	case 655:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2442
+//line sql.y:3372
 		{
-			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: yyDollar[2].str, Right: yyDollar[3].expr}
+			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: yyDollar[2].comparisonExprOperator, Right: yyDollar[3].expr}
 		}
-	case 465:
+	case 656:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2446
+//line sql.y:3376
 		{
-			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: InStr, Right: yyDollar[3].colTuple}
+			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: InOp, Right: yyDollar[3].colTuple}
 		}
-	case 466:
+	case 657:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2450
+//line sql.y:3380
 		{
-			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: NotInStr, Right: yyDollar[4].colTuple}
+			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: NotInOp, Right: yyDollar[4].colTuple}
 		}
-	case 467:
+	case 658:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2454
+//line sql.y:3384
 		{
-			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: LikeStr, Right: yyDollar[3].expr, Escape: yyDollar[4].expr}
+			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: LikeOp, Right: yyDollar[3].expr, Escape: yyDollar[4].expr}
 		}
-	case 468:
+	case 659:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2458
+//line sql.y:3388
 		{
-			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: NotLikeStr, Right: yyDollar[4].expr, Escape: yyDollar[5].expr}
+			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: NotLikeOp, Right: yyDollar[4].expr, Escape: yyDollar[5].expr}
 		}
-	case 469:
+	case 660:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2462
+//line sql.y:3392
 		{
-			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: RegexpStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: RegexpOp, Right: yyDollar[3].expr}
 		}
-	case 470:
+	case 661:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2466
+//line sql.y:3396
 		{
-			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: NotRegexpStr, Right: yyDollar[4].expr}
+			yyVAL.expr = &ComparisonExpr{Left: yyDollar[1].expr, Operator: NotRegexpOp, Right: yyDollar[4].expr}
 		}
-	case 471:
+	case 662:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2470
+//line sql.y:3400
 		{
-			yyVAL.expr = &RangeCond{Left: yyDollar[1].expr, Operator: BetweenStr, From: yyDollar[3].expr, To: yyDollar[5].expr}
+			yyVAL.expr = &RangeCond{Left: yyDollar[1].expr, Operator: BetweenOp, From: yyDollar[3].expr, To: yyDollar[5].expr}
 		}
-	case 472:
+	case 663:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:2474
+//line sql.y:3404
 		{
-			yyVAL.expr = &RangeCond{Left: yyDollar[1].expr, Operator: NotBetweenStr, From: yyDollar[4].expr, To: yyDollar[6].expr}
+			yyVAL.expr = &RangeCond{Left: yyDollar[1].expr, Operator: NotBetweenOp, From: yyDollar[4].expr, To: yyDollar[6].expr}
 		}
-	case 473:
+	case 664:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2478
+//line sql.y:3408
 		{
 			yyVAL.expr = &ExistsExpr{Subquery: yyDollar[2].subquery}
 		}
-	case 474:
+	case 665:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2484
+//line sql.y:3414
 		{
-			yyVAL.str = IsNullStr
+			yyVAL.isExprOperator = IsNullOp
 		}
-	case 475:
+	case 666:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2488
+//line sql.y:3418
 		{
-			yyVAL.str = IsNotNullStr
+			yyVAL.isExprOperator = IsNotNullOp
 		}
-	case 476:
+	case 667:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2492
+//line sql.y:3422
 		{
-			yyVAL.str = IsTrueStr
+			yyVAL.isExprOperator = IsTrueOp
 		}
-	case 477:
+	case 668:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2496
+//line sql.y:3426
 		{
-			yyVAL.str = IsNotTrueStr
+			yyVAL.isExprOperator = IsNotTrueOp
 		}
-	case 478:
+	case 669:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2500
+//line sql.y:3430
 		{
-			yyVAL.str = IsFalseStr
+			yyVAL.isExprOperator = IsFalseOp
 		}
-	case 479:
+	case 670:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2504
+//line sql.y:3434
 		{
-			yyVAL.str = IsNotFalseStr
+			yyVAL.isExprOperator = IsNotFalseOp
 		}
-	case 480:
+	case 671:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2510
+//line sql.y:3440
 		{
-			yyVAL.str = EqualStr
+			yyVAL.comparisonExprOperator = EqualOp
 		}
-	case 481:
+	case 672:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2514
+//line sql.y:3444
 		{
-			yyVAL.str = LessThanStr
+			yyVAL.comparisonExprOperator = LessThanOp
 		}
-	case 482:
+	case 673:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2518
+//line sql.y:3448
 		{
-			yyVAL.str = GreaterThanStr
+			yyVAL.comparisonExprOperator = GreaterThanOp
 		}
-	case 483:
+	case 674:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2522
+//line sql.y:3452
 		{
-			yyVAL.str = LessEqualStr
+			yyVAL.comparisonExprOperator = LessEqualOp
 		}
-	case 484:
+	case 675:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2526
+//line sql.y:3456
 		{
-			yyVAL.str = GreaterEqualStr
+			yyVAL.comparisonExprOperator = GreaterEqualOp
 		}
-	case 485:
+	case 676:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2530
+//line sql.y:3460
 		{
-			yyVAL.str = NotEqualStr
+			yyVAL.comparisonExprOperator = NotEqualOp
 		}
-	case 486:
+	case 677:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2534
+//line sql.y:3464
 		{
-			yyVAL.str = NullSafeEqualStr
+			yyVAL.comparisonExprOperator = NullSafeEqualOp
 		}
-	case 487:
+	case 678:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2539
+//line sql.y:3469
 		{
 			yyVAL.expr = nil
 		}
-	case 488:
+	case 679:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2543
+//line sql.y:3473
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
-	case 489:
+	case 680:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2549
+//line sql.y:3479
 		{
 			yyVAL.colTuple = yyDollar[1].valTuple
 		}
-	case 490:
+	case 681:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2553
+//line sql.y:3483
 		{
 			yyVAL.colTuple = yyDollar[1].subquery
 		}
-	case 491:
+	case 682:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2557
+//line sql.y:3487
 		{
 			yyVAL.colTuple = ListArg(yyDollar[1].bytes)
 		}
-	case 492:
+	case 683:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2563
+//line sql.y:3493
 		{
 			yyVAL.subquery = &Subquery{yyDollar[2].selStmt}
 		}
-	case 493:
+	case 684:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2569
+//line sql.y:3499
 		{
 			yyVAL.exprs = Exprs{yyDollar[1].expr}
 		}
-	case 494:
+	case 685:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2573
+//line sql.y:3503
 		{
 			yyVAL.exprs = append(yyDollar[1].exprs, yyDollar[3].expr)
 		}
-	case 495:
+	case 686:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2579
+//line sql.y:3509
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
-	case 496:
+	case 687:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2583
+//line sql.y:3513
 		{
 			yyVAL.expr = yyDollar[1].boolVal
 		}
-	case 497:
+	case 688:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2587
+//line sql.y:3517
 		{
 			yyVAL.expr = yyDollar[1].colName
 		}
-	case 498:
+	case 689:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2591
+//line sql.y:3521
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
-	case 499:
+	case 690:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2595
+//line sql.y:3525
 		{
 			yyVAL.expr = yyDollar[1].subquery
 		}
-	case 500:
+	case 691:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2599
+//line sql.y:3529
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: BitAndStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: BitAndOp, Right: yyDollar[3].expr}
 		}
-	case 501:
+	case 692:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2603
+//line sql.y:3533
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: BitOrStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: BitOrOp, Right: yyDollar[3].expr}
 		}
-	case 502:
+	case 693:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2607
+//line sql.y:3537
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: BitXorStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: BitXorOp, Right: yyDollar[3].expr}
 		}
-	case 503:
+	case 694:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2611
+//line sql.y:3541
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: PlusStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: PlusOp, Right: yyDollar[3].expr}
 		}
-	case 504:
+	case 695:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2615
+//line sql.y:3545
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: MinusStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: MinusOp, Right: yyDollar[3].expr}
 		}
-	case 505:
+	case 696:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2619
+//line sql.y:3549
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: MultStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: MultOp, Right: yyDollar[3].expr}
 		}
-	case 506:
+	case 697:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2623
+//line sql.y:3553
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: DivStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: DivOp, Right: yyDollar[3].expr}
 		}
-	case 507:
+	case 698:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2627
+//line sql.y:3557
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: IntDivStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: IntDivOp, Right: yyDollar[3].expr}
 		}
-	case 508:
+	case 699:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2631
+//line sql.y:3561
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ModStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ModOp, Right: yyDollar[3].expr}
 		}
-	case 509:
+	case 700:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2635
+//line sql.y:3565
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ModStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ModOp, Right: yyDollar[3].expr}
 		}
-	case 510:
+	case 701:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2639
+//line sql.y:3569
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ShiftLeftStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ShiftLeftOp, Right: yyDollar[3].expr}
 		}
-	case 511:
+	case 702:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2643
+//line sql.y:3573
 		{
-			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ShiftRightStr, Right: yyDollar[3].expr}
+			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].expr, Operator: ShiftRightOp, Right: yyDollar[3].expr}
 		}
-	case 512:
+	case 703:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2647
+//line sql.y:3577
 		{
 			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].colName, Operator: JSONExtractOp, Right: yyDollar[3].expr}
 		}
-	case 513:
+	case 704:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2651
+//line sql.y:3581
 		{
 			yyVAL.expr = &BinaryExpr{Left: yyDollar[1].colName, Operator: JSONUnquoteExtractOp, Right: yyDollar[3].expr}
 		}
-	case 514:
+	case 705:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2655
+//line sql.y:3585
 		{
 			yyVAL.expr = &CollateExpr{Expr: yyDollar[1].expr, Charset: yyDollar[3].str}
 		}
-	case 515:
+	case 706:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2659
+//line sql.y:3589
 		{
-			yyVAL.expr = &UnaryExpr{Operator: BinaryStr, Expr: yyDollar[2].expr}
+			yyVAL.expr = &UnaryExpr{Operator: BinaryOp, Expr: yyDollar[2].expr}
 		}
-	case 516:
+	case 707:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2663
+//line sql.y:3593
 		{
-			yyVAL.expr = &UnaryExpr{Operator: UBinaryStr, Expr: yyDollar[2].expr}
+			yyVAL.expr = &UnaryExpr{Operator: UBinaryOp, Expr: yyDollar[2].expr}
 		}
-	case 517:
+	case 708:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2667
+//line sql.y:3597
 		{
-			yyVAL.expr = &UnaryExpr{Operator: Utf8Str, Expr: yyDollar[2].expr}
+			yyVAL.expr = &UnaryExpr{Operator: Utf8Op, Expr: yyDollar[2].expr}
 		}
-	case 518:
+	case 709:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2671
+//line sql.y:3601
 		{
-			yyVAL.expr = &UnaryExpr{Operator: Utf8mb4Str, Expr: yyDollar[2].expr}
+			yyVAL.expr = &UnaryExpr{Operator: Utf8mb4Op, Expr: yyDollar[2].expr}
 		}
-	case 519:
+	case 710:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2675
+//line sql.y:3605
 		{
-			yyVAL.expr = &UnaryExpr{Operator: Latin1Str, Expr: yyDollar[2].expr}
+			yyVAL.expr = &UnaryExpr{Operator: Latin1Op, Expr: yyDollar[2].expr}
 		}
-	case 520:
+	case 711:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2679
+//line sql.y:3609
 		{
 			if num, ok := yyDollar[2].expr.(*Literal); ok && num.Type == IntVal {
 				yyVAL.expr = num
 			} else {
-				yyVAL.expr = &UnaryExpr{Operator: UPlusStr, Expr: yyDollar[2].expr}
+				yyVAL.expr = &UnaryExpr{Operator: UPlusOp, Expr: yyDollar[2].expr}
 			}
 		}
-	case 521:
+	case 712:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2687
+//line sql.y:3617
 		{
 			if num, ok := yyDollar[2].expr.(*Literal); ok && num.Type == IntVal {
 				// Handle double negative
@@ -6790,24 +9537,24 @@ yydefault:
 					yyVAL.expr = NewIntLiteral(append([]byte("-"), num.Val...))
 				}
 			} else {
-				yyVAL.expr = &UnaryExpr{Operator: UMinusStr, Expr: yyDollar[2].expr}
+				yyVAL.expr = &UnaryExpr{Operator: UMinusOp, Expr: yyDollar[2].expr}
 			}
 		}
-	case 522:
+	case 713:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2701
+//line sql.y:3631
 		{
-			yyVAL.expr = &UnaryExpr{Operator: TildaStr, Expr: yyDollar[2].expr}
+			yyVAL.expr = &UnaryExpr{Operator: TildaOp, Expr: yyDollar[2].expr}
 		}
-	case 523:
+	case 714:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2705
+//line sql.y:3635
 		{
-			yyVAL.expr = &UnaryExpr{Operator: BangStr, Expr: yyDollar[2].expr}
+			yyVAL.expr = &UnaryExpr{Operator: BangOp, Expr: yyDollar[2].expr}
 		}
-	case 524:
+	case 715:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2709
+//line sql.y:3639
 		{
 			// This rule prevents the usage of INTERVAL
 			// as a function. If support is needed for that,
@@ -6815,497 +9562,503 @@ yydefault:
 			// will be non-trivial because of grammar conflicts.
 			yyVAL.expr = &IntervalExpr{Expr: yyDollar[2].expr, Unit: yyDollar[3].colIdent.String()}
 		}
-	case 529:
+	case 720:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2727
+//line sql.y:3657
 		{
 			yyVAL.expr = &FuncExpr{Name: yyDollar[1].colIdent, Exprs: yyDollar[3].selectExprs}
 		}
-	case 530:
+	case 721:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2731
+//line sql.y:3661
 		{
 			yyVAL.expr = &FuncExpr{Name: yyDollar[1].colIdent, Distinct: true, Exprs: yyDollar[4].selectExprs}
 		}
-	case 531:
+	case 722:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2735
+//line sql.y:3665
 		{
 			yyVAL.expr = &FuncExpr{Name: yyDollar[1].colIdent, Distinct: true, Exprs: yyDollar[4].selectExprs}
 		}
-	case 532:
+	case 723:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:2739
+//line sql.y:3669
 		{
 			yyVAL.expr = &FuncExpr{Qualifier: yyDollar[1].tableIdent, Name: yyDollar[3].colIdent, Exprs: yyDollar[5].selectExprs}
 		}
-	case 533:
+	case 724:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2749
+//line sql.y:3679
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("left"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 534:
+	case 725:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2753
+//line sql.y:3683
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("right"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 535:
+	case 726:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:2757
+//line sql.y:3687
 		{
 			yyVAL.expr = &ConvertExpr{Expr: yyDollar[3].expr, Type: yyDollar[5].convertType}
 		}
-	case 536:
+	case 727:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:2761
+//line sql.y:3691
 		{
 			yyVAL.expr = &ConvertExpr{Expr: yyDollar[3].expr, Type: yyDollar[5].convertType}
 		}
-	case 537:
+	case 728:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line sql.y:2765
+//line sql.y:3695
 		{
 			yyVAL.expr = &ConvertUsingExpr{Expr: yyDollar[3].expr, Type: yyDollar[5].str}
 		}
-	case 538:
+	case 729:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:2769
+//line sql.y:3699
 		{
 			yyVAL.expr = &SubstrExpr{Name: yyDollar[3].colName, From: yyDollar[5].expr, To: yyDollar[7].expr}
 		}
-	case 539:
+	case 730:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:2773
+//line sql.y:3703
 		{
 			yyVAL.expr = &SubstrExpr{Name: yyDollar[3].colName, From: yyDollar[5].expr, To: yyDollar[7].expr}
 		}
-	case 540:
+	case 731:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:2777
+//line sql.y:3707
 		{
 			yyVAL.expr = &SubstrExpr{StrVal: NewStrLiteral(yyDollar[3].bytes), From: yyDollar[5].expr, To: yyDollar[7].expr}
 		}
-	case 541:
+	case 732:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:2781
+//line sql.y:3711
 		{
 			yyVAL.expr = &SubstrExpr{StrVal: NewStrLiteral(yyDollar[3].bytes), From: yyDollar[5].expr, To: yyDollar[7].expr}
 		}
-	case 542:
+	case 733:
 		yyDollar = yyS[yypt-9 : yypt+1]
-//line sql.y:2785
+//line sql.y:3715
 		{
-			yyVAL.expr = &MatchExpr{Columns: yyDollar[3].selectExprs, Expr: yyDollar[7].expr, Option: yyDollar[8].str}
+			yyVAL.expr = &MatchExpr{Columns: yyDollar[3].selectExprs, Expr: yyDollar[7].expr, Option: yyDollar[8].matchExprOption}
 		}
-	case 543:
+	case 734:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:2789
+//line sql.y:3719
 		{
-			yyVAL.expr = &GroupConcatExpr{Distinct: yyDollar[3].str, Exprs: yyDollar[4].selectExprs, OrderBy: yyDollar[5].orderBy, Separator: yyDollar[6].str, Limit: yyDollar[7].limit}
+			yyVAL.expr = &GroupConcatExpr{Distinct: yyDollar[3].boolean, Exprs: yyDollar[4].selectExprs, OrderBy: yyDollar[5].orderBy, Separator: yyDollar[6].str, Limit: yyDollar[7].limit}
 		}
-	case 544:
+	case 735:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:2793
+//line sql.y:3723
 		{
 			yyVAL.expr = &CaseExpr{Expr: yyDollar[2].expr, Whens: yyDollar[3].whens, Else: yyDollar[4].expr}
 		}
-	case 545:
+	case 736:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2797
+//line sql.y:3727
 		{
 			yyVAL.expr = &ValuesFuncExpr{Name: yyDollar[3].colName}
 		}
-	case 546:
+	case 737:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2807
+//line sql.y:3737
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("current_timestamp")}
 		}
-	case 547:
+	case 738:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2811
+//line sql.y:3741
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("utc_timestamp")}
 		}
-	case 548:
+	case 739:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2815
+//line sql.y:3745
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("utc_time")}
 		}
-	case 549:
+	case 740:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2820
+//line sql.y:3750
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("utc_date")}
 		}
-	case 550:
+	case 741:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2825
+//line sql.y:3755
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("localtime")}
 		}
-	case 551:
+	case 742:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2830
+//line sql.y:3760
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("localtimestamp")}
 		}
-	case 552:
+	case 743:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2836
+//line sql.y:3766
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("current_date")}
 		}
-	case 553:
+	case 744:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2841
+//line sql.y:3771
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("current_time")}
 		}
-	case 554:
+	case 745:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2846
+//line sql.y:3776
 		{
 			yyVAL.expr = &CurTimeFuncExpr{Name: NewColIdent("current_timestamp"), Fsp: yyDollar[2].expr}
 		}
-	case 555:
+	case 746:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2850
+//line sql.y:3780
 		{
 			yyVAL.expr = &CurTimeFuncExpr{Name: NewColIdent("utc_timestamp"), Fsp: yyDollar[2].expr}
 		}
-	case 556:
+	case 747:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2854
+//line sql.y:3784
 		{
 			yyVAL.expr = &CurTimeFuncExpr{Name: NewColIdent("utc_time"), Fsp: yyDollar[2].expr}
 		}
-	case 557:
+	case 748:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2859
+//line sql.y:3789
 		{
 			yyVAL.expr = &CurTimeFuncExpr{Name: NewColIdent("localtime"), Fsp: yyDollar[2].expr}
 		}
-	case 558:
+	case 749:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2864
+//line sql.y:3794
 		{
 			yyVAL.expr = &CurTimeFuncExpr{Name: NewColIdent("localtimestamp"), Fsp: yyDollar[2].expr}
 		}
-	case 559:
+	case 750:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2869
+//line sql.y:3799
 		{
 			yyVAL.expr = &CurTimeFuncExpr{Name: NewColIdent("current_time"), Fsp: yyDollar[2].expr}
 		}
-	case 560:
+	case 751:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:2873
+//line sql.y:3803
 		{
 			yyVAL.expr = &TimestampFuncExpr{Name: string("timestampadd"), Unit: yyDollar[3].colIdent.String(), Expr1: yyDollar[5].expr, Expr2: yyDollar[7].expr}
 		}
-	case 561:
+	case 752:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line sql.y:2877
+//line sql.y:3807
 		{
 			yyVAL.expr = &TimestampFuncExpr{Name: string("timestampdiff"), Unit: yyDollar[3].colIdent.String(), Expr1: yyDollar[5].expr, Expr2: yyDollar[7].expr}
 		}
-	case 564:
+	case 755:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2887
+//line sql.y:3817
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
-	case 565:
+	case 756:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2897
+//line sql.y:3827
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("if"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 566:
+	case 757:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2901
+//line sql.y:3831
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("database"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 567:
+	case 758:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2905
+//line sql.y:3835
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("schema"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 568:
+	case 759:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2909
+//line sql.y:3839
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("mod"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 569:
+	case 760:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2913
+//line sql.y:3843
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("replace"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 570:
+	case 761:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2917
+//line sql.y:3847
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("substr"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 571:
+	case 762:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2921
+//line sql.y:3851
 		{
 			yyVAL.expr = &FuncExpr{Name: NewColIdent("substr"), Exprs: yyDollar[3].selectExprs}
 		}
-	case 572:
+	case 763:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:2927
+//line sql.y:3857
 		{
-			yyVAL.str = ""
+			yyVAL.matchExprOption = NoOption
 		}
-	case 573:
+	case 764:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2931
+//line sql.y:3861
 		{
-			yyVAL.str = BooleanModeStr
+			yyVAL.matchExprOption = BooleanModeOpt
 		}
-	case 574:
+	case 765:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:2935
+//line sql.y:3865
 		{
-			yyVAL.str = NaturalLanguageModeStr
+			yyVAL.matchExprOption = NaturalLanguageModeOpt
 		}
-	case 575:
+	case 766:
 		yyDollar = yyS[yypt-7 : yypt+1]
-//line sql.y:2939
+//line sql.y:3869
 		{
-			yyVAL.str = NaturalLanguageModeWithQueryExpansionStr
+			yyVAL.matchExprOption = NaturalLanguageModeWithQueryExpansionOpt
 		}
-	case 576:
+	case 767:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2943
+//line sql.y:3873
 		{
-			yyVAL.str = QueryExpansionStr
+			yyVAL.matchExprOption = QueryExpansionOpt
 		}
-	case 577:
+	case 768:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2949
+//line sql.y:3879
 		{
 			yyVAL.str = string(yyDollar[1].colIdent.String())
 		}
-	case 578:
+	case 769:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2953
+//line sql.y:3883
 		{
 			yyVAL.str = string(yyDollar[1].bytes)
 		}
-	case 579:
+	case 770:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:3887
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 771:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2959
+//line sql.y:3893
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 580:
+	case 772:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2963
+//line sql.y:3897
 		{
-			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal, Charset: yyDollar[3].str, Operator: CharacterSetStr}
+			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal, Charset: yyDollar[3].str, Operator: CharacterSetOp}
 		}
-	case 581:
+	case 773:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:2967
+//line sql.y:3901
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal, Charset: string(yyDollar[3].colIdent.String())}
 		}
-	case 582:
+	case 774:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2971
+//line sql.y:3905
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes)}
 		}
-	case 583:
+	case 775:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2975
+//line sql.y:3909
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 584:
+	case 776:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2979
+//line sql.y:3913
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes)}
 			yyVAL.convertType.Length = yyDollar[2].LengthScaleOption.Length
 			yyVAL.convertType.Scale = yyDollar[2].LengthScaleOption.Scale
 		}
-	case 585:
+	case 777:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2985
+//line sql.y:3919
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes)}
 		}
-	case 586:
+	case 778:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2989
+//line sql.y:3923
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 587:
+	case 779:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:2993
+//line sql.y:3927
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes)}
 		}
-	case 588:
+	case 780:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:2997
+//line sql.y:3931
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes)}
 		}
-	case 589:
+	case 781:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3001
+//line sql.y:3935
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes), Length: yyDollar[2].literal}
 		}
-	case 590:
+	case 782:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3005
+//line sql.y:3939
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes)}
 		}
-	case 591:
+	case 783:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3009
+//line sql.y:3943
 		{
 			yyVAL.convertType = &ConvertType{Type: string(yyDollar[1].bytes)}
 		}
-	case 592:
+	case 784:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3014
+//line sql.y:3948
 		{
 			yyVAL.expr = nil
 		}
-	case 593:
+	case 785:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3018
+//line sql.y:3952
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
-	case 594:
+	case 786:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3023
+//line sql.y:3957
 		{
 			yyVAL.str = string("")
 		}
-	case 595:
+	case 787:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3027
+//line sql.y:3961
 		{
 			yyVAL.str = " separator '" + string(yyDollar[2].bytes) + "'"
 		}
-	case 596:
+	case 788:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3033
+//line sql.y:3967
 		{
 			yyVAL.whens = []*When{yyDollar[1].when}
 		}
-	case 597:
+	case 789:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3037
+//line sql.y:3971
 		{
 			yyVAL.whens = append(yyDollar[1].whens, yyDollar[2].when)
 		}
-	case 598:
+	case 790:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:3043
+//line sql.y:3977
 		{
 			yyVAL.when = &When{Cond: yyDollar[2].expr, Val: yyDollar[4].expr}
 		}
-	case 599:
+	case 791:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3048
+//line sql.y:3982
 		{
 			yyVAL.expr = nil
 		}
-	case 600:
+	case 792:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3052
+//line sql.y:3986
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
-	case 601:
+	case 793:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3058
+//line sql.y:3992
 		{
 			yyVAL.colName = &ColName{Name: yyDollar[1].colIdent}
 		}
-	case 602:
+	case 794:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3062
+//line sql.y:3996
 		{
 			yyVAL.colName = &ColName{Qualifier: TableName{Name: yyDollar[1].tableIdent}, Name: yyDollar[3].colIdent}
 		}
-	case 603:
+	case 795:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:3066
+//line sql.y:4000
 		{
 			yyVAL.colName = &ColName{Qualifier: TableName{Qualifier: yyDollar[1].tableIdent, Name: yyDollar[3].tableIdent}, Name: yyDollar[5].colIdent}
 		}
-	case 604:
+	case 796:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3072
+//line sql.y:4006
 		{
 			yyVAL.expr = NewStrLiteral(yyDollar[1].bytes)
 		}
-	case 605:
+	case 797:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3076
+//line sql.y:4010
 		{
 			yyVAL.expr = NewHexLiteral(yyDollar[1].bytes)
 		}
-	case 606:
+	case 798:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3080
+//line sql.y:4014
 		{
 			yyVAL.expr = NewBitLiteral(yyDollar[1].bytes)
 		}
-	case 607:
+	case 799:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3084
+//line sql.y:4018
 		{
 			yyVAL.expr = NewIntLiteral(yyDollar[1].bytes)
 		}
-	case 608:
+	case 800:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3088
+//line sql.y:4022
 		{
 			yyVAL.expr = NewFloatLiteral(yyDollar[1].bytes)
 		}
-	case 609:
+	case 801:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3092
+//line sql.y:4026
 		{
 			yyVAL.expr = NewHexNumLiteral(yyDollar[1].bytes)
 		}
-	case 610:
+	case 802:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3096
+//line sql.y:4030
 		{
 			yyVAL.expr = NewArgument(yyDollar[1].bytes)
 		}
-	case 611:
+	case 803:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3100
+//line sql.y:4034
 		{
 			yyVAL.expr = &NullVal{}
 		}
-	case 612:
+	case 804:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3106
+//line sql.y:4040
 		{
 			// TODO(sougou): Deprecate this construct.
 			if yyDollar[1].colIdent.Lowered() != "value" {
@@ -7314,225 +10067,597 @@ yydefault:
 			}
 			yyVAL.expr = NewIntLiteral([]byte("1"))
 		}
-	case 613:
+	case 805:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3115
+//line sql.y:4049
 		{
 			yyVAL.expr = NewIntLiteral(yyDollar[1].bytes)
 		}
-	case 614:
+	case 806:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3119
+//line sql.y:4053
 		{
 			yyVAL.expr = NewArgument(yyDollar[1].bytes)
 		}
-	case 615:
+	case 807:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3124
+//line sql.y:4058
 		{
 			yyVAL.exprs = nil
 		}
-	case 616:
+	case 808:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3128
+//line sql.y:4062
 		{
 			yyVAL.exprs = yyDollar[3].exprs
 		}
-	case 617:
+	case 809:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3133
+//line sql.y:4067
 		{
 			yyVAL.expr = nil
 		}
-	case 618:
+	case 810:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3137
+//line sql.y:4071
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
-	case 619:
+	case 811:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3142
+//line sql.y:4076
 		{
 			yyVAL.orderBy = nil
 		}
-	case 620:
+	case 812:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3146
+//line sql.y:4080
 		{
 			yyVAL.orderBy = yyDollar[3].orderBy
 		}
-	case 621:
+	case 813:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3152
+//line sql.y:4086
 		{
 			yyVAL.orderBy = OrderBy{yyDollar[1].order}
 		}
-	case 622:
+	case 814:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3156
+//line sql.y:4090
 		{
 			yyVAL.orderBy = append(yyDollar[1].orderBy, yyDollar[3].order)
 		}
-	case 623:
+	case 815:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3162
+//line sql.y:4096
 		{
-			yyVAL.order = &Order{Expr: yyDollar[1].expr, Direction: yyDollar[2].str}
+			yyVAL.order = &Order{Expr: yyDollar[1].expr, Direction: yyDollar[2].orderDirection}
 		}
-	case 624:
+	case 816:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3167
+//line sql.y:4101
 		{
-			yyVAL.str = AscScr
+			yyVAL.orderDirection = AscOrder
 		}
-	case 625:
+	case 817:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3171
+//line sql.y:4105
 		{
-			yyVAL.str = AscScr
+			yyVAL.orderDirection = AscOrder
 		}
-	case 626:
+	case 818:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3175
+//line sql.y:4109
 		{
-			yyVAL.str = DescScr
+			yyVAL.orderDirection = DescOrder
 		}
-	case 627:
+	case 819:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3180
+//line sql.y:4114
 		{
 			yyVAL.limit = nil
 		}
-	case 628:
+	case 820:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3184
+//line sql.y:4118
 		{
 			yyVAL.limit = &Limit{Rowcount: yyDollar[2].expr}
 		}
-	case 629:
+	case 821:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:3188
+//line sql.y:4122
 		{
 			yyVAL.limit = &Limit{Offset: yyDollar[2].expr, Rowcount: yyDollar[4].expr}
 		}
-	case 630:
+	case 822:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:3192
+//line sql.y:4126
 		{
 			yyVAL.limit = &Limit{Offset: yyDollar[4].expr, Rowcount: yyDollar[2].expr}
 		}
-	case 631:
+	case 823:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3197
+//line sql.y:4131
+		{
+			yyVAL.alterOptions = nil
+		}
+	case 824:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4135
+		{
+			yyVAL.alterOptions = []AlterOption{yyDollar[1].alterOption, yyDollar[2].alterOption}
+		}
+	case 825:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4139
+		{
+			yyVAL.alterOptions = []AlterOption{yyDollar[1].alterOption, yyDollar[2].alterOption}
+		}
+	case 826:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4143
+		{
+			yyVAL.alterOptions = []AlterOption{yyDollar[1].alterOption}
+		}
+	case 827:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4147
+		{
+			yyVAL.alterOptions = []AlterOption{yyDollar[1].alterOption}
+		}
+	case 828:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4154
+		{
+			yyVAL.alterOption = &LockOption{Type: DefaultType}
+		}
+	case 829:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4158
+		{
+			yyVAL.alterOption = &LockOption{Type: NoneType}
+		}
+	case 830:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4162
+		{
+			yyVAL.alterOption = &LockOption{Type: SharedType}
+		}
+	case 831:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4166
+		{
+			yyVAL.alterOption = &LockOption{Type: ExclusiveType}
+		}
+	case 832:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4172
+		{
+			yyVAL.alterOption = AlgorithmValue(yyDollar[3].bytes)
+		}
+	case 833:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4176
+		{
+			yyVAL.alterOption = AlgorithmValue(yyDollar[3].bytes)
+		}
+	case 834:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4180
+		{
+			yyVAL.alterOption = AlgorithmValue(yyDollar[3].bytes)
+		}
+	case 835:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4185
 		{
 			yyVAL.str = ""
 		}
-	case 632:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3201
+	case 836:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4189
 		{
-			yyVAL.str = ForUpdateStr
+			yyVAL.str = string(yyDollar[3].bytes)
 		}
-	case 633:
+	case 837:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4193
+		{
+			yyVAL.str = string(yyDollar[3].bytes)
+		}
+	case 838:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4197
+		{
+			yyVAL.str = string(yyDollar[3].bytes)
+		}
+	case 839:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4202
+		{
+			yyVAL.str = ""
+		}
+	case 840:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4206
+		{
+			yyVAL.str = yyDollar[3].str
+		}
+	case 841:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4212
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 842:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4216
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 843:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4221
+		{
+			yyVAL.str = ""
+		}
+	case 844:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:3205
+//line sql.y:4225
 		{
-			yyVAL.str = ShareModeStr
+			yyVAL.str = yyDollar[2].str
 		}
-	case 634:
+	case 845:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4230
+		{
+			yyVAL.str = "cascaded"
+		}
+	case 846:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4234
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 847:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4238
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 848:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4243
+		{
+			yyVAL.str = ""
+		}
+	case 849:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4247
+		{
+			yyVAL.str = yyDollar[3].str
+		}
+	case 850:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4253
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 851:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4257
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 852:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3218
+//line sql.y:4261
+		{
+			yyVAL.str = "'" + string(yyDollar[1].bytes) + "'@" + string(yyDollar[2].bytes)
+		}
+	case 853:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4265
+		{
+			yyVAL.str = string(yyDollar[1].bytes)
+		}
+	case 854:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4270
+		{
+			yyVAL.lock = NoLock
+		}
+	case 855:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4274
+		{
+			yyVAL.lock = ForUpdateLock
+		}
+	case 856:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:4278
+		{
+			yyVAL.lock = ShareModeLock
+		}
+	case 857:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4283
+		{
+			yyVAL.selectInto = nil
+		}
+	case 858:
+		yyDollar = yyS[yypt-9 : yypt+1]
+//line sql.y:4287
+		{
+			yyVAL.selectInto = &SelectInto{Type: IntoOutfileS3, FileName: string(yyDollar[4].bytes), Charset: yyDollar[5].str, FormatOption: yyDollar[6].str, ExportOption: yyDollar[7].str, Manifest: yyDollar[8].str, Overwrite: yyDollar[9].str}
+		}
+	case 859:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4291
+		{
+			yyVAL.selectInto = &SelectInto{Type: IntoDumpfile, FileName: string(yyDollar[3].bytes), Charset: "", FormatOption: "", ExportOption: "", Manifest: "", Overwrite: ""}
+		}
+	case 860:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:4295
+		{
+			yyVAL.selectInto = &SelectInto{Type: IntoOutfile, FileName: string(yyDollar[3].bytes), Charset: yyDollar[4].str, FormatOption: "", ExportOption: yyDollar[5].str, Manifest: "", Overwrite: ""}
+		}
+	case 861:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4300
+		{
+			yyVAL.str = ""
+		}
+	case 862:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4304
+		{
+			yyVAL.str = " format csv" + yyDollar[3].str
+		}
+	case 863:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4308
+		{
+			yyVAL.str = " format text" + yyDollar[3].str
+		}
+	case 864:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4313
+		{
+			yyVAL.str = ""
+		}
+	case 865:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4317
+		{
+			yyVAL.str = " header"
+		}
+	case 866:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4322
+		{
+			yyVAL.str = ""
+		}
+	case 867:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4326
+		{
+			yyVAL.str = " manifest on"
+		}
+	case 868:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4330
+		{
+			yyVAL.str = " manifest off"
+		}
+	case 869:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4335
+		{
+			yyVAL.str = ""
+		}
+	case 870:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4339
+		{
+			yyVAL.str = " overwrite on"
+		}
+	case 871:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4343
+		{
+			yyVAL.str = " overwrite off"
+		}
+	case 872:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4349
+		{
+			yyVAL.str = yyDollar[1].str + yyDollar[2].str
+		}
+	case 873:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4354
+		{
+			yyVAL.str = ""
+		}
+	case 874:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4358
+		{
+			yyVAL.str = " lines" + yyDollar[2].str + yyDollar[3].str
+		}
+	case 875:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4363
+		{
+			yyVAL.str = ""
+		}
+	case 876:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4367
+		{
+			yyVAL.str = " starting by '" + string(yyDollar[3].bytes) + "'"
+		}
+	case 877:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4372
+		{
+			yyVAL.str = ""
+		}
+	case 878:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4376
+		{
+			yyVAL.str = " terminated by '" + string(yyDollar[3].bytes) + "'"
+		}
+	case 879:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4381
+		{
+			yyVAL.str = ""
+		}
+	case 880:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:4385
+		{
+			yyVAL.str = " " + yyDollar[1].str + yyDollar[2].str + yyDollar[3].str + yyDollar[4].str
+		}
+	case 881:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4390
+		{
+			yyVAL.str = ""
+		}
+	case 882:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line sql.y:4394
+		{
+			yyVAL.str = " escaped by '" + string(yyDollar[3].bytes) + "'"
+		}
+	case 883:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4399
+		{
+			yyVAL.str = ""
+		}
+	case 884:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:4403
+		{
+			yyVAL.str = yyDollar[1].str + " enclosed by '" + string(yyDollar[4].bytes) + "'"
+		}
+	case 885:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4408
+		{
+			yyVAL.str = ""
+		}
+	case 886:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4412
+		{
+			yyVAL.str = " optionally"
+		}
+	case 887:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4425
 		{
 			yyVAL.ins = &Insert{Rows: yyDollar[2].values}
 		}
-	case 635:
+	case 888:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3222
+//line sql.y:4429
 		{
 			yyVAL.ins = &Insert{Rows: yyDollar[1].selStmt}
 		}
-	case 636:
+	case 889:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:3226
+//line sql.y:4433
 		{
 			yyVAL.ins = &Insert{Columns: yyDollar[2].columns, Rows: yyDollar[5].values}
 		}
-	case 637:
+	case 890:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line sql.y:3230
+//line sql.y:4437
+		{
+			yyVAL.ins = &Insert{Rows: yyDollar[4].values}
+		}
+	case 891:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line sql.y:4441
 		{
 			yyVAL.ins = &Insert{Columns: yyDollar[2].columns, Rows: yyDollar[4].selStmt}
 		}
-	case 638:
+	case 892:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3236
+//line sql.y:4447
 		{
 			yyVAL.columns = Columns{yyDollar[1].colIdent}
 		}
-	case 639:
+	case 893:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3240
+//line sql.y:4451
 		{
 			yyVAL.columns = Columns{yyDollar[3].colIdent}
 		}
-	case 640:
+	case 894:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3244
+//line sql.y:4455
 		{
 			yyVAL.columns = append(yyVAL.columns, yyDollar[3].colIdent)
 		}
-	case 641:
+	case 895:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:3248
+//line sql.y:4459
 		{
 			yyVAL.columns = append(yyVAL.columns, yyDollar[5].colIdent)
 		}
-	case 642:
+	case 896:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3253
+//line sql.y:4464
 		{
 			yyVAL.updateExprs = nil
 		}
-	case 643:
+	case 897:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line sql.y:3257
+//line sql.y:4468
 		{
 			yyVAL.updateExprs = yyDollar[5].updateExprs
 		}
-	case 644:
+	case 898:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3263
+//line sql.y:4474
 		{
 			yyVAL.values = Values{yyDollar[1].valTuple}
 		}
-	case 645:
+	case 899:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3267
+//line sql.y:4478
 		{
 			yyVAL.values = append(yyDollar[1].values, yyDollar[3].valTuple)
 		}
-	case 646:
+	case 900:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3273
+//line sql.y:4484
 		{
 			yyVAL.valTuple = yyDollar[1].valTuple
 		}
-	case 647:
+	case 901:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3277
+//line sql.y:4488
 		{
 			yyVAL.valTuple = ValTuple{}
 		}
-	case 648:
+	case 902:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3283
+//line sql.y:4494
 		{
 			yyVAL.valTuple = ValTuple(yyDollar[2].exprs)
 		}
-	case 649:
+	case 903:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3289
+//line sql.y:4500
 		{
 			if len(yyDollar[1].valTuple) == 1 {
 				yyVAL.expr = yyDollar[1].valTuple[0]
@@ -7540,319 +10665,265 @@ yydefault:
 				yyVAL.expr = yyDollar[1].valTuple
 			}
 		}
-	case 650:
+	case 904:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3299
+//line sql.y:4510
 		{
 			yyVAL.updateExprs = UpdateExprs{yyDollar[1].updateExpr}
 		}
-	case 651:
+	case 905:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3303
+//line sql.y:4514
 		{
 			yyVAL.updateExprs = append(yyDollar[1].updateExprs, yyDollar[3].updateExpr)
 		}
-	case 652:
+	case 906:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3309
+//line sql.y:4520
 		{
 			yyVAL.updateExpr = &UpdateExpr{Name: yyDollar[1].colName, Expr: yyDollar[3].expr}
 		}
-	case 653:
+	case 907:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3315
+//line sql.y:4526
 		{
 			yyVAL.setExprs = SetExprs{yyDollar[1].setExpr}
 		}
-	case 654:
+	case 908:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3319
+//line sql.y:4530
 		{
 			yyVAL.setExprs = append(yyDollar[1].setExprs, yyDollar[3].setExpr)
 		}
-	case 655:
+	case 909:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3325
+//line sql.y:4536
 		{
-			yyVAL.setExpr = &SetExpr{Name: yyDollar[1].colIdent, Expr: NewStrLiteral([]byte("on"))}
+			yyVAL.setExpr = &SetExpr{Name: yyDollar[1].colIdent, Scope: ImplicitScope, Expr: NewStrLiteral([]byte("on"))}
 		}
-	case 656:
+	case 910:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3329
+//line sql.y:4540
 		{
-			yyVAL.setExpr = &SetExpr{Name: yyDollar[1].colIdent, Expr: NewStrLiteral([]byte("off"))}
+			yyVAL.setExpr = &SetExpr{Name: yyDollar[1].colIdent, Scope: ImplicitScope, Expr: NewStrLiteral([]byte("off"))}
 		}
-	case 657:
+	case 911:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3333
+//line sql.y:4544
 		{
-			yyVAL.setExpr = &SetExpr{Name: yyDollar[1].colIdent, Expr: yyDollar[3].expr}
+			yyVAL.setExpr = &SetExpr{Name: yyDollar[1].colIdent, Scope: ImplicitScope, Expr: yyDollar[3].expr}
 		}
-	case 658:
+	case 912:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3337
+//line sql.y:4548
 		{
-			yyVAL.setExpr = &SetExpr{Name: NewColIdent(string(yyDollar[1].bytes)), Expr: yyDollar[2].expr}
+			yyVAL.setExpr = &SetExpr{Name: NewColIdent(string(yyDollar[1].bytes)), Scope: ImplicitScope, Expr: yyDollar[2].expr}
 		}
-	case 659:
+	case 913:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3341
+//line sql.y:4552
 		{
-			yyDollar[2].setExpr.Scope = yyDollar[1].str
+			yyDollar[2].setExpr.Scope = yyDollar[1].scope
 			yyVAL.setExpr = yyDollar[2].setExpr
 		}
-	case 661:
+	case 915:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3349
+//line sql.y:4560
 		{
 			yyVAL.bytes = []byte("charset")
 		}
-	case 663:
+	case 918:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3356
+//line sql.y:4570
 		{
 			yyVAL.expr = NewStrLiteral([]byte(yyDollar[1].colIdent.String()))
 		}
-	case 664:
+	case 919:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3360
+//line sql.y:4574
 		{
 			yyVAL.expr = NewStrLiteral(yyDollar[1].bytes)
 		}
-	case 665:
+	case 920:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3364
+//line sql.y:4578
 		{
 			yyVAL.expr = &Default{}
 		}
-	case 668:
+	case 923:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3373
+//line sql.y:4587
 		{
 			yyVAL.boolean = false
 		}
-	case 669:
-		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3375
+	case 924:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4589
 		{
 			yyVAL.boolean = true
 		}
-	case 670:
+	case 925:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3378
+//line sql.y:4592
 		{
 			yyVAL.boolean = false
 		}
-	case 671:
+	case 926:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line sql.y:4594
+		{
+			yyVAL.boolean = true
+		}
+	case 927:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line sql.y:4597
+		{
+			yyVAL.boolean = false
+		}
+	case 928:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line sql.y:3380
+//line sql.y:4599
 		{
 			yyVAL.boolean = true
 		}
-	case 672:
+	case 929:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3383
+//line sql.y:4602
 		{
-			yyVAL.str = ""
+			yyVAL.ignore = false
 		}
-	case 673:
+	case 930:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3385
+//line sql.y:4604
 		{
-			yyVAL.str = IgnoreStr
+			yyVAL.ignore = true
 		}
-	case 674:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3389
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 675:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3391
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 676:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3393
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 677:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3395
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 678:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3397
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 679:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3399
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 680:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3401
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 681:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3403
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 682:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3405
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 683:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3407
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 684:
+	case 931:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3410
+//line sql.y:4607
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 685:
+	case 932:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3412
+//line sql.y:4609
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 686:
+	case 933:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3414
+//line sql.y:4611
 		{
 			yyVAL.empty = struct{}{}
 		}
-	case 687:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3418
+	case 934:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line sql.y:4615
 		{
-			yyVAL.empty = struct{}{}
+			yyVAL.statement = &CallProc{Name: yyDollar[2].tableName, Params: yyDollar[4].exprs}
 		}
-	case 688:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3420
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 689:
+	case 935:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3423
+//line sql.y:4620
 		{
-			yyVAL.empty = struct{}{}
+			yyVAL.exprs = nil
 		}
-	case 690:
+	case 936:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3425
+//line sql.y:4624
 		{
-			yyVAL.empty = struct{}{}
+			yyVAL.exprs = yyDollar[1].exprs
 		}
-	case 691:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3427
-		{
-			yyVAL.empty = struct{}{}
-		}
-	case 692:
+	case 937:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3430
+//line sql.y:4629
 		{
-			yyVAL.colIdent = ColIdent{}
+			yyVAL.indexOptions = nil
 		}
-	case 693:
+	case 938:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line sql.y:4631
+		{
+			yyVAL.indexOptions = []*IndexOption{yyDollar[1].indexOption}
+		}
+	case 939:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line sql.y:3432
+//line sql.y:4635
 		{
-			yyVAL.colIdent = yyDollar[2].colIdent
+			yyVAL.indexOption = &IndexOption{Name: string(yyDollar[1].bytes), String: string(yyDollar[2].colIdent.String())}
 		}
-	case 694:
+	case 940:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3436
+//line sql.y:4641
 		{
 			yyVAL.colIdent = yyDollar[1].colIdent
 		}
-	case 695:
+	case 941:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3440
+//line sql.y:4645
 		{
 			yyVAL.colIdent = NewColIdent(string(yyDollar[1].bytes))
 		}
-	case 697:
+	case 943:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3447
+//line sql.y:4652
 		{
 			yyVAL.colIdent = NewColIdent(string(yyDollar[1].bytes))
 		}
-	case 698:
+	case 944:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3453
+//line sql.y:4658
 		{
 			yyVAL.tableIdent = NewTableIdent(string(yyDollar[1].colIdent.String()))
 		}
-	case 699:
+	case 945:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3457
+//line sql.y:4662
 		{
 			yyVAL.tableIdent = NewTableIdent(string(yyDollar[1].bytes))
 		}
-	case 701:
+	case 947:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3464
+//line sql.y:4669
 		{
 			yyVAL.tableIdent = NewTableIdent(string(yyDollar[1].bytes))
 		}
-	case 996:
+	case 1346:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3784
+//line sql.y:5092
 		{
 			if incNesting(yylex) {
 				yylex.Error("max nesting level reached")
 				return 1
 			}
 		}
-	case 997:
+	case 1347:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3793
+//line sql.y:5101
 		{
 			decNesting(yylex)
 		}
-	case 998:
+	case 1348:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3798
+//line sql.y:5106
 		{
 			skipToEnd(yylex)
 		}
-	case 999:
+	case 1349:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line sql.y:3803
+//line sql.y:5111
 		{
 			skipToEnd(yylex)
 		}
-	case 1000:
+	case 1350:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3807
+//line sql.y:5115
 		{
 			skipToEnd(yylex)
 		}
-	case 1001:
+	case 1351:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line sql.y:3811
+//line sql.y:5119
 		{
 			skipToEnd(yylex)
 		}

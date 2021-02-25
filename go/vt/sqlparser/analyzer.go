@@ -57,6 +57,10 @@ const (
 	StmtSRollback
 	StmtRelease
 	StmtVStream
+	StmtLockTables
+	StmtUnlockTables
+	StmtFlush
+	StmtCallProc
 )
 
 //ASTToStatementType returns a StatementType from an AST stmt
@@ -74,13 +78,13 @@ func ASTToStatementType(stmt Statement) StatementType {
 		return StmtSet
 	case *Show:
 		return StmtShow
-	case *DDL, *DBDDL:
+	case DDLStatement, DBDDLStatement, *AlterVschema:
 		return StmtDDL
 	case *Use:
 		return StmtUse
-	case *OtherRead, *OtherAdmin:
+	case *OtherRead, *OtherAdmin, *Load:
 		return StmtOther
-	case *Explain:
+	case Explain:
 		return StmtExplain
 	case *Begin:
 		return StmtBegin
@@ -94,6 +98,14 @@ func ASTToStatementType(stmt Statement) StatementType {
 		return StmtSRollback
 	case *Release:
 		return StmtRelease
+	case *LockTables:
+		return StmtLockTables
+	case *UnlockTables:
+		return StmtUnlockTables
+	case *Flush:
+		return StmtFlush
+	case *CallProc:
+		return StmtCallProc
 	default:
 		return StmtUnknown
 	}
@@ -102,7 +114,17 @@ func ASTToStatementType(stmt Statement) StatementType {
 //CanNormalize takes Statement and returns if the statement can be normalized.
 func CanNormalize(stmt Statement) bool {
 	switch stmt.(type) {
-	case *Select, *Union, *Insert, *Update, *Delete, *Set:
+	case *Select, *Union, *Insert, *Update, *Delete, *Set, *CallProc: // TODO: we could merge this logic into ASTrewriter
+		return true
+	}
+	return false
+}
+
+// CachePlan takes Statement and returns true if the query plan should be cached
+func CachePlan(stmt Statement) bool {
+	switch stmt.(type) {
+	case *Select, *Union, *ParenSelect,
+		*Insert, *Update, *Delete:
 		return true
 	}
 	return false
@@ -151,6 +173,10 @@ func Preview(sql string) StatementType {
 		return StmtDelete
 	case "savepoint":
 		return StmtSavepoint
+	case "lock":
+		return StmtLockTables
+	case "unlock":
+		return StmtUnlockTables
 	}
 	// For the following statements it is not sufficient to rely
 	// on loweredFirstWord. This is because they are not statements
@@ -167,8 +193,10 @@ func Preview(sql string) StatementType {
 		return StmtRollback
 	}
 	switch loweredFirstWord {
-	case "create", "alter", "rename", "drop", "truncate", "flush":
+	case "create", "alter", "rename", "drop", "truncate":
 		return StmtDDL
+	case "flush":
+		return StmtFlush
 	case "set":
 		return StmtSet
 	case "show":
@@ -231,6 +259,14 @@ func (s StatementType) String() string {
 		return "SAVEPOINT_ROLLBACK"
 	case StmtRelease:
 		return "RELEASE"
+	case StmtLockTables:
+		return "LOCK_TABLES"
+	case StmtUnlockTables:
+		return "UNLOCK_TABLES"
+	case StmtFlush:
+		return "FLUSH"
+	case StmtCallProc:
+		return "CALL_PROC"
 	default:
 		return "UNKNOWN"
 	}
@@ -252,15 +288,6 @@ func IsDMLStatement(stmt Statement) bool {
 		return true
 	}
 
-	return false
-}
-
-//IsVschemaDDL returns true if the query is an Vschema alter ddl.
-func IsVschemaDDL(ddl *DDL) bool {
-	switch ddl.Action {
-	case CreateVindexStr, DropVindexStr, AddVschemaTableStr, DropVschemaTableStr, AddColVindexStr, DropColVindexStr, AddSequenceStr, AddAutoIncStr:
-		return true
-	}
 	return false
 }
 
@@ -407,7 +434,7 @@ func NewPlanValue(node Expr) (sqltypes.PlanValue, error) {
 		return sqltypes.PlanValue{}, nil
 	case *UnaryExpr:
 		switch node.Operator {
-		case UBinaryStr, Utf8mb4Str, Utf8Str, Latin1Str: // for some charset introducers, we can just ignore them
+		case UBinaryOp, Utf8mb4Op, Utf8Op, Latin1Op: // for some charset introducers, we can just ignore them
 			return NewPlanValue(node.Expr)
 		}
 	}
